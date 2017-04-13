@@ -38,11 +38,10 @@ Each version with the same major version number is guaranteed to create the same
 ---
 
 ## Copyright
-All parts in the "baack" directory are released under [LGPL](https://www.gnu.org/licenses/lgpl-3.0.html) license. In short: You can redistribute, use and modify the code as long as you credit the author in all prjects the code or results from the code (e.g. MonteCarlo data) is used.
-The other directorys in this project are released under different licenses, see "Original Readme" further down or the specific license in the respective directory.
+All parts in the "baack" directory are released under [LGPL](https://www.gnu.org/licenses/lgpl-3.0.html) license. In short: You can redistribute, use and modify the code as long as you credit the author in all projects the code or results from the code (e.g. MonteCarlo data) are used.
 
 - - -
 ## Contact
-If any issuse or problems arise fill an github issue. Otherwise you can contact my via GitHUB private message or under dominik.baack@udo.edu
+If any issuse or problems arise fill an github issue. Otherwise you can contact the authoer email written in the corsika manual.
 
 
