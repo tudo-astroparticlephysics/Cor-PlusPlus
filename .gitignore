@@ -15,7 +15,6 @@
 
 # Fortran module files
 *.mod
-*.smod
 
 # Compiled Static libraries
 *.lai
@@ -27,3 +26,24 @@
 *.exe
 *.out
 *.app
+
+#VC++
+*.tlog
+*.pdb
+*.idb
+*.suo
+*.db
+*.log
+*.sdf
+
+#Intel
+*.ilk
+*.iobj
+*.ipdb
+*.opendb
+*.xml
+*.nupkg
+*.targets
+*.lastcodeanalysissucceeded
+*.config
+*.props
