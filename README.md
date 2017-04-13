@@ -6,20 +6,9 @@ This project containes multiple modules for the [CORSIKA](https://www.ikp.kit.ed
 
 ## Content
 1. [Requirements](#requiremnts)
-2. [Modules](#modules)
-  * [DynStack](#dynstack-module)
-  * [RemoteControl](#remotecontrol-module)
-  * [Basic](#basic-module)
-3. [Usage](#usage)
-  * [DynStack](#dynstack-usage)
-  * [RemoteControl](#remotecontrol-usage)
-  * [Basic](#basic-usage)
-4. [Steering-Card](#steering-card)
-5. [Installation](#installation)
-6. [Tests](#tests)
-7. [Showerview](#showerview)
-8. [Copyright](#copyright)
-9. [Contact](#contact)
+2. [More Informaitons](#more-informations)
+3. [Copyright](#copyright)
+4. [Contact](#contact)
 
 - - - 
 ## Requirements
