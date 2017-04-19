@@ -14,6 +14,7 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-4.9
+            - automake
       env: COMPILER=g++-4.9
     - compiler: gcc-5
       addons:
@@ -22,6 +23,7 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-5
+            - automake
       env: COMPILER=g++-5
     - compiler: gcc-6
       addons:
@@ -30,6 +32,7 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-6
+            - automake
       env: COMPILER=g++-6
     - compiler: clang-3.6
       addons:
@@ -39,6 +42,7 @@ matrix:
             - llvm-toolchain-precise-3.6
           packages:
             - clang-3.6
+            - automake
       env: COMPILER=clang++-3.6
     - compiler: clang-3.7
       addons:
@@ -48,6 +52,7 @@ matrix:
             - llvm-toolchain-precise-3.7
           packages:
             - clang-3.7
+            - automake
       env: COMPILER=clang++-3.7
     - compiler: clang-3.8
       addons:
@@ -57,6 +62,7 @@ matrix:
             - llvm-toolchain-precise-3.8
           packages:
             - clang-3.8
+            - automake
       env: COMPILER=clang++-3.8
   allow_failures:
     - compiler: gcc-4.9
@@ -70,10 +76,8 @@ script:
   - g++ --version
   - mkdir build
   - cd build
-  - #touch ../config/*
-  - #touch ../configure
-  - #touch ../aclocal.m4
-  -  ../configure --prefix=$(pwd) --with-test --enable-nococo
+  - touch ../configure.ac ../aclocal.m4 ../configure ../Makefile.am ../Makefile.in
+  - ../configure --prefix=$(pwd) --with-test --enable-nococo
   - make CXX=$COMPILER dynstack_test
   - make CXX=$COMPILER remotecontrol_test
   - make CXX=$COMPILER library_test
