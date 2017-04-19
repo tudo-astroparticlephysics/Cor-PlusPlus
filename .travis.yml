@@ -82,7 +82,7 @@ script:
   - make CXX=$COMPILER remotecontrol_test
   - make CXX=$COMPILER library_test
   - ./dynstack_test
-  - ./remotecontrol_text
+  - ./remotecontrol_test
   - ./library_test
 
 notifications:
