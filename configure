@@ -728,8 +728,8 @@ ac_user_opts='
 enable_option_checking
 enable_silent_rules
 enable_dependency_tracking
-with_notest
-with_nobench
+with_test
+with_bench
 enable_nococo
 '
       ac_precious_vars='build_alias
@@ -3994,15 +3994,15 @@ fi
 
 #Check if called from coconut
 
-# Check whether --with-notest was given.
-if test "${with_notest+set}" = set; then :
-  withval=$with_notest;
+# Check whether --with-test was given.
+if test "${with_test+set}" = set; then :
+  withval=$with_test;
 fi
 
 
-# Check whether --with-nobench was given.
-if test "${with_nobench+set}" = set; then :
-  withval=$with_nobench;
+# Check whether --with-bench was given.
+if test "${with_bench+set}" = set; then :
+  withval=$with_bench;
 fi
 
 # Check whether --enable-nococo was given.
@@ -4016,12 +4016,15 @@ if test "x$enable_nococo" = "xyes"; then :
 
    $as_echo "#define _NOCOCO_ 1" >>confdefs.h
 
+   $as_echo "#define __DYNDEFAULT__ 1" >>confdefs.h
+
    BAACK_CPPFLAGS=" "
 
 
 fi
 
-if test "x$with_test" != "xno"; then
+if test "x$with_test" = "xyes"; then :
+
     if test x = x; then
   BAACK_WITHTEST_TRUE=
   BAACK_WITHTEST_FALSE='#'
@@ -4030,9 +4033,33 @@ else
   BAACK_WITHTEST_FALSE=
 fi
 
+
+else
+
+    if test x != x; then
+  BAACK_WITHTEST_TRUE=
+  BAACK_WITHTEST_FALSE='#'
+else
+  BAACK_WITHTEST_TRUE='#'
+  BAACK_WITHTEST_FALSE=
 fi
 
-if test "x$with_bench" == "xno"; then
+
+fi
+
+if test "x$with_bench" = "xyes"; then :
+
+    if test x = x; then
+  BAACK_WITHBENCH_TRUE=
+  BAACK_WITHBENCH_FALSE='#'
+else
+  BAACK_WITHBENCH_TRUE='#'
+  BAACK_WITHBENCH_FALSE=
+fi
+
+
+else
+
     if test x != x; then
   BAACK_WITHBENCH_TRUE=
   BAACK_WITHBENCH_FALSE='#'
@@ -4041,14 +4068,6 @@ else
   BAACK_WITHBENCH_FALSE=
 fi
 
-else
-    if test x = x; then
-  BAACK_WITHBENCH_TRUE=
-  BAACK_WITHBENCH_FALSE='#'
-else
-  BAACK_WITHBENCH_TRUE='#'
-  BAACK_WITHBENCH_FALSE=
-fi
 
 fi
 
@@ -4875,6 +4894,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${HAVE_DOXYGEN_TRUE}" && test -z "${HAVE_DOXYGEN_FALSE}"; then
   as_fn_error $? "conditional \"HAVE_DOXYGEN\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${BAACK_WITHTEST_TRUE}" && test -z "${BAACK_WITHTEST_FALSE}"; then
+  as_fn_error $? "conditional \"BAACK_WITHTEST\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${BAACK_WITHTEST_TRUE}" && test -z "${BAACK_WITHTEST_FALSE}"; then

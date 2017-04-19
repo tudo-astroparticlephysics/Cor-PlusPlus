@@ -70,10 +70,10 @@ script:
   - g++ --version
   - mkdir build
   - cd build
-  - ../configure --prefix=$(pwd)
-  - #make CXX=$COMPILER dynstack_test
-  - #make CXX=$COMPILER remotecontrol_test
-  - #make CXX=$COMPILER library_test
+  - ../configure --prefix=$(pwd) --with-test --enable-nococo
+  - make CXX=$COMPILER dynstack_test
+  - make CXX=$COMPILER remotecontrol_test
+  - make CXX=$COMPILER library_test
   - #./dynstack_test
   - #./remotecontrol_text
   - #./library_test

@@ -38,6 +38,7 @@ AC_ARG_ENABLE([nococo], AS_HELP_STRING([--enable-nococo], [Enable compile withou
 
 AS_IF([test "x$enable_nococo" = "xyes"], [
    AC_DEFINE(_NOCOCO_, 1)
+   AC_DEFINE(__DYNDEFAULT__, 1)
    BAACK_CPPFLAGS=" "
    AC_SUBST([BAACK_CPPFLAGS])
 ])

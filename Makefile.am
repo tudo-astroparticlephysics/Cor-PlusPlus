@@ -57,9 +57,11 @@ libBaack_a_SOURCES = lib/data/corsika/event_header.cpp \
 
 libBaack_a_CPPFLAGS = -O3 -g @BAACK_CPPFLAGS@ 
 
+bin_PROGRAMS =
+
 if BAACK_WITHTEST
 
-bin_PROGRAMS = dynstack_test remotecontrol_test library_test dynstack_benchmark
+bin_PROGRAMS += dynstack_test remotecontrol_test library_test
 
 dynstack_test_SOURCES = test/dynstack/storage_test.cpp \
   test/dynstack/advanced_test.cpp \
@@ -94,6 +96,8 @@ library_test_CPPFLAGS = -Og -g
 endif
 
 if BAACK_WITHBENCH
+
+bin_PROGRAMS += dynstack_benchmark
 
 dynstack_benchmark_SOURCES = benchmark/benchmark.cpp \
   benchmark/stack/real.cpp
