@@ -70,9 +70,9 @@ script:
   - g++ --version
   - mkdir build
   - cd build
-  - touch ../config/*
-  - touch ../configure
-  - touch ../aclocal.m4
+  - #touch ../config/*
+  - #touch ../configure
+  - #touch ../aclocal.m4
   -  ../configure --prefix=$(pwd) --with-test --enable-nococo
   - make CXX=$COMPILER dynstack_test
   - make CXX=$COMPILER remotecontrol_test
