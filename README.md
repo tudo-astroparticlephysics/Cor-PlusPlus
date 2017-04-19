@@ -28,7 +28,7 @@ Additional to compile the source code a compiler with C++11 support is neccesary
 ## Versions
 Each version with the same major version number is guaranteed to create the same binary output. When changes due to bugs or further development do not allow to reproduce the same output file with the same steeringcard data the major version number is increased.
 
-| Corsika Ver. | Cor++ Version (Major.Minor) | 
+| [CORSIKA](https://www.ikp.kit.edu/corsika/) Ver. | Cor++ Version (Major.Minor) | 
 |:------------:|:---------------------------:|
 | 7.602        |  1.0                        |
 |              |                             |
@@ -42,6 +42,6 @@ All parts in the "baack" directory are released under [LGPL](https://www.gnu.org
 
 - - -
 ## Contact
-If any issuse or problems arise fill an github issue. Otherwise you can contact the authoer email written in the corsika manual.
+If any issuse or problems arise fill an github issue. Otherwise you can contact the authoer email written in the [CORSIKA](https://www.ikp.kit.edu/corsika/) manual.
 
 
