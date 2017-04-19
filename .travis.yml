@@ -82,8 +82,8 @@ script:
   - make CXX=$COMPILER remotecontrol_test
   - make CXX=$COMPILER library_test
   - ./dynstack_test
-  - #./remotecontrol_text
-  - #./library_test
+  - ./remotecontrol_text
+  - ./library_test
 
 notifications:
 email: false
