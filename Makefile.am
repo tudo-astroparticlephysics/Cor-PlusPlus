@@ -26,7 +26,12 @@ nobase_include_HEADERS =
 lib_LIBRARIES = libDynstack.a libRemotecontrol.a libBaack.a
 
 libDynstack_a_SOURCES = dynstack/export.cpp 
+
+if BAACK_WITHTEST
+libDynstack_a_CPPFLAGS = -Og -g @BAACK_CPPFLAGS@
+else
 libDynstack_a_CPPFLAGS = -O3 -g @BAACK_CPPFLAGS@
+endif
 
 ## Remotecontrol
 libRemotecontrol_a_SOURCES = remote_control/communication/packet.cpp \
@@ -35,8 +40,12 @@ libRemotecontrol_a_SOURCES = remote_control/communication/packet.cpp \
   remote_control/control/periodic_task.cpp \
   remote_control/control/main_control.cpp \
   remote_control/control/recv_cache.cpp
-libRemotecontrol_a_CPPFLAGS = -O3 -g @BAACK_CPPFLAGS@ 
 
+if BAACK_WITHTEST
+libRemotecontrol_a_CPPFLAGS = -O3 -g @BAACK_CPPFLAGS@ 
+else
+libRemotecontrol_a_CPPFLAGS = -Og -g @BAACK_CPPFLAGS@
+endif
 
 ## Dependency library for Dynstack and Remotecontrol
 libBaack_a_SOURCES = lib/data/corsika/event_header.cpp \
@@ -55,7 +64,11 @@ libBaack_a_SOURCES = lib/data/corsika/event_header.cpp \
   basic/export.cpp \
   basic/basic.cpp 
 
+if BAACK_WITHTEST
 libBaack_a_CPPFLAGS = -O3 -g @BAACK_CPPFLAGS@ 
+else
+libBaack_a_CPPFLAGS = -Og -g @BAACK_CPPFLAGS@
+endif
 
 bin_PROGRAMS =
 
@@ -68,14 +81,14 @@ dynstack_test_SOURCES = test/dynstack/storage_test.cpp \
   test/dynstack/unit_test.cpp \
   test/dynstack/wrapper_test.cpp 
 dynstack_test_LDADD = libDynstack.a
-dynstack_test_CPPFLAGS = -Og -g
+dynstack_test_CPPFLAGS = -Og -g3
 
 
 remotecontrol_test_SOURCES = test/remote_control/message_queue_test.cpp \
   test/remote_control/protocol_test.cpp \
   test/remote_control/unit_test.cpp
 remotecontrol_test_LDADD = libRemotecontrol.a 
-remotecontrol_test_CPPFLAGS = -Og -g
+remotecontrol_test_CPPFLAGS = -Og -g3
 
 library_test_SOURCES = test/lib/data/particle_test.cpp \
   test/lib/io/server_test.cpp \
@@ -87,7 +100,7 @@ library_test_SOURCES = test/lib/data/particle_test.cpp \
   test/lib/meta/list_test.cpp \
   test/lib/meta/is_callable_test.cpp
 library_test_LDADD = libBaack.a
-library_test_CPPFLAGS = -Og -g
+library_test_CPPFLAGS = -Og -g3
 
 #basic_test_SOURCES =
 #basic_test_LDADD = libBaack.a 

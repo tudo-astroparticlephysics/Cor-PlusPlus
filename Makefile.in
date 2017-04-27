@@ -411,7 +411,8 @@ AM_CXXFLAGS = -I$(top_srcdir) -pthread -std=c++14 -Wall -Wextra -Wnarrowing -ped
 nobase_include_HEADERS = 
 lib_LIBRARIES = libDynstack.a libRemotecontrol.a libBaack.a
 libDynstack_a_SOURCES = dynstack/export.cpp 
-libDynstack_a_CPPFLAGS = -O3 -g @BAACK_CPPFLAGS@
+@BAACK_WITHTEST_FALSE@libDynstack_a_CPPFLAGS = -O3 -g @BAACK_CPPFLAGS@
+@BAACK_WITHTEST_TRUE@libDynstack_a_CPPFLAGS = -Og -g @BAACK_CPPFLAGS@
 libRemotecontrol_a_SOURCES = remote_control/communication/packet.cpp \
   remote_control/communication/message_queue.cpp \
   remote_control/export.cpp \
@@ -419,7 +420,8 @@ libRemotecontrol_a_SOURCES = remote_control/communication/packet.cpp \
   remote_control/control/main_control.cpp \
   remote_control/control/recv_cache.cpp
 
-libRemotecontrol_a_CPPFLAGS = -O3 -g @BAACK_CPPFLAGS@ 
+@BAACK_WITHTEST_FALSE@libRemotecontrol_a_CPPFLAGS = -Og -g @BAACK_CPPFLAGS@
+@BAACK_WITHTEST_TRUE@libRemotecontrol_a_CPPFLAGS = -O3 -g @BAACK_CPPFLAGS@ 
 libBaack_a_SOURCES = lib/data/corsika/event_header.cpp \
   lib/data/corsika/event_end.cpp \
   lib/data/corsika/steering_card.cpp \
@@ -436,20 +438,21 @@ libBaack_a_SOURCES = lib/data/corsika/event_header.cpp \
   basic/export.cpp \
   basic/basic.cpp 
 
-libBaack_a_CPPFLAGS = -O3 -g @BAACK_CPPFLAGS@ 
+@BAACK_WITHTEST_FALSE@libBaack_a_CPPFLAGS = -Og -g @BAACK_CPPFLAGS@
+@BAACK_WITHTEST_TRUE@libBaack_a_CPPFLAGS = -O3 -g @BAACK_CPPFLAGS@ 
 @BAACK_WITHTEST_TRUE@dynstack_test_SOURCES = test/dynstack/storage_test.cpp \
 @BAACK_WITHTEST_TRUE@  test/dynstack/advanced_test.cpp \
 @BAACK_WITHTEST_TRUE@  test/dynstack/unit_test.cpp \
 @BAACK_WITHTEST_TRUE@  test/dynstack/wrapper_test.cpp 
 
 @BAACK_WITHTEST_TRUE@dynstack_test_LDADD = libDynstack.a
-@BAACK_WITHTEST_TRUE@dynstack_test_CPPFLAGS = -Og -g
+@BAACK_WITHTEST_TRUE@dynstack_test_CPPFLAGS = -Og -g3
 @BAACK_WITHTEST_TRUE@remotecontrol_test_SOURCES = test/remote_control/message_queue_test.cpp \
 @BAACK_WITHTEST_TRUE@  test/remote_control/protocol_test.cpp \
 @BAACK_WITHTEST_TRUE@  test/remote_control/unit_test.cpp
 
 @BAACK_WITHTEST_TRUE@remotecontrol_test_LDADD = libRemotecontrol.a 
-@BAACK_WITHTEST_TRUE@remotecontrol_test_CPPFLAGS = -Og -g
+@BAACK_WITHTEST_TRUE@remotecontrol_test_CPPFLAGS = -Og -g3
 @BAACK_WITHTEST_TRUE@library_test_SOURCES = test/lib/data/particle_test.cpp \
 @BAACK_WITHTEST_TRUE@  test/lib/io/server_test.cpp \
 @BAACK_WITHTEST_TRUE@  test/lib/io/client_test.cpp \
@@ -461,7 +464,7 @@ libBaack_a_CPPFLAGS = -O3 -g @BAACK_CPPFLAGS@
 @BAACK_WITHTEST_TRUE@  test/lib/meta/is_callable_test.cpp
 
 @BAACK_WITHTEST_TRUE@library_test_LDADD = libBaack.a
-@BAACK_WITHTEST_TRUE@library_test_CPPFLAGS = -Og -g
+@BAACK_WITHTEST_TRUE@library_test_CPPFLAGS = -Og -g3
 @BAACK_WITHBENCH_TRUE@dynstack_benchmark_SOURCES = benchmark/benchmark.cpp \
 @BAACK_WITHBENCH_TRUE@  benchmark/stack/real.cpp
 

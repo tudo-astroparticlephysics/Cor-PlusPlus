@@ -18,6 +18,7 @@
 #include <iostream>
 
 #include <cstring>
+#include <cstdlib>
 
 namespace test
 {
@@ -29,7 +30,8 @@ namespace test
 			bool test_server()
 			{
 
-				::lib::io::network::Server server(9558);
+				const int port = 5000 + (rand() % 5000);				
+				::lib::io::network::Server server(port);
 				server.setNewConFunc([](unsigned int id, ::lib::io::network::Socket* sock)->bool
 				{					
 					(void)(id);
@@ -48,12 +50,14 @@ namespace test
 
 
 				std::this_thread::sleep_for(std::chrono::seconds(1));
+				
 
-				std::thread tr([]() -> bool
+
+				std::thread tr([port]() -> bool
 				{
 					::lib::io::network::Socket client;
 					client.create();
-					client.connect("127.0.0.1", 9558);
+					client.connect("127.0.0.1", port);
 
 					client.send( ::lib::algorithm::char_to_byte("T3st\0").data(), 5);
 					
