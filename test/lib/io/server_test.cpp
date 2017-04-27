@@ -47,6 +47,8 @@ namespace test
 				});
 
 
+				std::this_thread::sleep_for(std::chrono::seconds(1));
+
 				std::thread tr([]() -> bool
 				{
 					::lib::io::network::Socket client;
