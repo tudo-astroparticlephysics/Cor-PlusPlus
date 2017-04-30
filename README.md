@@ -19,9 +19,11 @@ For more informations, manuals and examples visit the [Wiki](https://github.com/
 
 - - - 
 ## Installation
-[CORSIKA](https://www.ikp.kit.edu/corsika/) already contains the last stable version of this module collection. When you want to update the version delivered with [CORSIKA](https://www.ikp.kit.edu/corsika/) you need to delete all files in the baack directory and overwrite them with the downloaded files. The newest working releases are in the table below.
+[CORSIKA](https://www.ikp.kit.edu/corsika/) already contains the last stable version of this module collection. When you want to update the version delivered with [CORSIKA](https://www.ikp.kit.edu/corsika/) you need to delete all files in the baack directory and overwrite them with the downloaded files. The newest working releases that are compatible with your version are in the table below. 
 
-Additional to compile the source code a compiler with C++11 support is neccesary (gcc > 5.0).
+If you want to **upgrade an old [CORSIKA](https://www.ikp.kit.edu/corsika/) verion** that is incompatible with the needed version of Cor++ a patchfile can be provided upon request.
+
+To compile the source code a compiler with C++11 support is neccesary (gcc > 5.0).
 
 - - -
 
@@ -30,8 +32,8 @@ Each version with the same major version number is guaranteed to create the same
 
 | [CORSIKA](https://www.ikp.kit.edu/corsika/) Ver. | Cor++ Version (Major.Minor) | 
 |:------------:|:---------------------------:|
-| 7.602        |  1.0                        |
-|              |                             |
+| 7.5          |  1.0 (patchfile available)  |
+| next version |  1.0                        |
  
 
 
