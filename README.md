@@ -30,10 +30,10 @@ To compile the source code a compiler with C++11 support is neccesary (gcc > 5.0
 ## Versions
 Each version with the same major version number is guaranteed to create the same binary output. When changes due to bugs or further development do not allow to reproduce the same output file with the same steeringcard data the major version number is increased.
 
-| [CORSIKA](https://www.ikp.kit.edu/corsika/) Ver. | Cor++ Version (Major.Minor) | 
+| [CORSIKA](https://www.ikp.kit.edu/corsika/) Ver. | Cor++ Version | 
 |:------------:|:---------------------------:|
-| 7.5          |  1.0 (patchfile available)  |
-| next version |  1.0                        |
+| 7.5          |  1.0.0 (patchfile available)  |
+| next version |  1.0.0                        |
  
 
 
