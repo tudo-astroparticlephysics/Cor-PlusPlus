@@ -10,6 +10,8 @@
 
 #include "lib/io/network/server.h"
 
+#include <stdexcept>
+
 namespace lib
 {
 	namespace io
@@ -92,7 +94,12 @@ namespace lib
 				m_nextID = 1;
 
 				this->m_arb_listenSock.create();
-				this->m_arb_listenSock.bind(p_port);
+				if( !this->m_arb_listenSock.bind(p_port) )
+				{
+					std::stringstream sstr;
+					sstr << p_port;
+					throw( std::runtime_error("Socket could not be bind to port" + sstr.str() ) );				
+				}
 
 				m_isRunning = true;
 				m_threadNewCon = new std::thread(&Server::handleConnection, this);
