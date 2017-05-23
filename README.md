@@ -1,6 +1,6 @@
 # Cor++
 
-[![Build Status](https://travis-ci.org/tudo-astroparticlephysics/Cor-PlusPlus.svg?branch=master)](https://travis-ci.org/tudo-astroparticlephysics/Cor-PlusPlus)
+[![Build Status](https://travis-ci.org/tudo-astroparticlephysics/Cor-PlusPlus.svg?branch=master)](https://travis-ci.org/tudo-astroparticlephysics/Cor-PlusPlus) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/7fbe8beefb06494b8fab3ee0498ebb2f)](https://www.codacy.com/app/rangarik_91/Cor-PlusPlus?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=tudo-astroparticlephysics/Cor-PlusPlus&amp;utm_campaign=Badge_Grade)
 
 This project containes multiple modules for the [CORSIKA](https://www.ikp.kit.edu/corsika/) simulation framework. The modules extend the functionality of the base program with the target to give the user more freedom and an easy API to customize the the simulation for specific experiments without knowledge about F77 or the internal structure of the simulation. The adjustment of the simualtioned to specific experiment allowes the reduction of unnecessary and redundant data created during the simulation.
 
