@@ -1,5 +1,5 @@
 
-[Cor++-Logo](https://github.com/tudo-astroparticlephysics/Cor-PlusPlus/wiki/images/GitHub_CORR_Logo.png)
+[Cor++-Logo](https://github.com/tudo-astroparticlephysics/Cor-PlusPlus/wiki/images/GitHub_CORR_Logo.png?raw=true)
 # Cor++
 
 [![Build Status](https://travis-ci.org/tudo-astroparticlephysics/Cor-PlusPlus.svg?branch=master)](https://travis-ci.org/tudo-astroparticlephysics/Cor-PlusPlus) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/7fbe8beefb06494b8fab3ee0498ebb2f)](https://www.codacy.com/app/rangarik_91/Cor-PlusPlus?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=tudo-astroparticlephysics/Cor-PlusPlus&amp;utm_campaign=Badge_Grade)
