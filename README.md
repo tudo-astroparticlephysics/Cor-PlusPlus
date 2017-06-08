@@ -52,7 +52,7 @@ You can cite one of the following papers:
 
 - - -
 ## Contact
-If any issuse or problems arise fill an github issue. Otherwise you can contact the authoer email written in the [CORSIKA](https://www.ikp.kit.edu/corsika/) manual.
+If any issuse or problems arise fill an github issue. Otherwise you can contact the author ([Dominik Baack](http://app.tu-dortmund.de/cms/de/Lehrstuhl-E5b/mitarbeiter/wiss/Baack-Dominik.html)) with the email adress written in the [CORSIKA](https://www.ikp.kit.edu/corsika/) manual.
 
 
 ## Acknowledgment
