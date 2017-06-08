@@ -41,10 +41,20 @@ Each version with the same major version number is guaranteed to create the same
 ---
 
 ## Copyright
-All parts in the "baack" directory are released under [LGPL](https://www.gnu.org/licenses/lgpl-3.0.html) license. In short: You can redistribute, use and modify the code as long as you credit the author in all projects the code or results from the code (e.g. MonteCarlo data) are used.
+All parts in the "baack" directory are released under (modified) [LGPL](https://www.gnu.org/licenses/lgpl-3.0.html) license. 
+In short: You can redistribute, use and modify the code as long as you credit the author in all projects the code or results from the code (e.g. MonteCarlo data) are used.
+
+The author of this project is [Dominik Baack](http://app.tu-dortmund.de/cms/de/Lehrstuhl-E5b/mitarbeiter/wiss/Baack-Dominik.html) from the university of Dortmund.
+
+You can cite one of the following papers:
+
+[SFB 876 - Technical Report](http://sfb876.tu-dortmund.de/auto?self=%24Publication_es3rppdg5c)
 
 - - -
 ## Contact
 If any issuse or problems arise fill an github issue. Otherwise you can contact the authoer email written in the [CORSIKA](https://www.ikp.kit.edu/corsika/) manual.
 
 
+## Acknowledgment
+![Cor++-Logo](https://raw.githubusercontent.com/wiki/tudo-astroparticlephysics/Cor-PlusPlus/images/sfb876.png)
+This work is created and maintained as part of the project [C3](http://sfb876.tu-dortmund.de/SPP/sfb876-c3.html) of the [SFB876](http://sfb876.tu-dortmund.de/index.html).
