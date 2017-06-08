@@ -56,5 +56,5 @@ If any issuse or problems arise fill an github issue. Otherwise you can contact 
 
 
 ## Acknowledgment
-![Cor++-Logo](https://raw.githubusercontent.com/wiki/tudo-astroparticlephysics/Cor-PlusPlus/images/sfb876.png)
+![SFB876](https://raw.githubusercontent.com/wiki/tudo-astroparticlephysics/Cor-PlusPlus/images/sfb876.png)
 This work is created and maintained from Dominik Baack as part of the project [C3](http://sfb876.tu-dortmund.de/SPP/sfb876-c3.html) of the [SFB876](http://sfb876.tu-dortmund.de/index.html).
