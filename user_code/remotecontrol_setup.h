@@ -36,7 +36,7 @@
 
 
 // With feature level C++14 the decltype becomes uneccessary
-inline const auto register_periodic_callback() -> std::array<remote_control::PeriodicTask, 1>
+inline auto register_periodic_callback() -> const std::array<remote_control::PeriodicTask, 1>
 {
 	/** User code here
 	 *	Create your periodic tasks with lambda or a function pointer and the spacing.
@@ -53,7 +53,7 @@ inline const auto register_periodic_callback() -> std::array<remote_control::Per
 }
 
 
-inline const auto register_server_callback() -> std::map<uint32_t, std::function<remote_control::communication::Packet(const std::vector<uint8_t>)>>
+inline auto register_server_callback() -> const std::map<uint32_t, std::function<remote_control::communication::Packet(const std::vector<uint8_t>)>>
 {
 	typedef std::function<remote_control::communication::Packet(const std::vector<uint8_t>)> callback_type;
 	std::map<uint32_t, callback_type > callback;
