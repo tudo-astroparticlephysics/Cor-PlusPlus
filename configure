@@ -4137,7 +4137,10 @@ if test "x$enable_nococo" = "xyes"; then :
 
   $as_echo "#define __DYNDEFAULT__ 1" >>confdefs.h
 
+
   BAACK_CPPFLAGS=" "
+  BAACK_CPPFLAGS="$BAACK_CPPFLAGS -std=c++0x"
+
 
   { $as_echo "$as_me:${as_lineno-$LINENO}: Activate Dynstack" >&5
 $as_echo "$as_me: Activate Dynstack" >&6;}

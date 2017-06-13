@@ -68,8 +68,11 @@ AS_IF([test "x$with_remotecontrol" = "xyes"], [
 AS_IF([test "x$enable_nococo" = "xyes"], [
   AC_DEFINE(_NOCOCO_, 1)
   AC_DEFINE(__DYNDEFAULT__, 1)
+  
   BAACK_CPPFLAGS=" "
+  BAACK_CPPFLAGS="$BAACK_CPPFLAGS -std=c++0x"
   AC_SUBST([BAACK_CPPFLAGS])
+  
   AC_MSG_NOTICE([Activate Dynstack])
   AM_CONDITIONAL([BAACK_WITH_DYNSTACK], [test x = x])
   AC_MSG_NOTICE([Activate Remotecontrol])
