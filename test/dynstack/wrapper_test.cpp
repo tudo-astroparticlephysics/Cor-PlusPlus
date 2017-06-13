@@ -148,7 +148,9 @@ namespace test
 				::dynstack::wrapper::PriorityStack<::dynstack::storage::LIFO_Stack<float>, prio> tmp1(12);
 
 				testStack<decltype(tmp1), float, 12>(tmp1, { { 1,2,3,4,5,6,7,8,9,10,11,12 } }, { { 12, 10, 8, 6, 4, 2, 11, 9, 7, 5, 3, 1 } });
-			}
+			    
+                return true;
+            }
 
 
 			bool Combinations()
