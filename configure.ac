@@ -70,7 +70,7 @@ AS_IF([test "x$enable_nococo" = "xyes"], [
   AC_DEFINE(__DYNDEFAULT__, 1)
   
   BAACK_CPPFLAGS=" "
-  BAACK_CPPFLAGS="$BAACK_CPPFLAGS -std=c++0x"
+  BAACK_CPPFLAGS="$BAACK_CPPFLAGS -std=c++14"
   AC_SUBST([BAACK_CPPFLAGS])
   
   AC_MSG_NOTICE([Activate Dynstack])
