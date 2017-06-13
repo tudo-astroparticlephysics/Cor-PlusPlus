@@ -19,11 +19,13 @@
 #include <string>
 
 
-auto dynstack_setup(std::vector<long> sizes, std::vector< std::list<std::string> > arguments )
+auto dynstack_setup(std::vector<long> sizes, std::vector< std::list<std::string> > arguments ) -> decltype(std::unique_ptr< dynstack::storage::LIFO_Stack<DeductedParticleType> >())
 {
 	if(sizes.size() != 1)
         {
                 std::cerr << "You need to define the size of a single stack with DYNSTACK N in the input card" << std::endl;
+		std::cerr << "You provided " << sizes.size() << " Arguments" << std::endl;
+		
                 exit(-1);
         }
 	const int stackSize = sizes[0];
