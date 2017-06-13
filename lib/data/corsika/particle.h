@@ -17,7 +17,11 @@
 #include <iostream>
 #include <sstream>
 
+#include <stdexcept>
+
 #include "lib/meta/index_sequence.h"
+
+
 
 namespace lib
 {
@@ -690,7 +694,7 @@ namespace lib
 		 *  \return returns a particle storage
 		 */
 		template<size_t ... TArgs>
-		auto make_particle()
+		auto make_particle()->decltype(ParticleData<0, TArgs...>())
 		{
 			return ParticleData<0, TArgs...>();
 		}

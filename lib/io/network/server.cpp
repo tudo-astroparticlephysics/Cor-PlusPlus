@@ -11,6 +11,13 @@
 #include "lib/io/network/server.h"
 
 #include <stdexcept>
+#include <thread>
+#include <chrono>
+
+#if __cplusplus > 199711L
+#else
+#include <unistd.h>
+#endif
 
 namespace lib
 {
@@ -73,9 +80,11 @@ namespace lib
 							m_functionMutex.unlock();
 						}
 					}
-
+#if __cplusplus > 199711L
 					std::this_thread::sleep_for(std::chrono::milliseconds(20));
-
+#else
+					usleep(20000);
+#endif
 					this->m_actionMutex.lock();					
 				
 					for (unsigned int i = 0; i < m_action.size(); i++)
@@ -85,7 +94,12 @@ namespace lib
 					}
 					
 					this->m_actionMutex.unlock();				
+					
+#if __cplusplus > 199711L
 					std::this_thread::sleep_for(std::chrono::milliseconds(20));
+#else
+					usleep(20000);
+#endif
 				}
 			}
 
