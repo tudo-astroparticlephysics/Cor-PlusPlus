@@ -17,6 +17,8 @@
 #include "dynstack/stack/storage/lifo_stack.h"
 #include "dynstack/stack/advanced/debug_stack.h"
 
+#include "dynstack/stack/wrapper/priority_stack.h"
+
 #include "lib/data/controlled_value.h"
 
 
@@ -139,11 +141,11 @@ namespace test
 
 			bool prio(const float* const data)
 			{
-				return (*data % 2 == 0)?true, false;
+				return (static_cast<const int>(*data) % 2 == 0)?true : false;
 			}
 			bool Priority()
 			{
-				::dynstack::wrapper::PriorityStack<::dynstack::storage::LIFO_Stack<float>, sort> tmp1(12);
+				::dynstack::wrapper::PriorityStack<::dynstack::storage::LIFO_Stack<float>, prio> tmp1(12);
 
 				testStack<decltype(tmp1), float, 12>(tmp1, { { 1,2,3,4,5,6,7,8,9,10,11,12 } }, { { 12, 10, 8, 6, 4, 2, 11, 9, 7, 5, 3, 1 } });
 			}

@@ -39,15 +39,6 @@ AC_ARG_WITH([dynstack], AS_HELP_STRING([--with-dynstack], [Compile dynstack libr
 AC_ARG_WITH([remotecontrol], AS_HELP_STRING([--with-remotecontrol], [Compile remotecontrol library]))
 
 
-AS_IF([test "x$enable_nococo" = "xyes"], [
-   AC_DEFINE(_NOCOCO_, 1)
-   AC_DEFINE(__DYNDEFAULT__, 1)
-   BAACK_CPPFLAGS=" "
-   AC_SUBST([BAACK_CPPFLAGS])
-   AM_CONDITIONAL([BAACK_WITH_DYNSTACK], [test x = x])
-   AM_CONDITIONAL([BAACK_WITH_REMOTECONTROL], [test x = x])
-])
-
 AS_IF([test "x$with_test" = "xyes"], [
    AM_CONDITIONAL([BAACK_WITHTEST], [test x = x])
 ], [
@@ -71,6 +62,18 @@ AS_IF([test "x$with_remotecontrol" = "xyes"], [
   AM_CONDITIONAL([BAACK_WITH_REMOTECONTROL], [test x = x])
 ], [
   AM_CONDITIONAL([BAACK_WITH_REMOTECONTROL], [test x != x])
+])
+
+
+AS_IF([test "x$enable_nococo" = "xyes"], [
+  AC_DEFINE(_NOCOCO_, 1)
+  AC_DEFINE(__DYNDEFAULT__, 1)
+  BAACK_CPPFLAGS=" "
+  AC_SUBST([BAACK_CPPFLAGS])
+  AC_MSG_NOTICE([Activate Dynstack])
+  AM_CONDITIONAL([BAACK_WITH_DYNSTACK], [test x = x])
+  AC_MSG_NOTICE([Activate Remotecontrol])
+  AM_CONDITIONAL([BAACK_WITH_REMOTECONTROL], [test x = x])
 ])
 
 
