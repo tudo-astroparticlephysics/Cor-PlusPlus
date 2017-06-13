@@ -16,7 +16,7 @@
 #include <map>
 #include <string>
 #include <list>
-
+#include <vector>
 
 
 #include "dynstack/export.h"
@@ -47,11 +47,20 @@ void dynstack_init_(const char* line, const int* size)
 	std::string item;
 	while (std::getline(sstr, item, ' '))
 	{
-		list.push_back(item);
+		if(item == " " || item == "")
+		{
+			continue;
+		}
+		else
+		{
+			list.push_back(item);
+		}
 	}
 
 	item = list.front();
 	list.pop_front();
+	
+	std::cout << item << " with " << list.size() << std::endl;
 
 	dynstack_steering_card.push_back( std::pair<std::string, std::list<std::string>>(item, list) );
 	

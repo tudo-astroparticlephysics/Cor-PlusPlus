@@ -13,7 +13,6 @@
 #include <type_traits>
 
 #include "dynstack/stack/stack.h"
-#include "dynstack/stack/stack_ptr.h"
 
 namespace dynstack
 {
@@ -165,18 +164,6 @@ namespace dynstack
 			}
 
 
-			//Get new empty element to write into (direct access, zero copy)
-			inline StackPtr<TType> reserve()
-			{
-				const unsigned long off = getCurrentOffset();
-				if (off < this->m_uiSize - 1)
-				{
-					m_tNextFree++;
-
-					return Stack<TType>::createStackObj(m_tNextFree - 1);
-				}
-				return StackPtr<TType>();
-			}
 
 					
 
