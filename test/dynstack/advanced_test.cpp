@@ -21,6 +21,7 @@
 #include "dynstack/stack/advanced/debug_stack.h"
 #include "dynstack/stack/advanced/copy_stack.h"
 #include "dynstack/stack/advanced/dynamic_sorted_stack.h"
+#include "dynstack/stack/advanced/if_stack.h"
 
 
 #include "test/dynstack/common_test_function.h"
@@ -87,6 +88,31 @@ namespace test
 
 				return true;
 			}
+           
+
+
+            bool if_decision(const float* const data)
+            {
+                if( static_cast<const int>(*data) % 2 == 0)
+                {
+                    return false;
+                }
+                return true;
+            }
+
+            bool If()
+            {
+                ::dynstack::advanced::IfStack<
+                    ::dynstack::storage::FIFO_Stack<float>,
+                    ::dynstack::storage::LIFO_Stack<float>,
+                    if_decision > tmp1(12);
+
+                testStack<decltype(tmp1), float, 12>(tmp1, { { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 } }, { { 1, 3, 5, 7, 9, 11, 12, 10, 8, 6, 4, 2 } });
+                
+                return true;
+            }
+
+
 
 
 			bool Combinations()

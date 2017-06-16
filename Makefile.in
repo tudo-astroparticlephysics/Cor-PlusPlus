@@ -414,7 +414,7 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AUTOMAKE_OPTIONS = foreign subdir-objects
-AM_CXXFLAGS = -I$(top_srcdir) -pthread -Wall -Wextra -pedantic @BAACK_CPPFLAGS@
+AM_CXXFLAGS = -I$(top_srcdir) -pthread -Wall -Wextra -pedantic -Werror=return-type @BAACK_CPPFLAGS@
 nobase_include_HEADERS = 
 @BAACK_WITH_DYNSTACK_FALSE@@BAACK_WITH_REMOTECONTROL_FALSE@lib_LIBRARIES = 
 @BAACK_WITH_DYNSTACK_FALSE@@BAACK_WITH_REMOTECONTROL_TRUE@lib_LIBRARIES = libBaack.a libRemotecontrol.a

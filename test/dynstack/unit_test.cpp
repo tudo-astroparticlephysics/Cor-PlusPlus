@@ -61,7 +61,10 @@ namespace test
 
 			std::cout << "\n\t-Dynamic Sorted-" << std::endl;
 			test::dynstack::advanced::DynamicSorted();
-		}
+
+            std::cout << "\n\t-If-" << std::endl;
+            test::dynstack::advanced::If();
+        }
 
 	}
 

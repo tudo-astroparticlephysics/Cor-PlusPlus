@@ -3,7 +3,7 @@ VPATH = @srcdir@
 
 AUTOMAKE_OPTIONS = foreign subdir-objects
 
-AM_CXXFLAGS = -I$(top_srcdir) -pthread -Wall -Wextra -pedantic @BAACK_CPPFLAGS@
+AM_CXXFLAGS = -I$(top_srcdir) -pthread -Wall -Wextra -pedantic -Werror=return-type @BAACK_CPPFLAGS@
  
 
 
