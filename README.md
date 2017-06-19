@@ -24,7 +24,8 @@ For more informations, manuals and examples visit the [Wiki](https://github.com/
 
 If you want to **upgrade an old [CORSIKA](https://www.ikp.kit.edu/corsika/) verion** that is incompatible with the needed version of Cor++ a patchfile can be provided upon request.
 
-To compile the source code a compiler with C++11 support is neccesary (gcc > 5.0).
+To compile the source code a compiler with C++11 support is neccesary (gcc > 4.8).
+A reduced feature level is available with old gcc up to version 4.6
 
 - - -
 
