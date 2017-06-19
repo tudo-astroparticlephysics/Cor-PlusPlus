@@ -33,9 +33,9 @@ Each version with the same major version number is guaranteed to create the same
 
 | [CORSIKA](https://www.ikp.kit.edu/corsika/) Ver. | Cor++ Version | 
 |:------------:|:---------------------------:|
-| 7.5          |  1.0.0 (patchfile available)  |
-| next version |  1.0.0                        |
- 
+| 7.5600 |  1.0.0 (patchfile available)  |
+| 7.5700 |  [1.0.1](https://github.com/tudo-astroparticlephysics/Cor-PlusPlus/releases/tag/1.0.1)                        |
+| ... | ... |
 
 
 ---
