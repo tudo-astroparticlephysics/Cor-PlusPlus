@@ -3,7 +3,7 @@ VPATH = @srcdir@
 
 AUTOMAKE_OPTIONS = foreign subdir-objects
 
-AM_CXXFLAGS = -I$(top_srcdir) -pthread -std=c++14 -Wall -Wextra -Wnarrowing -pedantic @BAACK_CPPFLAGS@
+AM_CXXFLAGS = -I$(top_srcdir) -pthread -Wall -Wextra -pedantic -Werror=return-type @BAACK_CPPFLAGS@
  
 
 
@@ -22,8 +22,30 @@ endif
 nobase_include_HEADERS = 
 
 
+if BAACK_WITH_DYNSTACK
+
+if BAACK_WITH_REMOTECONTROL
+lib_LIBRARIES = libBaack.a libDynstack.a libRemotecontrol.a
+else
+lib_LIBRARIES = libBaack.a libDynstack.a
+endif
+
+else
+
+if BAACK_WITH_REMOTECONTROL
+lib_LIBRARIES = libBaack.a libRemotecontrol.a
+else
+lib_LIBRARIES =
+endif
+
+endif
+
+
+
+
 ## Dynstack
-lib_LIBRARIES = libDynstack.a libRemotecontrol.a libBaack.a
+if BAACK_WITH_DYNSTACK
+##lib_LIBRARIES += libDynstack.a 
 
 libDynstack_a_SOURCES = dynstack/export.cpp 
 
@@ -32,19 +54,24 @@ libDynstack_a_CPPFLAGS = -Og -g @BAACK_CPPFLAGS@
 else
 libDynstack_a_CPPFLAGS = -O3 -g @BAACK_CPPFLAGS@
 endif
+endif
 
 ## Remotecontrol
-libRemotecontrol_a_SOURCES = remote_control/communication/packet.cpp \
-  remote_control/communication/message_queue.cpp \
-  remote_control/export.cpp \
-  remote_control/control/periodic_task.cpp \
-  remote_control/control/main_control.cpp \
-  remote_control/control/recv_cache.cpp
+if BAACK_WITH_REMOTECONTROL
+##lib_LIBRARIES += libRemotecontrol.a
+
+libRemotecontrol_a_SOURCES = remote_control/export.cpp \
+			     remote_control/communication/packet.cpp \
+                             remote_control/communication/message_queue.cpp \
+                             remote_control/control/periodic_task.cpp \
+                             remote_control/control/main_control.cpp \
+                             remote_control/control/recv_cache.cpp
 
 if BAACK_WITHTEST
-libRemotecontrol_a_CPPFLAGS = -O3 -g @BAACK_CPPFLAGS@ 
+libRemotecontrol_a_CPPFLAGS = -Og -g @BAACK_CPPFLAGS@ 
 else
-libRemotecontrol_a_CPPFLAGS = -Og -g @BAACK_CPPFLAGS@
+libRemotecontrol_a_CPPFLAGS = -O3 -g @BAACK_CPPFLAGS@
+endif
 endif
 
 ## Dependency library for Dynstack and Remotecontrol
@@ -65,9 +92,9 @@ libBaack_a_SOURCES = lib/data/corsika/event_header.cpp \
   basic/basic.cpp 
 
 if BAACK_WITHTEST
-libBaack_a_CPPFLAGS = -O3 -g @BAACK_CPPFLAGS@ 
+libBaack_a_CPPFLAGS = -Og -g @BAACK_CPPFLAGS@ 
 else
-libBaack_a_CPPFLAGS = -Og -g @BAACK_CPPFLAGS@
+libBaack_a_CPPFLAGS = -O3 -g @BAACK_CPPFLAGS@
 endif
 
 bin_PROGRAMS =

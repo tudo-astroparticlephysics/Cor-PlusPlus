@@ -13,6 +13,8 @@
 #include <vector>
 #include <memory>
 
+#include <cstdint>
+
 namespace remote_control
 {
 	namespace  communication

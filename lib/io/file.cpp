@@ -14,7 +14,7 @@
 #include <sstream>
 
 
-File::File(std::string p_fileName)
+File::File(std::string p_fileName) 
 {
 
 	m_oFile.open( p_fileName, std::ios::in | std::ios::out | std::ios::binary );
@@ -29,7 +29,7 @@ File::File(std::string p_fileName)
 	}
 }
 
-File::File()
+File::File() : statusOpen(false)
 {
 
 }

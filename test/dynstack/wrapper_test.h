@@ -30,7 +30,10 @@ namespace test
 
 			bool Sorted();
 
+			bool Priority();
+
 			bool Combinations();
+
 		}
 	}
 }

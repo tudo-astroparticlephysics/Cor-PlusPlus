@@ -85,5 +85,16 @@ using namespace lib::data;
 typedef decltype(lib::data::make_particle< DEDUCTED_PARTICLE_COMPOSITION >()) DeductedParticleType;
 
 
+#if __cplusplus > 199711L
 template<int TSize>
 using DeductedParticleTypeCustom = decltype(lib::data::make_particle< DEDUCTED_PARTICLE_COMPOSITION, ParticleDataType::custom, TSize>());
+#else
+
+template<int TSize>
+struct DeductedParticleTypeCustom
+{
+	typedef decltype(lib::data::make_particle< DEDUCTED_PARTICLE_COMPOSITION, ParticleDataType::custom, TSize>()) type;
+};
+#endif
+
+

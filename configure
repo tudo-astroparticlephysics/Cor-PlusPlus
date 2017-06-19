@@ -630,11 +630,15 @@ LIBOBJS
 EGREP
 GREP
 CXXCPP
+BAACK_CPPFLAGS
+BAACK_WITH_REMOTECONTROL_FALSE
+BAACK_WITH_REMOTECONTROL_TRUE
+BAACK_WITH_DYNSTACK_FALSE
+BAACK_WITH_DYNSTACK_TRUE
 BAACK_WITHBENCH_FALSE
 BAACK_WITHBENCH_TRUE
 BAACK_WITHTEST_FALSE
 BAACK_WITHTEST_TRUE
-BAACK_CPPFLAGS
 HAVE_DOXYGEN_FALSE
 HAVE_DOXYGEN_TRUE
 DOXYGEN
@@ -731,6 +735,8 @@ enable_dependency_tracking
 with_test
 with_bench
 enable_nococo
+with_dynstack
+with_remotecontrol
 '
       ac_precious_vars='build_alias
 host_alias
@@ -1380,6 +1386,8 @@ Optional Packages:
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
   --with-test             Compile all Tests
   --with-bench            Compile with benchmark
+  --with-dynstack         Compile dynstack library
+  --with-remotecontrol    Compile remotecontrol library
 
 Some influential environment variables:
   CXX         C++ compiler command
@@ -4012,16 +4020,18 @@ fi
 
 
 
-if test "x$enable_nococo" = "xyes"; then :
-
-   $as_echo "#define _NOCOCO_ 1" >>confdefs.h
-
-   $as_echo "#define __DYNDEFAULT__ 1" >>confdefs.h
-
-   BAACK_CPPFLAGS=" "
-
-
+# Check whether --with-dynstack was given.
+if test "${with_dynstack+set}" = set; then :
+  withval=$with_dynstack;
 fi
+
+
+# Check whether --with-remotecontrol was given.
+if test "${with_remotecontrol+set}" = set; then :
+  withval=$with_remotecontrol;
+fi
+
+
 
 if test "x$with_test" = "xyes"; then :
 
@@ -4070,6 +4080,91 @@ fi
 
 
 fi
+
+
+if test "x$with_dynstack" = "xyes"; then :
+
+    if test x = x; then
+  BAACK_WITH_DYNSTACK_TRUE=
+  BAACK_WITH_DYNSTACK_FALSE='#'
+else
+  BAACK_WITH_DYNSTACK_TRUE='#'
+  BAACK_WITH_DYNSTACK_FALSE=
+fi
+
+
+else
+
+    if test x != x; then
+  BAACK_WITH_DYNSTACK_TRUE=
+  BAACK_WITH_DYNSTACK_FALSE='#'
+else
+  BAACK_WITH_DYNSTACK_TRUE='#'
+  BAACK_WITH_DYNSTACK_FALSE=
+fi
+
+
+fi
+
+if test "x$with_remotecontrol" = "xyes"; then :
+
+   if test x = x; then
+  BAACK_WITH_REMOTECONTROL_TRUE=
+  BAACK_WITH_REMOTECONTROL_FALSE='#'
+else
+  BAACK_WITH_REMOTECONTROL_TRUE='#'
+  BAACK_WITH_REMOTECONTROL_FALSE=
+fi
+
+
+else
+
+   if test x != x; then
+  BAACK_WITH_REMOTECONTROL_TRUE=
+  BAACK_WITH_REMOTECONTROL_FALSE='#'
+else
+  BAACK_WITH_REMOTECONTROL_TRUE='#'
+  BAACK_WITH_REMOTECONTROL_FALSE=
+fi
+
+
+fi
+
+
+if test "x$enable_nococo" = "xyes"; then :
+
+  $as_echo "#define _NOCOCO_ 1" >>confdefs.h
+
+  $as_echo "#define __DYNDEFAULT__ 1" >>confdefs.h
+
+
+  BAACK_CPPFLAGS=" "
+  BAACK_CPPFLAGS="$BAACK_CPPFLAGS -std=c++14"
+
+
+  { $as_echo "$as_me:${as_lineno-$LINENO}: Activate Dynstack" >&5
+$as_echo "$as_me: Activate Dynstack" >&6;}
+   if test x = x; then
+  BAACK_WITH_DYNSTACK_TRUE=
+  BAACK_WITH_DYNSTACK_FALSE='#'
+else
+  BAACK_WITH_DYNSTACK_TRUE='#'
+  BAACK_WITH_DYNSTACK_FALSE=
+fi
+
+  { $as_echo "$as_me:${as_lineno-$LINENO}: Activate Remotecontrol" >&5
+$as_echo "$as_me: Activate Remotecontrol" >&6;}
+   if test x = x; then
+  BAACK_WITH_REMOTECONTROL_TRUE=
+  BAACK_WITH_REMOTECONTROL_FALSE='#'
+else
+  BAACK_WITH_REMOTECONTROL_TRUE='#'
+  BAACK_WITH_REMOTECONTROL_FALSE=
+fi
+
+
+fi
+
 
 
 
@@ -4910,6 +5005,30 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${BAACK_WITHBENCH_TRUE}" && test -z "${BAACK_WITHBENCH_FALSE}"; then
   as_fn_error $? "conditional \"BAACK_WITHBENCH\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${BAACK_WITH_DYNSTACK_TRUE}" && test -z "${BAACK_WITH_DYNSTACK_FALSE}"; then
+  as_fn_error $? "conditional \"BAACK_WITH_DYNSTACK\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${BAACK_WITH_DYNSTACK_TRUE}" && test -z "${BAACK_WITH_DYNSTACK_FALSE}"; then
+  as_fn_error $? "conditional \"BAACK_WITH_DYNSTACK\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${BAACK_WITH_REMOTECONTROL_TRUE}" && test -z "${BAACK_WITH_REMOTECONTROL_FALSE}"; then
+  as_fn_error $? "conditional \"BAACK_WITH_REMOTECONTROL\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${BAACK_WITH_REMOTECONTROL_TRUE}" && test -z "${BAACK_WITH_REMOTECONTROL_FALSE}"; then
+  as_fn_error $? "conditional \"BAACK_WITH_REMOTECONTROL\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${BAACK_WITH_DYNSTACK_TRUE}" && test -z "${BAACK_WITH_DYNSTACK_FALSE}"; then
+  as_fn_error $? "conditional \"BAACK_WITH_DYNSTACK\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${BAACK_WITH_REMOTECONTROL_TRUE}" && test -z "${BAACK_WITH_REMOTECONTROL_FALSE}"; then
+  as_fn_error $? "conditional \"BAACK_WITH_REMOTECONTROL\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 

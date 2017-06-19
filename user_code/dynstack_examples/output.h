@@ -55,8 +55,13 @@ void callback_out(const DeductedParticleType* const p)
 }
 
 
+typedef  dynstack::wrapper::OutputCallbackStack<
+  	       dynstack::wrapper::InputCallbackStack<
+        		 dynstack::storage::LIFO_Stack<DeductedParticleType>,
+			 callback_in>,
+	       callback_out> stacktype;
 
-auto dynstack_setup(std::vector<long> sizes, std::vector< std::list<std::string> > arguments )
+auto dynstack_setup(std::vector<long> sizes, std::vector< std::list<std::string> > arguments ) -> decltype(std::unique_ptr< stacktype >())
 {
 	if(sizes.size() != 1)
 	{
@@ -85,12 +90,6 @@ auto dynstack_setup(std::vector<long> sizes, std::vector< std::list<std::string>
 	}
 
 	std::cout << "(Dyn) Showerview file ready!" << std::endl;
-
-	typedef  dynstack::wrapper::OutputCallbackStack<
-				dynstack::wrapper::InputCallbackStack<
-					dynstack::storage::LIFO_Stack<DeductedParticleType>,
-					callback_in>,
-				callback_out> stacktype;
 	
 	auto stack = std::unique_ptr< stacktype >(new stacktype(size));
 

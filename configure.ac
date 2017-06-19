@@ -35,13 +35,9 @@ AC_ARG_WITH([test], AS_HELP_STRING([--with-test], [Compile all Tests]))
 AC_ARG_WITH([bench], AS_HELP_STRING([--with-bench], [Compile with benchmark]))
 AC_ARG_ENABLE([nococo], AS_HELP_STRING([--enable-nococo], [Enable compile without coconut]))
 
+AC_ARG_WITH([dynstack], AS_HELP_STRING([--with-dynstack], [Compile dynstack library]))
+AC_ARG_WITH([remotecontrol], AS_HELP_STRING([--with-remotecontrol], [Compile remotecontrol library]))
 
-AS_IF([test "x$enable_nococo" = "xyes"], [
-   AC_DEFINE(_NOCOCO_, 1)
-   AC_DEFINE(__DYNDEFAULT__, 1)
-   BAACK_CPPFLAGS=" "
-   AC_SUBST([BAACK_CPPFLAGS])
-])
 
 AS_IF([test "x$with_test" = "xyes"], [
    AM_CONDITIONAL([BAACK_WITHTEST], [test x = x])
@@ -54,6 +50,35 @@ AS_IF([test "x$with_bench" = "xyes"], [
 ], [
    AM_CONDITIONAL([BAACK_WITHBENCH],[test x != x])
 ])
+
+
+AS_IF([test "x$with_dynstack" = "xyes"], [
+   AM_CONDITIONAL([BAACK_WITH_DYNSTACK], [test x = x])
+], [
+   AM_CONDITIONAL([BAACK_WITH_DYNSTACK], [test x != x])
+])
+
+AS_IF([test "x$with_remotecontrol" = "xyes"], [
+  AM_CONDITIONAL([BAACK_WITH_REMOTECONTROL], [test x = x])
+], [
+  AM_CONDITIONAL([BAACK_WITH_REMOTECONTROL], [test x != x])
+])
+
+
+AS_IF([test "x$enable_nococo" = "xyes"], [
+  AC_DEFINE(_NOCOCO_, 1)
+  AC_DEFINE(__DYNDEFAULT__, 1)
+  
+  BAACK_CPPFLAGS=" "
+  BAACK_CPPFLAGS="$BAACK_CPPFLAGS -std=c++14"
+  AC_SUBST([BAACK_CPPFLAGS])
+  
+  AC_MSG_NOTICE([Activate Dynstack])
+  AM_CONDITIONAL([BAACK_WITH_DYNSTACK], [test x = x])
+  AC_MSG_NOTICE([Activate Remotecontrol])
+  AM_CONDITIONAL([BAACK_WITH_REMOTECONTROL], [test x = x])
+])
+
 
 
 AC_CHECK_LIB([pthread], [pthread_mutex_init], [

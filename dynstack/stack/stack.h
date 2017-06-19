@@ -13,7 +13,6 @@
 #include <memory>
 #include <cstring>
 
-#include "dynstack/stack/stack_ptr.h"
 
 
 /// Main namespace for the dynstack package
@@ -33,9 +32,9 @@ namespace dynstack
 	{
 	private:
 
-		static_assert(std::is_default_constructible<TReturn>::value, "Stack type needs a default constructor!");
-		static_assert(std::is_copy_constructible<TReturn>::value, "Stack type needs a copy constructor!");
-		static_assert(std::is_move_constructible<TReturn>::value, "Stack type needs a copy constructor!");
+		//static_assert(std::is_default_constructible<TReturn>::value, "Stack type needs a default constructor!");
+		//static_assert(std::is_copy_constructible<TReturn>::value, "Stack type needs a copy constructor!");
+		//static_assert(std::is_move_constructible<TReturn>::value, "Stack type needs a copy constructor!");
 
 	protected:
 
@@ -45,10 +44,10 @@ namespace dynstack
 
 		Stack(const Stack& rhs) = delete;
 
-		inline StackPtr<TReturn, TStorage> createStackObj(TReturn* const item, void (*del)(TStorage* const) = nullptr) const
+		/*inline StackPtr<TReturn, TStorage> createStackObj(TReturn* const item, void (*del)(TStorage* const) = nullptr) const
 		{
 			return StackPtr<TReturn, TStorage>(item, del);
-		}
+		}*/
 
 	public:
 
@@ -80,9 +79,9 @@ namespace dynstack
 		virtual void clear() = 0;
 		
 
-		//Get new empty element to write into (direct access, zero copy)
+		/*//Get new empty element to write into (direct access, zero copy)
 		virtual StackPtr<TReturn, TStorage> reserve() = 0;
-
+*/
 		//Returns the number of currently stored elements
 		virtual unsigned long size() const = 0;
 

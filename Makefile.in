@@ -165,16 +165,23 @@ am_libBaack_a_OBJECTS =  \
 libBaack_a_OBJECTS = $(am_libBaack_a_OBJECTS)
 libDynstack_a_AR = $(AR) $(ARFLAGS)
 libDynstack_a_LIBADD =
-am_libDynstack_a_OBJECTS = dynstack/libDynstack_a-export.$(OBJEXT)
+am__libDynstack_a_SOURCES_DIST = dynstack/export.cpp
+@BAACK_WITH_DYNSTACK_TRUE@am_libDynstack_a_OBJECTS = dynstack/libDynstack_a-export.$(OBJEXT)
 libDynstack_a_OBJECTS = $(am_libDynstack_a_OBJECTS)
 libRemotecontrol_a_AR = $(AR) $(ARFLAGS)
 libRemotecontrol_a_LIBADD =
-am_libRemotecontrol_a_OBJECTS = remote_control/communication/libRemotecontrol_a-packet.$(OBJEXT) \
-	remote_control/communication/libRemotecontrol_a-message_queue.$(OBJEXT) \
-	remote_control/libRemotecontrol_a-export.$(OBJEXT) \
-	remote_control/control/libRemotecontrol_a-periodic_task.$(OBJEXT) \
-	remote_control/control/libRemotecontrol_a-main_control.$(OBJEXT) \
-	remote_control/control/libRemotecontrol_a-recv_cache.$(OBJEXT)
+am__libRemotecontrol_a_SOURCES_DIST = remote_control/export.cpp \
+	remote_control/communication/packet.cpp \
+	remote_control/communication/message_queue.cpp \
+	remote_control/control/periodic_task.cpp \
+	remote_control/control/main_control.cpp \
+	remote_control/control/recv_cache.cpp
+@BAACK_WITH_REMOTECONTROL_TRUE@am_libRemotecontrol_a_OBJECTS = remote_control/libRemotecontrol_a-export.$(OBJEXT) \
+@BAACK_WITH_REMOTECONTROL_TRUE@	remote_control/communication/libRemotecontrol_a-packet.$(OBJEXT) \
+@BAACK_WITH_REMOTECONTROL_TRUE@	remote_control/communication/libRemotecontrol_a-message_queue.$(OBJEXT) \
+@BAACK_WITH_REMOTECONTROL_TRUE@	remote_control/control/libRemotecontrol_a-periodic_task.$(OBJEXT) \
+@BAACK_WITH_REMOTECONTROL_TRUE@	remote_control/control/libRemotecontrol_a-main_control.$(OBJEXT) \
+@BAACK_WITH_REMOTECONTROL_TRUE@	remote_control/control/libRemotecontrol_a-recv_cache.$(OBJEXT)
 libRemotecontrol_a_OBJECTS = $(am_libRemotecontrol_a_OBJECTS)
 @BAACK_WITHTEST_TRUE@am__EXEEXT_1 = dynstack_test$(EXEEXT) \
 @BAACK_WITHTEST_TRUE@	remotecontrol_test$(EXEEXT) \
@@ -259,8 +266,8 @@ SOURCES = $(libBaack_a_SOURCES) $(libDynstack_a_SOURCES) \
 	$(libRemotecontrol_a_SOURCES) $(dynstack_benchmark_SOURCES) \
 	$(dynstack_test_SOURCES) $(library_test_SOURCES) \
 	$(remotecontrol_test_SOURCES)
-DIST_SOURCES = $(libBaack_a_SOURCES) $(libDynstack_a_SOURCES) \
-	$(libRemotecontrol_a_SOURCES) \
+DIST_SOURCES = $(libBaack_a_SOURCES) $(am__libDynstack_a_SOURCES_DIST) \
+	$(am__libRemotecontrol_a_SOURCES_DIST) \
 	$(am__dynstack_benchmark_SOURCES_DIST) \
 	$(am__dynstack_test_SOURCES_DIST) \
 	$(am__library_test_SOURCES_DIST) \
@@ -407,21 +414,24 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AUTOMAKE_OPTIONS = foreign subdir-objects
-AM_CXXFLAGS = -I$(top_srcdir) -pthread -std=c++14 -Wall -Wextra -Wnarrowing -pedantic @BAACK_CPPFLAGS@
+AM_CXXFLAGS = -I$(top_srcdir) -pthread -Wall -Wextra -pedantic -Werror=return-type @BAACK_CPPFLAGS@
 nobase_include_HEADERS = 
-lib_LIBRARIES = libDynstack.a libRemotecontrol.a libBaack.a
-libDynstack_a_SOURCES = dynstack/export.cpp 
-@BAACK_WITHTEST_FALSE@libDynstack_a_CPPFLAGS = -O3 -g @BAACK_CPPFLAGS@
-@BAACK_WITHTEST_TRUE@libDynstack_a_CPPFLAGS = -Og -g @BAACK_CPPFLAGS@
-libRemotecontrol_a_SOURCES = remote_control/communication/packet.cpp \
-  remote_control/communication/message_queue.cpp \
-  remote_control/export.cpp \
-  remote_control/control/periodic_task.cpp \
-  remote_control/control/main_control.cpp \
-  remote_control/control/recv_cache.cpp
+@BAACK_WITH_DYNSTACK_FALSE@@BAACK_WITH_REMOTECONTROL_FALSE@lib_LIBRARIES = 
+@BAACK_WITH_DYNSTACK_FALSE@@BAACK_WITH_REMOTECONTROL_TRUE@lib_LIBRARIES = libBaack.a libRemotecontrol.a
+@BAACK_WITH_DYNSTACK_TRUE@@BAACK_WITH_REMOTECONTROL_FALSE@lib_LIBRARIES = libBaack.a libDynstack.a
+@BAACK_WITH_DYNSTACK_TRUE@@BAACK_WITH_REMOTECONTROL_TRUE@lib_LIBRARIES = libBaack.a libDynstack.a libRemotecontrol.a
+@BAACK_WITH_DYNSTACK_TRUE@libDynstack_a_SOURCES = dynstack/export.cpp 
+@BAACK_WITHTEST_FALSE@@BAACK_WITH_DYNSTACK_TRUE@libDynstack_a_CPPFLAGS = -O3 -g @BAACK_CPPFLAGS@
+@BAACK_WITHTEST_TRUE@@BAACK_WITH_DYNSTACK_TRUE@libDynstack_a_CPPFLAGS = -Og -g @BAACK_CPPFLAGS@
+@BAACK_WITH_REMOTECONTROL_TRUE@libRemotecontrol_a_SOURCES = remote_control/export.cpp \
+@BAACK_WITH_REMOTECONTROL_TRUE@			     remote_control/communication/packet.cpp \
+@BAACK_WITH_REMOTECONTROL_TRUE@                             remote_control/communication/message_queue.cpp \
+@BAACK_WITH_REMOTECONTROL_TRUE@                             remote_control/control/periodic_task.cpp \
+@BAACK_WITH_REMOTECONTROL_TRUE@                             remote_control/control/main_control.cpp \
+@BAACK_WITH_REMOTECONTROL_TRUE@                             remote_control/control/recv_cache.cpp
 
-@BAACK_WITHTEST_FALSE@libRemotecontrol_a_CPPFLAGS = -Og -g @BAACK_CPPFLAGS@
-@BAACK_WITHTEST_TRUE@libRemotecontrol_a_CPPFLAGS = -O3 -g @BAACK_CPPFLAGS@ 
+@BAACK_WITHTEST_FALSE@@BAACK_WITH_REMOTECONTROL_TRUE@libRemotecontrol_a_CPPFLAGS = -O3 -g @BAACK_CPPFLAGS@
+@BAACK_WITHTEST_TRUE@@BAACK_WITH_REMOTECONTROL_TRUE@libRemotecontrol_a_CPPFLAGS = -Og -g @BAACK_CPPFLAGS@ 
 libBaack_a_SOURCES = lib/data/corsika/event_header.cpp \
   lib/data/corsika/event_end.cpp \
   lib/data/corsika/steering_card.cpp \
@@ -438,8 +448,8 @@ libBaack_a_SOURCES = lib/data/corsika/event_header.cpp \
   basic/export.cpp \
   basic/basic.cpp 
 
-@BAACK_WITHTEST_FALSE@libBaack_a_CPPFLAGS = -Og -g @BAACK_CPPFLAGS@
-@BAACK_WITHTEST_TRUE@libBaack_a_CPPFLAGS = -O3 -g @BAACK_CPPFLAGS@ 
+@BAACK_WITHTEST_FALSE@libBaack_a_CPPFLAGS = -O3 -g @BAACK_CPPFLAGS@
+@BAACK_WITHTEST_TRUE@libBaack_a_CPPFLAGS = -Og -g @BAACK_CPPFLAGS@ 
 @BAACK_WITHTEST_TRUE@dynstack_test_SOURCES = test/dynstack/storage_test.cpp \
 @BAACK_WITHTEST_TRUE@  test/dynstack/advanced_test.cpp \
 @BAACK_WITHTEST_TRUE@  test/dynstack/unit_test.cpp \
@@ -623,6 +633,15 @@ libDynstack.a: $(libDynstack_a_OBJECTS) $(libDynstack_a_DEPENDENCIES) $(EXTRA_li
 	$(AM_V_at)-rm -f libDynstack.a
 	$(AM_V_AR)$(libDynstack_a_AR) libDynstack.a $(libDynstack_a_OBJECTS) $(libDynstack_a_LIBADD)
 	$(AM_V_at)$(RANLIB) libDynstack.a
+remote_control/$(am__dirstamp):
+	@$(MKDIR_P) remote_control
+	@: > remote_control/$(am__dirstamp)
+remote_control/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) remote_control/$(DEPDIR)
+	@: > remote_control/$(DEPDIR)/$(am__dirstamp)
+remote_control/libRemotecontrol_a-export.$(OBJEXT):  \
+	remote_control/$(am__dirstamp) \
+	remote_control/$(DEPDIR)/$(am__dirstamp)
 remote_control/communication/$(am__dirstamp):
 	@$(MKDIR_P) remote_control/communication
 	@: > remote_control/communication/$(am__dirstamp)
@@ -635,15 +654,6 @@ remote_control/communication/libRemotecontrol_a-packet.$(OBJEXT):  \
 remote_control/communication/libRemotecontrol_a-message_queue.$(OBJEXT):  \
 	remote_control/communication/$(am__dirstamp) \
 	remote_control/communication/$(DEPDIR)/$(am__dirstamp)
-remote_control/$(am__dirstamp):
-	@$(MKDIR_P) remote_control
-	@: > remote_control/$(am__dirstamp)
-remote_control/$(DEPDIR)/$(am__dirstamp):
-	@$(MKDIR_P) remote_control/$(DEPDIR)
-	@: > remote_control/$(DEPDIR)/$(am__dirstamp)
-remote_control/libRemotecontrol_a-export.$(OBJEXT):  \
-	remote_control/$(am__dirstamp) \
-	remote_control/$(DEPDIR)/$(am__dirstamp)
 remote_control/control/$(am__dirstamp):
 	@$(MKDIR_P) remote_control/control
 	@: > remote_control/control/$(am__dirstamp)
@@ -1126,6 +1136,20 @@ dynstack/libDynstack_a-export.obj: dynstack/export.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libDynstack_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o dynstack/libDynstack_a-export.obj `if test -f 'dynstack/export.cpp'; then $(CYGPATH_W) 'dynstack/export.cpp'; else $(CYGPATH_W) '$(srcdir)/dynstack/export.cpp'; fi`
 
+remote_control/libRemotecontrol_a-export.o: remote_control/export.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libRemotecontrol_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT remote_control/libRemotecontrol_a-export.o -MD -MP -MF remote_control/$(DEPDIR)/libRemotecontrol_a-export.Tpo -c -o remote_control/libRemotecontrol_a-export.o `test -f 'remote_control/export.cpp' || echo '$(srcdir)/'`remote_control/export.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) remote_control/$(DEPDIR)/libRemotecontrol_a-export.Tpo remote_control/$(DEPDIR)/libRemotecontrol_a-export.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='remote_control/export.cpp' object='remote_control/libRemotecontrol_a-export.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libRemotecontrol_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o remote_control/libRemotecontrol_a-export.o `test -f 'remote_control/export.cpp' || echo '$(srcdir)/'`remote_control/export.cpp
+
+remote_control/libRemotecontrol_a-export.obj: remote_control/export.cpp
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libRemotecontrol_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT remote_control/libRemotecontrol_a-export.obj -MD -MP -MF remote_control/$(DEPDIR)/libRemotecontrol_a-export.Tpo -c -o remote_control/libRemotecontrol_a-export.obj `if test -f 'remote_control/export.cpp'; then $(CYGPATH_W) 'remote_control/export.cpp'; else $(CYGPATH_W) '$(srcdir)/remote_control/export.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) remote_control/$(DEPDIR)/libRemotecontrol_a-export.Tpo remote_control/$(DEPDIR)/libRemotecontrol_a-export.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='remote_control/export.cpp' object='remote_control/libRemotecontrol_a-export.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libRemotecontrol_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o remote_control/libRemotecontrol_a-export.obj `if test -f 'remote_control/export.cpp'; then $(CYGPATH_W) 'remote_control/export.cpp'; else $(CYGPATH_W) '$(srcdir)/remote_control/export.cpp'; fi`
+
 remote_control/communication/libRemotecontrol_a-packet.o: remote_control/communication/packet.cpp
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libRemotecontrol_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT remote_control/communication/libRemotecontrol_a-packet.o -MD -MP -MF remote_control/communication/$(DEPDIR)/libRemotecontrol_a-packet.Tpo -c -o remote_control/communication/libRemotecontrol_a-packet.o `test -f 'remote_control/communication/packet.cpp' || echo '$(srcdir)/'`remote_control/communication/packet.cpp
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) remote_control/communication/$(DEPDIR)/libRemotecontrol_a-packet.Tpo remote_control/communication/$(DEPDIR)/libRemotecontrol_a-packet.Po
@@ -1153,20 +1177,6 @@ remote_control/communication/libRemotecontrol_a-message_queue.obj: remote_contro
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='remote_control/communication/message_queue.cpp' object='remote_control/communication/libRemotecontrol_a-message_queue.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libRemotecontrol_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o remote_control/communication/libRemotecontrol_a-message_queue.obj `if test -f 'remote_control/communication/message_queue.cpp'; then $(CYGPATH_W) 'remote_control/communication/message_queue.cpp'; else $(CYGPATH_W) '$(srcdir)/remote_control/communication/message_queue.cpp'; fi`
-
-remote_control/libRemotecontrol_a-export.o: remote_control/export.cpp
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libRemotecontrol_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT remote_control/libRemotecontrol_a-export.o -MD -MP -MF remote_control/$(DEPDIR)/libRemotecontrol_a-export.Tpo -c -o remote_control/libRemotecontrol_a-export.o `test -f 'remote_control/export.cpp' || echo '$(srcdir)/'`remote_control/export.cpp
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) remote_control/$(DEPDIR)/libRemotecontrol_a-export.Tpo remote_control/$(DEPDIR)/libRemotecontrol_a-export.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='remote_control/export.cpp' object='remote_control/libRemotecontrol_a-export.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libRemotecontrol_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o remote_control/libRemotecontrol_a-export.o `test -f 'remote_control/export.cpp' || echo '$(srcdir)/'`remote_control/export.cpp
-
-remote_control/libRemotecontrol_a-export.obj: remote_control/export.cpp
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libRemotecontrol_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT remote_control/libRemotecontrol_a-export.obj -MD -MP -MF remote_control/$(DEPDIR)/libRemotecontrol_a-export.Tpo -c -o remote_control/libRemotecontrol_a-export.obj `if test -f 'remote_control/export.cpp'; then $(CYGPATH_W) 'remote_control/export.cpp'; else $(CYGPATH_W) '$(srcdir)/remote_control/export.cpp'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) remote_control/$(DEPDIR)/libRemotecontrol_a-export.Tpo remote_control/$(DEPDIR)/libRemotecontrol_a-export.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='remote_control/export.cpp' object='remote_control/libRemotecontrol_a-export.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libRemotecontrol_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o remote_control/libRemotecontrol_a-export.obj `if test -f 'remote_control/export.cpp'; then $(CYGPATH_W) 'remote_control/export.cpp'; else $(CYGPATH_W) '$(srcdir)/remote_control/export.cpp'; fi`
 
 remote_control/control/libRemotecontrol_a-periodic_task.o: remote_control/control/periodic_task.cpp
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libRemotecontrol_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT remote_control/control/libRemotecontrol_a-periodic_task.o -MD -MP -MF remote_control/control/$(DEPDIR)/libRemotecontrol_a-periodic_task.Tpo -c -o remote_control/control/libRemotecontrol_a-periodic_task.o `test -f 'remote_control/control/periodic_task.cpp' || echo '$(srcdir)/'`remote_control/control/periodic_task.cpp

@@ -147,12 +147,6 @@ namespace dynstack
 			}
 
 
-			//Get new empty element to write into (direct access, zero copy)
-			inline StackPtr<TType> reserve()
-			{
-				return StackPtr<TType>();
-			}
-
 					
 
 			inline unsigned long size() const

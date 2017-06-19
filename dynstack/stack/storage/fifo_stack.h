@@ -15,7 +15,7 @@
 #include <deque>
 
 #include "dynstack/stack/stack.h"
-#include "dynstack/stack/stack_ptr.h"
+//#include "dynstack/stack/stack_ptr.h"
 
 namespace dynstack
 {
@@ -251,10 +251,6 @@ namespace dynstack
  			 *
 			 * \return Returns a pointer to new storage area without and precaution
 			 */
-			inline StackPtr<TType> reserve()
-			{
-				return StackPtr<TType>();
-			}
 			
 			inline unsigned long size() const
 			{

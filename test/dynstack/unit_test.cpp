@@ -44,6 +44,9 @@ namespace test
 			std::cout << "\n\t-Sorted-" << std::endl;
 			test::dynstack::wrapper::Sorted();
 
+			std::cout << "\n\t-Priority-" << std::endl;
+			test::dynstack::wrapper::Priority();
+
 			std::cout << "\n\t-Combination-" << std::endl;
 			test::dynstack::wrapper::Combinations();
 		}
@@ -58,7 +61,10 @@ namespace test
 
 			std::cout << "\n\t-Dynamic Sorted-" << std::endl;
 			test::dynstack::advanced::DynamicSorted();
-		}
+
+            std::cout << "\n\t-If-" << std::endl;
+            test::dynstack::advanced::If();
+        }
 
 	}
 

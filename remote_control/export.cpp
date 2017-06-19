@@ -34,15 +34,24 @@ void remotecontrol_init_(const char* line, const int* size)
 
 	std::list<std::string> list;
 	std::string item;
+	
 	while (std::getline(sstr, item, ' '))
 	{
-		list.push_back(item);
+		if(item == " " || item == "")
+		{
+			continue;
+		}
+		else
+		{
+			list.push_back(item);
+		}
 	}
+
 	
 	item = list.front();
 	list.pop_front();
 
-	remotecontrol_steering_card.emplace(item, list);
+	remotecontrol_steering_card[item] = list;
 	
 }
 

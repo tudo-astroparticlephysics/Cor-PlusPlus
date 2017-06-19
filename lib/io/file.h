@@ -27,7 +27,7 @@ class File
 private:
 	std::fstream m_oFile;
 	
-	bool statusOpen = false;
+	bool statusOpen;
 
 public:
 	

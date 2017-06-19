@@ -18,6 +18,8 @@ typedef DeductedParticleType Particle;
 #include "user_code/dynstack_examples/default.h"
 #elif __DYNOUTPUT__
 #include "user_code/dynstack_examples/output.h"
+#elif __DYNICECUBE__
+#include "user_code/dynstack_examples/icecube1.h"
 #elif __DYNCUSTOM__
 #include <vector>
 #include <string>

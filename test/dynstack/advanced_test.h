@@ -29,7 +29,9 @@ namespace test
 			bool Copy();
 
 			bool DynamicSorted();
-		}
+
+            bool If();
+        }
 	}
 }
 
