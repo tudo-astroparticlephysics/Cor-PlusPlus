@@ -19,12 +19,10 @@
 
 #include <stdexcept>
 
-#include "lib/meta/index_sequence.h"
+#include "meta/index_sequence.h"
 
 
 
-namespace lib
-{
 
 	namespace data
 	{
@@ -701,5 +699,5 @@ namespace lib
 
 
 	}
-}
+
 

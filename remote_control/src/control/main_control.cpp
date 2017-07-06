@@ -10,7 +10,7 @@
 
 #include "remote_control/control/main_control.h"
 
-#include "lib/io/network/dns_lookup.h"
+#include "io/network/dns_lookup.h"
 
 namespace remote_control
 {
@@ -99,7 +99,7 @@ namespace remote_control
 			return false;
 		}
 
-		const std::string ip = lib::io::network::hostname_to_ip(dns);
+		const std::string ip = io::network::hostname_to_ip(dns);
 		if (!m_client.init(ip, port))
 		{
 			std::cerr << "Could not connect to " << dns << ":" << port << "(" << ip << ")" << std::endl;

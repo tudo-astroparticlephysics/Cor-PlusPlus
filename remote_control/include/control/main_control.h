@@ -17,7 +17,7 @@
 
 #include <chrono>
 
-#include "lib/io/network/client.h"
+#include "io/network/client.h"
 
 #include "remote_control/communication/message_queue.h"
 #include "remote_control/communication/packet.h"
@@ -28,7 +28,7 @@
 
 namespace remote_control
 {
-	
+
 	class MainControl
 	{
 	private:
@@ -38,7 +38,7 @@ namespace remote_control
 		 * @{
 		 *
 		 */
-		lib::io::network::Client m_client;
+		io::network::Client m_client;
 
 		decltype(register_periodic_callback()) m_periodic;
 		decltype(register_server_callback()) m_callback;
@@ -55,9 +55,9 @@ namespace remote_control
 
 
 		/// @}
-		
 
-		/// 
+
+		///
 		/** \defgroup Synchronisation Communication with the parallel running network thread
 		 *  @{
 		 *   Every variable which is thread save is marked with a ts **in this class**

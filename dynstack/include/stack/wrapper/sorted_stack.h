@@ -12,7 +12,7 @@
 
 #include "dynstack/stack/stack.h"
 
-#include "lib/meta/tuple_algorithm.h"
+#include "meta/tuple/tuple_algorithm.h"
 
 #include <type_traits>
 #include <tuple>
@@ -23,7 +23,7 @@
 namespace dynstack
 {
 	namespace wrapper
-	{		
+	{
 
 		template<class TStack, unsigned int TBins, unsigned int(*TFunc)(const typename TStack::m_ReturnType* const)>
 		class SortedStack : public Stack<typename TStack::m_ReturnType, typename TStack::m_StackType>
@@ -35,7 +35,7 @@ namespace dynstack
 			typedef typename TStack::m_ReturnType TType;
 			typedef typename TStack::m_StackType TTypeStack;
 
-			std::array<lib::meta::tuple::tupleUnpack<TStack>, TBins> m_oStacks;
+			std::array<meta::tuple::tupleUnpack<TStack>, TBins> m_oStacks;
 
 			unsigned int m_uiBinSize[TBins];
 			unsigned int m_uiSize;
@@ -48,32 +48,32 @@ namespace dynstack
 
 		protected:
 
-					
+
 		public:
 
-			
+
 			template<class ... TArgs>
 			SortedStack(TArgs&&... args)
 				: m_oStacks{ { std::forward<TArgs>(args)... } }, m_uiSize(0), m_iLastStack(-1)
-			{		
+			{
 				static_assert(sizeof...(TArgs) == TBins, "Not enough Arguments for every DiscreteSorted Bin!");
 
 				for (unsigned int i = 0; i < TBins; i++)
-				{									
+				{
 					m_uiBinSize[i] = 0;
 				}
 
-				
+
 				for (unsigned int i = 0; i < TBins; i++)
 					m_uiCap += m_oStacks[i].capacity();
 			}
 
 
-			
+
 			SortedStack(SortedStack<TStack, TBins, TFunc> && rhs)
 				: m_oStacks( std::move(rhs.m_oStacks) ), m_uiSize(rhs.m_uiSize), m_iLastStack(rhs.m_iLastStack)
 			{
-				
+
 				rhs.m_iLastStack = -1;
 				rhs.m_uiSize = 0;
 
@@ -82,12 +82,12 @@ namespace dynstack
 			}
 
 			~SortedStack()
-			{				
+			{
 			}
 
 			inline int push_back(const TType& data)
-			{				
-				const unsigned int bin = TFunc(&data);				
+			{
+				const unsigned int bin = TFunc(&data);
 
 				const int tmp = m_oStacks[bin].push_back(data);
 				if (tmp == 0)
@@ -117,7 +117,7 @@ namespace dynstack
 			{
 				int check = true;
 				for (unsigned int i = 0; i < elem; i++)
-				{					
+				{
 					const unsigned int bin = TFunc(&data[i]);
 
 					const int tmp = m_oStacks[bin].push_back(data[i]);
@@ -130,7 +130,7 @@ namespace dynstack
 					check = check | tmp;
 				}
 				return check;
-				
+
 			}
 
 			inline int push_back(const TType* const data, const unsigned int elem)
@@ -183,7 +183,7 @@ namespace dynstack
 			}
 
 
-			// Removes last element from stack 
+			// Removes last element from stack
 			// that was readed with back
 			inline bool pop()
 			{
@@ -216,7 +216,7 @@ namespace dynstack
 				return StackPtr<TType, TTypeStack>();
 			}
 
-			
+
 
 			inline unsigned long size() const
 			{
@@ -232,4 +232,3 @@ namespace dynstack
 		};
 	}
 }
-

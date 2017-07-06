@@ -14,10 +14,10 @@
 #include "../include/config.h"
 #endif
 
-#include "lib/data/corsika/particle.h"
+#include "basic/corsika/particle.h"
 
 
-using namespace lib::data;
+using namespace data;
 
 
 #if __MULTITHIN__
@@ -82,19 +82,17 @@ using namespace lib::data;
   *  Its additional possible to use make_particle to create a custom particle storage that can be compatible with unmodified CORSIKA. But allows more modifications
   *  to change the internal order of the storage for changes/optimization in the used CORSIKA particle format.
 */
-typedef decltype(lib::data::make_particle< DEDUCTED_PARTICLE_COMPOSITION >()) DeductedParticleType;
+typedef decltype(data::make_particle< DEDUCTED_PARTICLE_COMPOSITION >()) DeductedParticleType;
 
 
 #if __cplusplus > 199711L
 template<int TSize>
-using DeductedParticleTypeCustom = decltype(lib::data::make_particle< DEDUCTED_PARTICLE_COMPOSITION, ParticleDataType::custom, TSize>());
+using DeductedParticleTypeCustom = decltype(data::make_particle< DEDUCTED_PARTICLE_COMPOSITION, ParticleDataType::custom, TSize>());
 #else
 
 template<int TSize>
 struct DeductedParticleTypeCustom
 {
-	typedef decltype(lib::data::make_particle< DEDUCTED_PARTICLE_COMPOSITION, ParticleDataType::custom, TSize>()) type;
+	typedef decltype(data::make_particle< DEDUCTED_PARTICLE_COMPOSITION, ParticleDataType::custom, TSize>()) type;
 };
 #endif
-
-

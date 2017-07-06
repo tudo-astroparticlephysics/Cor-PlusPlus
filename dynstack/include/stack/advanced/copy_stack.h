@@ -19,7 +19,7 @@
 
 #include "dynstack/stack/stack.h"
 
-#include "lib/meta/tuple_algorithm.h"
+#include "meta/tuple/tuple_algorithm.h"
 
 namespace dynstack
 {
@@ -34,40 +34,40 @@ namespace dynstack
 		*	Additional this class only works if the type of the main stack is _standard constructible and castable_ to the type of the copy stack.
 		*
 		*	\tparam TStackOrig	Main stack that all functionallity depends on
-		*	\tparam TStackCopy	Stack that all pushed elements get additional copied to. Its not possible to querry any information to this class with 
+		*	\tparam TStackCopy	Stack that all pushed elements get additional copied to. Its not possible to querry any information to this class with
 		*	this decorator.
 		*/
 		template<class TStackOrig, class TStackCopy>
-		class CopyStack: public lib::meta::tuple::tupleUnpack< TStackOrig >
+		class CopyStack: public meta::tuple::tupleUnpack< TStackOrig >
 		{
 
 			static_assert(std::is_base_of<_Stack, TStackOrig>::value, "TStackOrig must be a Stack!");
 			static_assert(std::is_base_of<_Stack, TStackCopy>::value, "TStackCopy must be a Stack!");
-			
+
 		private:
 
 			typedef typename TStackOrig::m_ReturnType TType;
 			typedef typename TStackOrig::m_StackType TTypeStack;
 
 
-			lib::meta::tuple::tupleUnpack< TStackCopy > m_oCopy;
-			
+			meta::tuple::tupleUnpack< TStackCopy > m_oCopy;
+
 		protected:
-			
+
 
 		public:
 
 			template<typename ... TArgs1, typename ... TArgs2>
 			CopyStack(std::tuple<TArgs1...> arg1, std::tuple<TArgs2...> arg2)
-					: lib::meta::tuple::tupleUnpack< TStackOrig >( std::forward<std::tuple<TArgs1...> >(arg1) ), m_oCopy(arg2)
+					: meta::tuple::tupleUnpack< TStackOrig >( std::forward<std::tuple<TArgs1...> >(arg1) ), m_oCopy(arg2)
 			{
 			}
 
-						
+
 			CopyStack(CopyStack<TStackOrig, TStackCopy> && rhs)
 				: TStackOrig(std::forward<TStackOrig&&>(rhs) ), m_oCopy( std::move(rhs.m_oCopy) )
-			{				
-			}			
+			{
+			}
 
 			~CopyStack()
 			{
@@ -98,17 +98,17 @@ namespace dynstack
 				{
 					copy[i] = data[i];
 				}
-				
+
 				m_oCopy.push_back( std::move(copy) , elem);
 				return TStackOrig::push_back( std::move(data), elem);
 			}
 
 			inline int push_back(const TType* const data, const unsigned int elem)
-			{		
+			{
 
 				m_oCopy.push_back(data, elem);
 				return TStackOrig::push_back(data, elem);
-			}	
+			}
 
 			///TODO: Implement pop, back and pop_back
 
@@ -118,4 +118,3 @@ namespace dynstack
 
 	}
 }
-

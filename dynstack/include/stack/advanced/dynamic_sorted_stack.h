@@ -12,7 +12,7 @@
 
 #include "dynstack/stack/stack.h"
 
-#include "lib/meta/tuple_algorithm.h"
+#include "meta/tuple/tuple_algorithm.h"
 
 #include <type_traits>
 #include <tuple>
@@ -34,9 +34,9 @@ namespace dynstack
 			/**
 			 *  This visiter structure allows runtime access to tuple elements, here with focus on a std::tuple of (different) stacks.
 			 *  It does not provide direct access to the elements in the std::tuple but to the most important stack functions.
-			 *  For the access it creates multiple if else statments with template recursion that should be optimized from the compiler to a switch statement.			 
+			 *  For the access it creates multiple if else statments with template recursion that should be optimized from the compiler to a switch statement.
 			 *
-			 *  This general struct has a specialisation \ref visit_impl<0> to end the recursion. 		
+			 *  This general struct has a specialisation \ref visit_impl<0> to end the recursion.
 			 *
 			 *  \tparam I Number of elements in the tuple, in most cases std::tuple_size<T>::value.
 			 */
@@ -124,7 +124,7 @@ namespace dynstack
 				static int push_at(T& tup, size_t idx, TData data)
 				{
 					(void)(tup);
-					(void)(idx);	
+					(void)(idx);
 					(void)(data);
 					return -1;
 					//static_assert(false,"This should not happen!");
@@ -203,7 +203,7 @@ namespace dynstack
 
 		private:
 
-			std::tuple< lib::meta::tuple::tupleUnpack<TStack>...> m_oStacks;
+			std::tuple< meta::tuple::tupleUnpack<TStack>...> m_oStacks;
 
 			unsigned int m_uiBinSize[sizeof...(TStack)];
 
@@ -233,7 +233,7 @@ namespace dynstack
 				m_uiBinSize[i] = 0;
 			}
 
-			//tuple fold lib::Meta::Tuple::foldTuple::foldl();
+			//tuple fold Meta::Tuple::foldTuple::foldl();
 
 			for (unsigned int i = 0; i < sizeof...(TStack); i++)
 				m_uiCap += aux::visit_impl<TType, sizeof...(TStack)>::capacity_at(m_oStacks, i);
@@ -265,7 +265,7 @@ namespace dynstack
 		/**
 		*   Classifies the variable and stores it into the specific stack
 		*   \param data Reference to data that should be stores. The reference will get passed to the next stack level.
-		*   \return forwards the return of the underlying stack classes 
+		*   \return forwards the return of the underlying stack classes
 		*/
 		inline int push_back(const TType& data)
 		{
