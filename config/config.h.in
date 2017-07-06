@@ -1,0 +1,15 @@
+
+// This options get automatically filled from the CMake Script with current values
+#define DTL_VERSION_MAJOR @DTL_VERSION_MAJOR@
+#define DTL_VERSION_MINOR @DTL_VERSION_MINOR@
+#define DTL_VERSION_PATCH @DTL_VERSION_PATCH@
+
+
+
+
+
+
+
+
+
+
