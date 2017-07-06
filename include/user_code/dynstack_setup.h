@@ -9,7 +9,7 @@
 */
 #pragma once
 
-#include "basic/particle_deduction.h"
+#include "particle_deduction.h"
 typedef DeductedParticleType Particle;
 
 

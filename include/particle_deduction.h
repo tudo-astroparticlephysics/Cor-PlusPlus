@@ -9,6 +9,8 @@
 */
 #pragma once
 
+#include "config.h"
+
 #ifdef _NOCOCO_
 #else
 #include "../include/config.h"

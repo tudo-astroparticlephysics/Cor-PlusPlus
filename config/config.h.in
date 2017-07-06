@@ -1,13 +1,21 @@
 
 // This options get automatically filled from the CMake Script with current values
-#define DTL_VERSION_MAJOR @DTL_VERSION_MAJOR@
-#define DTL_VERSION_MINOR @DTL_VERSION_MINOR@
-#define DTL_VERSION_PATCH @DTL_VERSION_PATCH@
 
 
+#cmakedefine DTL_VERSION_MAJOR @DTL_VERSION_MAJOR@
+#cmakedefine DTL_VERSION_MINOR @DTL_VERSION_MINOR@
+#cmakedefine DTL_VERSION_PATCH @DTL_VERSION_PATCH@
 
 
+// Options
+#cmakedefine BUILD_DYNSTACK
+#cmakedefine BUILD_REMOTECONTROL
+#cmakedefine BUILD_BASIC
+#cmakedefine BUILD_TESTS
 
+#ifndef BUILD_TESTS
+    #define _NOCOCO_
+#endif
 
 
 
