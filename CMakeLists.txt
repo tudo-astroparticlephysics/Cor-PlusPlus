@@ -25,16 +25,40 @@ set(PROJECT_SOURCE_DIR ${PROJECT_SOURCE_DIR}/src)
 
 set(USER_CODE_INCLUDE_DIR "${PROJECT_INCLUDE_DIR}")
 
+#Set settings to release
 set(CMAKE_BUILD_TYPE Release)
+
+# Set Compiler Version
+set (CMAKE_CXX_STANDARD 14)
+
+# Compiler-specific C++XY activation.
+if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
+    execute_process(
+        COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
+        message("Compiler version: ${GCC_VERSION}")
+    if (NOT (GCC_VERSION VERSION_GREATER 4.6 OR GCC_VERSION VERSION_EQUAL 4.6))
+        message(FATAL_ERROR "${PROJECT_NAME} requires g++ 4.6 or greater.")
+    elseif(NOT (GCC_VERSION VERSION_GREATER 4.8 OR GCC_VERSION VERSION_EQUAL 4.8))
+        message("${PROJECT_NAME} uses a version below g++ 4.8.1 and does not support the full feature level. Read the manual to check which functionality is available!")
+    elseif(NOT (GCC_VERSION VERSION_GREATER 5.0 OR GCC_VERSION VERSION_EQUAL 5.0))
+        message("${PROJECT_NAME} uses a version above g++ 4.8.1 and does support the full feature level.")
+    elseif(NOT (GCC_VERSION VERSION_GREATER 7.0.0 OR GCC_VERSION VERSION_EQUAL 7.0.0))
+        message("${PROJECT_NAME} uses a g++ version above 5.0.0 and support all features including additional performance and usability tweaks!")
+    endif ()
+elseif ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
+else ()
+    message(FATAL_ERROR "Your C++ compiler does not support the necessary feature to compile this module. For best results use gcc 4.6 or above.")
+endif ()
+
+# Set shared compiler flags
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall -Wextra -pedantic -pedantic-errors")
 
 
 # Include user_code
 include_directories("${PROJECT_INCLUDE_DIR}")
 message("Code to modify baack plugins is located in: ${PROJECT_INCLUDE_DIR}")
-
-if(NOCOCO)
- add_definitions(-D_NOCOCO_)
-endif(NOCOCO)
+message("")
 
 # Add generic library
 if(BUILD_DYNSTACK OR BUILD_REMOTECONTROL OR BUILD_BASIC)
@@ -67,24 +91,3 @@ configure_file (
 )
 # include config.h
 include_directories("${CMAKE_BINARY_DIR}")
-
-
-file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
-file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/obj")
-file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
-
-# Set the output folder where your program will be created
-set(EXECUTABLE_OUTPUT_PATH "${PROJECT_BINARY_DIR}/bin")
-set(LIBRARY_OUTPUT_PATH "${PROJECT_BINARY_DIR}/lib")
-
-set(SOURCES ${CMAKE_SOURCE_DIR}/src/)
-
-# The following folder will be included
-include_directories("${CMAKE_SOURCE_DIR}/include")
-include_directories("${CMAKE_SOURCE_DIR}/test")
-
-
-# Set Compiler Version
-set (CMAKE_CXX_STANDARD 14)
-# Set shared compiler flags
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall -Wextra -pedantic -pedantic-errors")

@@ -16,7 +16,7 @@
 #include "../include/config.h"
 #endif
 
-#include "basic/corsika/particle.h"
+#include "corsika/particle.h"
 
 
 using namespace data;
