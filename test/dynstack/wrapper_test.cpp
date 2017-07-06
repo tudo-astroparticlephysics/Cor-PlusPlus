@@ -19,7 +19,7 @@
 
 #include "dynstack/stack/wrapper/priority_stack.h"
 
-#include "lib/data/controlled_value.h"
+#include "data/controlled_value.h"
 
 
 
@@ -35,7 +35,7 @@ namespace test
 
 		namespace wrapper
 		{
-		
+
 
 			int inDecide(const float* const data)
 			{
@@ -74,7 +74,7 @@ namespace test
 				};*/
 
 			}
-				
+
 
 			void call(const float* const data)
 			{
@@ -105,7 +105,7 @@ namespace test
 
 				return true;
 			}
-			
+
 			float mod(const float* const data)
 			{
 				return *data + 4;
@@ -148,7 +148,7 @@ namespace test
 				::dynstack::wrapper::PriorityStack<::dynstack::storage::LIFO_Stack<float>, prio> tmp1(12);
 
 				testStack<decltype(tmp1), float, 12>(tmp1, { { 1,2,3,4,5,6,7,8,9,10,11,12 } }, { { 12, 10, 8, 6, 4, 2, 11, 9, 7, 5, 3, 1 } });
-			    
+
                 return true;
             }
 
@@ -162,7 +162,7 @@ namespace test
 
 				testStack<decltype(tmp1), float, 8>(tmp1, { { 11, 12, 3, 4, 5, 6, 7, 8, 9, 10, 1, 2 } }, { { 14, 13, 12, 11, 10, 9, 16, 15} });
 
-				
+
 				return true;
 
 			}
