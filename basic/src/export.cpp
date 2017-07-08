@@ -12,8 +12,8 @@
 
 #include <iostream>
 
-#include "header_manager.h"
-#include "basic.h"
+#include "basic/header_manager.h"
+#include "basic/basic.h"
 
 
 #include <user_code/basic_setup.h>

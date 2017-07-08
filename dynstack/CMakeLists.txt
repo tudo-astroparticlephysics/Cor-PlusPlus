@@ -1,6 +1,6 @@
 
 # Specify the minimum version for CMake
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 2.6)
 
 # Project's name
 project(DYNSTACK CXX)
@@ -9,6 +9,8 @@ set (CORPP_VERSION_MAJOR 2)
 set (CORPP_VERSION_MINOR 0)
 set (CORPP_VERSION_PATCH 0)
 
+
+option(__DYNDEFAULT__ "Set stack to default implementation" ON)
 
 
 # Each subdirectory CMakeList.txt defines booth variable with

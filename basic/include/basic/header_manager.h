@@ -16,10 +16,10 @@
 #include <vector>
 
 
-#include "lib/data/corsika/event_header.h"
-#include "lib/data/corsika/event_end.h"
-#include "lib/data/corsika/run_header.h"
-#include "lib/data/corsika/run_end.h"
+#include "corsika/event_header.h"
+#include "corsika/event_end.h"
+#include "corsika/run_header.h"
+#include "corsika/run_end.h"
 
 using namespace lib::data;
 

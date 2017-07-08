@@ -1,6 +1,6 @@
 
 # Specify the minimum version for CMake
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 2.6)
 
 # Project's name
 project(COR-PP C CXX)
@@ -28,28 +28,52 @@ set(USER_CODE_INCLUDE_DIR "${PROJECT_INCLUDE_DIR}")
 #Set settings to release
 set(CMAKE_BUILD_TYPE Release)
 
-# Set Compiler Version
-set (CMAKE_CXX_STANDARD 14)
-
 # Compiler-specific C++XY activation.
 if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
     execute_process(
-        COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
-        message("Compiler version: ${GCC_VERSION}")
-    if (NOT (GCC_VERSION VERSION_GREATER 4.6 OR GCC_VERSION VERSION_EQUAL 4.6))
+    #COMMAND "expr $(gcc -dumpversion | cut -f1 -d.) \\* 10000 + $(gcc -dumpversion | cut -f2 -d.) \\* 100 + 0$(gcc -dumpversion | cut -f3 -d.)"  OUTPUT_VARIABLE GCC_VERSION)
+    COMMAND bash "-c" "echo -n $(expr $(gcc -dumpversion | cut -f1 -d.) \\* 10000 + $(gcc -dumpversion | cut -f2 -d.) \\* 100 + 0$(gcc -dumpversion | cut -f3 -d.))" OUTPUT_VARIABLE GCC_VERSION)
+    message("GCC Version to number: ${GCC_VERSION}" )
+    IF ( GCC_VERSION LESS 40600 OR GCC_VERSION EQUAL 40600)
         message(FATAL_ERROR "${PROJECT_NAME} requires g++ 4.6 or greater.")
-    elseif(NOT (GCC_VERSION VERSION_GREATER 4.8 OR GCC_VERSION VERSION_EQUAL 4.8))
+    elseif( GCC_VERSION LESS 40800 OR GCC_VERSION EQUAL 40800)
         message("${PROJECT_NAME} uses a version below g++ 4.8.1 and does not support the full feature level. Read the manual to check which functionality is available!")
-    elseif(NOT (GCC_VERSION VERSION_GREATER 5.0 OR GCC_VERSION VERSION_EQUAL 5.0))
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
+    elseif( GCC_VERSION LESS 50000 OR GCC_VERSION EQUAL 50000)
         message("${PROJECT_NAME} uses a version above g++ 4.8.1 and does support the full feature level.")
-    elseif(NOT (GCC_VERSION VERSION_GREATER 7.0.0 OR GCC_VERSION VERSION_EQUAL 7.0.0))
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+    elseif( GCC_VERSION LESS 70000 OR GCC_VERSION EQUAL 70000)
         message("${PROJECT_NAME} uses a g++ version above 5.0.0 and support all features including additional performance and usability tweaks!")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
     endif ()
 elseif ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
 else ()
     message(FATAL_ERROR "Your C++ compiler does not support the necessary feature to compile this module. For best results use gcc 4.6 or above.")
 endif ()
+
+# Compiler-specific C++XY activation.
+#if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
+#    execute_process(
+#        COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
+#        message("Compiler version: ${GCC_VERSION}")
+#    if (NOT (GCC_VERSION VERSION_GREATER 4.6 OR GCC_VERSION VERSION_EQUAL 4.6)) #2.6.2 feature
+#        message(FATAL_ERROR "${PROJECT_NAME} requires g++ 4.6 or greater.")
+#    elseif(NOT (GCC_VERSION VERSION_GREATER 4.8 OR GCC_VERSION VERSION_EQUAL 4.8))
+#        message("${PROJECT_NAME} uses a version below g++ 4.8.1 and does not support the full feature level. Read the manual to check which functionality is available!")
+#        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
+#    elseif(NOT (GCC_VERSION VERSION_GREATER 5.0 OR GCC_VERSION VERSION_EQUAL 5.0))
+#        message("${PROJECT_NAME} uses a version above g++ 4.8.1 and does support the full feature level.")
+#        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+#    elseif(NOT (GCC_VERSION VERSION_GREATER 7.0.0 OR GCC_VERSION VERSION_EQUAL 7.0.0))
+#        message("${PROJECT_NAME} uses a g++ version above 5.0.0 and support all features including additional performance and usability tweaks!")
+#        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
+#    endif ()
+#elseif ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
+#    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
+#else ()
+#    message(FATAL_ERROR "Your C++ compiler does not support the necessary feature to compile this module. For best results use gcc 4.6 or above.")
+#endif ()
 
 # Set shared compiler flags
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall -Wextra -pedantic -pedantic-errors")

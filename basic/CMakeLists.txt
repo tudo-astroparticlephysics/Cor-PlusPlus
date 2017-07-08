@@ -1,6 +1,6 @@
 
 # Specify the minimum version for CMake
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 2.6)
 
 # Project's name
 project(BASIC CXX)
@@ -19,11 +19,6 @@ set(BASIC_SRCS
 ${PROJECT_SOURCE_DIR}/header_set.cpp
 ${PROJECT_SOURCE_DIR}/header_manager.cpp
 ${PROJECT_SOURCE_DIR}/export.cpp
-${PROJECT_SOURCE_DIR}/corsika/event_end.cpp
-${PROJECT_SOURCE_DIR}/corsika/run_end.cpp
-${PROJECT_SOURCE_DIR}/corsika/run_header.cpp
-${PROJECT_SOURCE_DIR}/corsika/steering_card.cpp
-${PROJECT_SOURCE_DIR}/corsika/event_header.cpp
 ${PROJECT_SOURCE_DIR}/basic.cpp
 )
 

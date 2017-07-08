@@ -7,7 +7,7 @@
 #cmakedefine DTL_VERSION_PATCH @DTL_VERSION_PATCH@
 
 
-// Options
+// Build Options
 #cmakedefine BUILD_DYNSTACK
 #cmakedefine BUILD_REMOTECONTROL
 #cmakedefine BUILD_BASIC
@@ -19,5 +19,8 @@
 
 
 
-
-
+// Module Options
+#cmakedefine __DYNDEFAULT__
+#cmakedefine __DYNOUTPUT__
+#cmakedefine __DYNICECUBE__
+#cmakedefine __DYNCUSTOM__
