@@ -120,18 +120,18 @@ install:
   - sudo mv libgtest* /usr/lib/
   - cd ${TRAVIS_BUILD_DIR}
 
-  script:
-    - ls
-    - g++ --version
-    - mkdir build
-    - cd build
-    - - cmake .. -DBUILD_TESTS=ON -D_NOCOCO_=ON
-    - echo "Compiler:" $COMP_XX
-    - make VERBOSE=1
-    - ./unit_test
+script:
+  - ls
+  - g++ --version
+  - mkdir build
+  - cd build
+  - cmake .. -DBUILD_TESTS=ON -D_NOCOCO_=ON
+  - echo "Compiler:" $COMP_XX
+  - make VERBOSE=1
+  - ./unit_test
 
-  after_success:
-    - coveralls --root .. -E ".*external.*" -E ".*CMakeFiles.*" -E ".*test/.*.cpp.*"
+after_success:
+  - coveralls --root .. -E ".*external.*" -E ".*CMakeFiles.*" -E ".*test/.*.cpp.*"
 
 notifications:
 email: false
