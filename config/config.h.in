@@ -1,4 +1,4 @@
-
+#pragma once
 // This options get automatically filled from the CMake Script with current values
 
 
@@ -13,7 +13,9 @@
 #cmakedefine BUILD_BASIC
 #cmakedefine BUILD_TESTS
 
-#ifndef BUILD_TESTS
+#cmakedefine _NOCOCO_
+
+#ifdef BUILD_TESTS
     #define _NOCOCO_
 #endif
 

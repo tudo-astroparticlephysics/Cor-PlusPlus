@@ -14,6 +14,8 @@ option(BUILD_REMOTECONTROL "Build the Remote-Control module" ON)
 option(BUILD_BASIC "Build the Basic module" ON)
 option(BUILD_TESTS "Build test programs" OFF)
 
+option(NOCOCO "Deactivate CORSIKA dependents" OFF)
+
 
 set(CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/build)
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
@@ -31,7 +33,6 @@ set(CMAKE_BUILD_TYPE Release)
 # Compiler-specific C++XY activation.
 if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
     execute_process(
-    #COMMAND "expr $(gcc -dumpversion | cut -f1 -d.) \\* 10000 + $(gcc -dumpversion | cut -f2 -d.) \\* 100 + 0$(gcc -dumpversion | cut -f3 -d.)"  OUTPUT_VARIABLE GCC_VERSION)
     COMMAND bash "-c" "echo -n $(expr $(gcc -dumpversion | cut -f1 -d.) \\* 10000 + $(gcc -dumpversion | cut -f2 -d.) \\* 100 + 0$(gcc -dumpversion | cut -f3 -d.))" OUTPUT_VARIABLE GCC_VERSION)
     message("GCC Version to number: ${GCC_VERSION}" )
     IF ( GCC_VERSION LESS 40600 OR GCC_VERSION EQUAL 40600)
@@ -47,7 +48,7 @@ if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
     endif ()
 elseif ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 else ()
     message(FATAL_ERROR "Your C++ compiler does not support the necessary feature to compile this module. For best results use gcc 4.6 or above.")
 endif ()
@@ -114,4 +115,10 @@ configure_file (
     "${CMAKE_BINARY_DIR}/config.h"
 )
 # include config.h
-include_directories("${CMAKE_BINARY_DIR}")
+include_directories(${CMAKE_BINARY_DIR})
+
+
+
+if(BUILD_TESTS)
+
+endif(BUILD_TESTS)

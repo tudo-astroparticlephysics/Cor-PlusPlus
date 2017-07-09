@@ -7,6 +7,19 @@ language: cpp
 
 matrix:
   include:
+    - compiler: gcc-4.6
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++4.6
+            - automake
+      env:
+          - COMP_XX=g++-4.6
+          - COMP_C=gcc-4.6
+          - CXX=g++-4.6
+          - CC=gcc-4.6
     - compiler: gcc-4.9
       addons:
         apt:
@@ -15,7 +28,11 @@ matrix:
           packages:
             - g++-4.9
             - automake
-      env: COMPILER=g++-4.9
+      env:
+          - COMP_XX=g++-4.9
+          - COMP_C=gcc-4.9
+          - CXX=g++-4.9
+          - CC=gcc-4.9
     - compiler: gcc-5
       addons:
         apt:
@@ -24,7 +41,11 @@ matrix:
           packages:
             - g++-5
             - automake
-      env: COMPILER=g++-5
+      env:
+          - COMP_XX=g++-5
+          - COMP_C=gcc-5
+          - CXX=g++-5
+          - CC=gcc-5
     - compiler: gcc-6
       addons:
         apt:
@@ -33,7 +54,11 @@ matrix:
           packages:
             - g++-6
             - automake
-      env: COMPILER=g++-6
+      env:
+          - COMP_XX=g++-6
+          - COMP_C=gcc-6
+          - CXX=g++-6
+          - CC=gcc-6
     - compiler: clang-3.6
       addons:
         apt:
@@ -43,7 +68,11 @@ matrix:
           packages:
             - clang-3.6
             - automake
-      env: COMPILER=clang++-3.6
+      env:
+          - COMP_XX=clang++-3.6
+          - COMP_C=clang-3.6
+          - CXX=clang++-3.6
+          - CC=clang-3.6
     - compiler: clang-3.7
       addons:
         apt:
@@ -53,7 +82,11 @@ matrix:
           packages:
             - clang-3.7
             - automake
-      env: COMPILER=clang++-3.7
+      env:
+           - COMP_XX=clang++-3.7
+           - COMP_C=clang-3.7
+           - CXX=clang++-3.7
+           - CC=clang-3.7
     - compiler: clang-3.8
       addons:
         apt:
@@ -63,29 +96,42 @@ matrix:
           packages:
             - clang-3.8
             - automake
-      env: COMPILER=clang++-3.8
+      env:
+          - COMP_XX=clang++-3.8
+          - COMP_C=clang-3.8
+          - CXX=clang++-3.8
+          - CC=clang-3.8
   allow_failures:
-    - compiler: gcc-4.9
+      - compiler: gcc-4.6
+      - compiler: gcc-4.9
   fast_finish: true
 
 before-install:
   - sudo apt-get update -qq
+  - pip install --user cpp-coveralls
 
-script:  
-  - ls 
-  - g++ --version
-  - mkdir build
-  - cd build
-  - touch ../configure.ac ../aclocal.m4 ../configure ../Makefile.am ../Makefile.in
-  - ../configure --prefix=$(pwd) --with-test --enable-nococo
-  - make CXX=$COMPILER dynstack_test
-  - make CXX=$COMPILER remotecontrol_test
-  - make CXX=$COMPILER library_test
-  - ./dynstack_test
-  - ./remotecontrol_test
-  - ./library_test
+install:
+  - sudo apt-get install libgtest-dev
+  - cd /usr/src/gtest
+  - export CXX=$COMP_XX
+  - export CC=$COMP_X
+  - sudo cmake .
+  - sudo make
+  - sudo mv libgtest* /usr/lib/
+  - cd ${TRAVIS_BUILD_DIR}
+
+  script:
+    - ls
+    - g++ --version
+    - mkdir build
+    - cd build
+    - - cmake .. -DBUILD_TESTS=ON -D_NOCOCO_=ON
+    - echo "Compiler:" $COMP_XX
+    - make VERBOSE=1
+    - ./unit_test
+
+  after_success:
+    - coveralls --root .. -E ".*external.*" -E ".*CMakeFiles.*" -E ".*test/.*.cpp.*"
 
 notifications:
 email: false
-
-
