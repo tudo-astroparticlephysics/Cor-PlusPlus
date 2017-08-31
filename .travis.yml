@@ -108,7 +108,6 @@ matrix:
 
 before-install:
   - sudo apt-get update -qq
-  - pip install --user cpp-coveralls
 
 install:
   - sudo apt-get install libgtest-dev
@@ -129,9 +128,6 @@ script:
   - echo "Compiler:" $COMP_XX
   - make VERBOSE=1
   - ./unit_test
-
-after_success:
-  - coveralls --root .. -E ".*external.*" -E ".*CMakeFiles.*" -E ".*test/.*.cpp.*"
 
 notifications:
 email: false

@@ -10,15 +10,9 @@
 
 #pragma once
 
-#include <iostream>
-#include <memory>
-#include <sstream>
-#include <algorithm>
-#include <functional>
 
 namespace test
 {
-
 	namespace dynstack
 	{
 		bool LIFO();
@@ -27,5 +21,3 @@ namespace test
 		bool Null();
 	}
 }
-
-

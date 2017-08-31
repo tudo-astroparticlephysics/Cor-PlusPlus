@@ -29,11 +29,11 @@ namespace test
 		{
 			::dynstack::storage::LIFO_Stack<float> tmp1(12);
 			bool ret = testStack<decltype(tmp1), float, 12>(tmp1, { { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 } }, { { 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1 } });
-			
+
 			std::cout << "Basic Test: " << std::boolalpha << ret << std::endl;
-			
-			
-			
+
+
+
 			// Fill 20 Elements
 			for(int i=0; i<20; i++)
 				tmp1.push_back((const float)i);
@@ -43,7 +43,7 @@ namespace test
 
 			while(tmp1.size())
 			{
-				static float counter = 11; 
+				static float counter = 11;
 				auto ele = tmp1.back();
 
 				if((float) ele != counter)
@@ -126,7 +126,7 @@ namespace test
 
 			bool ret = testStack<decltype(tmp1), float, 12>(tmp1, { { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 } },{ { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 } });
 			std::cout << "Basic Test: " << std::boolalpha << ret << std::endl;
-			
+
 			// Fill 20 Elements
 			for (int i = 0; i<20; i++)
 				tmp1.push_back((const float)i);
@@ -172,6 +172,6 @@ namespace test
 		}
 
 
-	
+
 	}
 }

@@ -14,8 +14,13 @@
 #cmakedefine BUILD_TESTS
 
 #cmakedefine _NOCOCO_
+#cmakedefine NOCOCO
 
 #ifdef BUILD_TESTS
+    #define _NOCOCO_
+#endif
+
+#ifdef NOCOCO
     #define _NOCOCO_
 #endif
 

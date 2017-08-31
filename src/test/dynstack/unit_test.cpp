@@ -8,6 +8,42 @@
 * 	of the LGPL license. See the LICENSE file for details.
 */
 
+//#include "gtest/gtest.h"
+
+#include "test/dynstack/storage_test.h"
+#include "test/dynstack/wrapper_test.h"
+#include "test/dynstack/advanced_test.h"
+
+/*
+namespace test
+{
+    namespace dynstack
+    {
+        int main(int argc, char **argv)
+        {
+
+
+
+
+            //::testing::InitGoogleTest(&argc, argv);
+            //return RUN_ALL_TESTS();
+
+        }
+
+    }
+}*/
+
+
+/* unit_test.cpp
+* this file is part of Dynstack/RemoteControl for CORSIKA
+*
+* Copyright (C) <2016> <Dominik Baack>
+*		All rights reserved.
+*
+* 	This software may be modified and distributed under the terms
+* 	of the LGPL license. See the LICENSE file for details.
+*/
+
 
 #include "test/dynstack/storage_test.h"
 #include "test/dynstack/wrapper_test.h"
@@ -21,49 +57,49 @@ namespace test
 		void test_storage()
 		{
 			std::cout << "\n\t-lifo-" << std::endl;
-			test::dynstack::LIFO();
+			::test::dynstack::LIFO();
 			std::cout << "\n\t-lifo std-" << std::endl;
-			test::dynstack::LIFO_std();
+			::test::dynstack::LIFO_std();
 			std::cout << "\n\t-fifo-" << std::endl;
-			test::dynstack::FIFO();
+			::test::dynstack::FIFO();
 			std::cout << "\n\t-null-" << std::endl;
-			test::dynstack::Null();
+			::test::dynstack::Null();
 		}
 
 		void test_wrapper()
 		{
 			std::cout << "\n\t-filter-" << std::endl;
-			test::dynstack::wrapper::Filter();
+			::test::dynstack::wrapper::Filter();
 
 			std::cout << "\n\t-In Callback-" << std::endl;
-			test::dynstack::wrapper::InputCallback();
+			::test::dynstack::wrapper::InputCallback();
 
 			std::cout << "\n\t-In Mod-" << std::endl;
-			test::dynstack::wrapper::InputModify();
+			::test::dynstack::wrapper::InputModify();
 
 			std::cout << "\n\t-Sorted-" << std::endl;
-			test::dynstack::wrapper::Sorted();
+			::test::dynstack::wrapper::Sorted();
 
 			std::cout << "\n\t-Priority-" << std::endl;
-			test::dynstack::wrapper::Priority();
+			::test::dynstack::wrapper::Priority();
 
 			std::cout << "\n\t-Combination-" << std::endl;
-			test::dynstack::wrapper::Combinations();
+			::test::dynstack::wrapper::Combinations();
 		}
 
 		void test_advanced()
 		{
 			std::cout << "\n\t-Debug-" << std::endl;
-			test::dynstack::advanced::Debug();			
+			::test::dynstack::advanced::Debug();
 
 			std::cout << "\n\t-Copy-" << std::endl;
-			test::dynstack::advanced::Copy();
+			::test::dynstack::advanced::Copy();
 
 			std::cout << "\n\t-Dynamic Sorted-" << std::endl;
-			test::dynstack::advanced::DynamicSorted();
+			::test::dynstack::advanced::DynamicSorted();
 
             std::cout << "\n\t-If-" << std::endl;
-            test::dynstack::advanced::If();
+            ::test::dynstack::advanced::If();
         }
 
 	}
@@ -90,10 +126,10 @@ namespace test
 int main()
 {
 	std::cout << "Start dynstack testing ... \n" << std::endl;
-	
-	test::test_dynstack();	
 
-	
+	test::test_dynstack();
+
+
 
 	std::cout << "\n\nAll tests finished " << std::endl;
 
