@@ -9,7 +9,7 @@
 */
 
 
-#include "lib/data/corsika/event_header.h"
+#include "corsika/event_header.h"
 
 namespace lib
 {

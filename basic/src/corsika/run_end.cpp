@@ -1,4 +1,4 @@
-/* event_end.cpp
+/* run_end.cpp
 * this file is part of Dynstack/RemoteControl for CORSIKA
 *
 * Copyright (C) <2016> <Dominik Baack>
@@ -9,19 +9,19 @@
 */
 
 
-#include "lib/data/corsika/event_end.h"
+#include "corsika/run_end.h"
 
 namespace lib
 {
 	namespace data
 	{
 
-		EventEnd::EventEnd(float* p_evth)
+		RunEnd::RunEnd(float* p_evth)
 		:m_fMemory(p_evth), m_bOwnsMemory(false)
 		{
 		}
 
-		EventEnd::EventEnd(const EventEnd& p_rhs)
+		RunEnd::RunEnd(const RunEnd& p_rhs)
 		:m_fMemory(new float[273]), m_bOwnsMemory(true)
 		{
 			for(int i=0; i<273; i++)
@@ -30,12 +30,12 @@ namespace lib
 			}
 		}
 
-		EventEnd::EventEnd(EventEnd&& p_rhs)
+		RunEnd::RunEnd(RunEnd&& p_rhs)
 		: m_fMemory(p_rhs.m_fMemory), m_bOwnsMemory(p_rhs.m_bOwnsMemory)
 		{
 		}
 
-		EventEnd::~EventEnd()
+		RunEnd::~RunEnd()
 		{
 			if(m_bOwnsMemory)
 			{
@@ -47,6 +47,6 @@ namespace lib
 			return;
 		}
 	}
-	
+
 
 }

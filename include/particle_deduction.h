@@ -9,14 +9,14 @@
 */
 #pragma once
 
-#include "config.h"
+#include "corpp_config.h"
 
 #ifdef _NOCOCO_
 #else
-#include "../include/config.h"
+#include "../../include/config.h"
 #endif
 
-#include "corsika/particle.h"
+#include "../basic/include/corsika/particle.h"
 
 
 using namespace data;

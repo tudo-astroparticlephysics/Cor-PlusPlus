@@ -8,7 +8,7 @@
  * 	of the LGPL license. See the LICENSE file for details.
  */
 
-#include "lib/data/corsika/run_header.h"
+#include "corsika/run_header.h"
 
 namespace lib
 {

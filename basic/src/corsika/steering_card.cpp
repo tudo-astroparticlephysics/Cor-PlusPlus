@@ -1,4 +1,4 @@
-#include "lib/data/corsika/steering_card.h"
+#include "corsika/steering_card.h"
 
 
 #include <sstream>
@@ -76,4 +76,3 @@ namespace lib
 		}
 	}
 }
-

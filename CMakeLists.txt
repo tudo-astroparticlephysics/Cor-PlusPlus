@@ -17,7 +17,7 @@ option(BUILD_TESTS "Build test programs" OFF)
 option(NOCOCO "Deactivate CORSIKA dependents" OFF)
 
 
-set(CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/build)
+# set(CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/build)
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 
@@ -107,14 +107,19 @@ if(BUILD_BASIC)
     add_subdirectory(basic)
 endif(BUILD_BASIC)
 
+# When Main is moved into Cor++
+if(BUILD_BAACK)
+
+endif(BUILD_BAACK)
+
 
 # configure a header file to pass CMake settings and checks
 # to the source code
 configure_file (
-    "${CMAKE_SOURCE_DIR}/config/config.h.in"
-    "${CMAKE_BINARY_DIR}/config.h"
+    "${CMAKE_SOURCE_DIR}/config/corpp_config.h.in"
+    "${CMAKE_BINARY_DIR}/corpp_config.h"
 )
-# include config.h
+# include corpp_config.h
 include_directories(${CMAKE_BINARY_DIR})
 
 
