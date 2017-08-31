@@ -140,9 +140,9 @@ if(BUILD_TESTS)
 
     target_link_libraries(dynstack_test network_lib)
 
-    target_link_libraries(dynstack_test DYNSTACK)
+    target_link_libraries(dynstack_test Dynstack)
     target_link_libraries(dynstack_test REMOTE_CONTROL)
-    target_link_libraries(dynstack_test BASIC)
+    target_link_libraries(dynstack_test Basic)
 
     target_link_libraries(dynstack_test ${GTEST_BOTH_LIBRARIES})
 
@@ -160,9 +160,9 @@ if(BUILD_TESTS)
 
     target_link_libraries(rc_test network_lib)
 
-    target_link_libraries(rc_test DYNSTACK)
+    target_link_libraries(rc_test Dynstack)
     target_link_libraries(rc_test REMOTE_CONTROL)
-    target_link_libraries(rc_test BASIC)
+    target_link_libraries(rc_test Basic)
 
     target_link_libraries(rc_test ${GTEST_BOTH_LIBRARIES})
 
