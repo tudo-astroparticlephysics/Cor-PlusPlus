@@ -35,7 +35,7 @@ if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
     execute_process(
     COMMAND bash "-c" "echo -n $(expr $(${CMAKE_CXX_COMPILER} -dumpversion | cut -f1 -d.) \\* 10000 + $(${CMAKE_CXX_COMPILER} -dumpversion | cut -f2 -d.) \\* 100 + 0$(${CMAKE_CXX_COMPILER} -dumpversion | cut -f3 -d.))" OUTPUT_VARIABLE GCC_VERSION)
     message("GCC Version to number: ${GCC_VERSION}" )
-    IF ( GCC_VERSION LESS 40600 OR GCC_VERSION EQUAL 40600)
+    IF ( GCC_VERSION LESS 40600 ) # OR GCC_VERSION EQUAL 40600
         message(FATAL_ERROR "${PROJECT_NAME} requires g++ 4.6 or greater.")
     elseif( GCC_VERSION LESS 40800 OR GCC_VERSION EQUAL 40800)
         message("${PROJECT_NAME} uses a version below g++ 4.8.1 and does not support the full feature level. Read the manual to check which functionality is available!")
