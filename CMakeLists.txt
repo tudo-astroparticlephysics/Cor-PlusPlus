@@ -43,9 +43,9 @@ if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
     elseif( GCC_VERSION LESS 50000 OR GCC_VERSION EQUAL 50000)
         message("${PROJECT_NAME} uses a version above g++ 4.8.1 and does support the full feature level.")
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-    elseif( GCC_VERSION LESS 70000 OR GCC_VERSION EQUAL 70000)
+    elseif( GCC_VERSION LESS 70200 OR GCC_VERSION EQUAL 70200)
         message("${PROJECT_NAME} uses a g++ version above 5.0.0 and support all features including additional performance and usability tweaks!")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1z")
     endif ()
 elseif ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
@@ -133,8 +133,6 @@ if(BUILD_TESTS)
     # Add DynstackTest
     set(DYNSTACK_TEST_SRCS
         ${PROJECT_SOURCE_DIR}/test/dynstack/unit_test.cpp
-        ${PROJECT_SOURCE_DIR}/test/dynstack/storage_test.cpp
-        ${PROJECT_SOURCE_DIR}/test/dynstack/wrapper_test.cpp
     )
     add_executable(dynstack_test ${DYNSTACK_TEST_SRCS})
 

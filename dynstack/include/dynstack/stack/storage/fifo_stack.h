@@ -12,7 +12,8 @@
 
 #include <type_traits>
 #include <queue>
-#include <deque>
+
+#include <type_traits>
 
 #include "dynstack/stack/stack.h"
 //#include "dynstack/stack/stack_ptr.h"
@@ -42,7 +43,7 @@ namespace dynstack
 			const unsigned int m_uiSize;
 
 		protected:
-			
+
 		public:
 
 			/// Constructor
@@ -74,12 +75,12 @@ namespace dynstack
 			 */
 			FIFO_Stack(FIFO_Stack<TType> && rhs)
 					: Stack<TType>(), m_uiSize(rhs.m_uiSize), m_tBuffer(rhs.m_tBuffer)
-			{				
+			{
 			}
 
 			/// Destructor
 			~FIFO_Stack()
-			{				
+			{
 			}
 
 			/// Store single element by copy
@@ -88,17 +89,26 @@ namespace dynstack
 			 *  pushes the data on the underlying std::deque data structure.
 			 *
 			 *  \param[in] data Element to copy on the internal storage
-			 *  \return Returns true if the data is successfully stored and false otherwise
+			 *  \return Returns 0 if the data is successfully stored and -1 otherwise
 			 */
-			inline int push_back(const TType& data)
+		    inline int push_back(const TType& data)
 			{
-				if (m_tBuffer->size() < m_uiSize)
-				{
-					m_tBuffer->push(data);
-					return 0;
-				}
-				return -1;
+                //if constexpr( std::is_copy_constructible<TType>::value )  C++17 feature to partial enable support of not copyconstructable types
+                //{
+                    if (m_tBuffer->size() < m_uiSize)
+    				{
+    					m_tBuffer->push( data );
+    					return 0;
+    				}
+                    return -1;
+                //}
+                //else
+                //{
+                //    return -1;
+                //}
+
 			}
+
 
 			/// Store single element by move
 			/**
@@ -106,16 +116,16 @@ namespace dynstack
 			 *  pushes the data on the underlying std::deque data structure.
 			 *
 			 *  \param[in/out] data Element gets invalid when its moved into the function. The actual data gets copied on the stack.
-			 *  \return Returns true if the data is successfully stored and false otherwise
+			 *  \return Returns 0 if the data is successfully stored and -1 otherwise
 			 */
 			inline int push_back(TType&& data)
 			{
 				if (m_tBuffer->size() < m_uiSize)
 				{
-					m_tBuffer->push(data);
-					return true;
+					m_tBuffer->push( std::move(data) );
+					return 0;
 				}
-				return false;
+				return -1;
 			}
 
 			/// Stores an array of data to the stack
@@ -128,16 +138,22 @@ namespace dynstack
 			 */
 			inline int push_back(std::unique_ptr<const TType[]> data, const unsigned int elem)
 			{
-				for (unsigned int i = 0; i < elem; i++)
-				{
-					if (m_tBuffer->size() >= m_uiSize)
-					{
-						return false;
-					}
-					m_tBuffer->push(data[i]);
-				}
-				
-				return true;
+                //if constexpr( std::is_copy_constructible<TType>::value )  C++17 feature to partial enable support of not copyconstructable types
+                //{
+                    for (unsigned int i = 0; i < elem; i++)
+                    {
+    					if (m_tBuffer->size() >= m_uiSize)
+    					{
+    						return -1;
+                        }
+                        m_tBuffer->push(data[i]);
+    				}
+    				return 0;
+                //}
+                //else
+                //{
+                //    return -1;
+                //}
 			}
 
 			/// Stores an array of data to the stack
@@ -146,22 +162,29 @@ namespace dynstack
 			 *  The data is pushed in sequential order on the underlying std::deque data structure.
 			 *
 			 *  \param[in] data Element to store in an sequential order
-			 *  \param[in] elem Number of elements stored in the Array
-			 *  \return Returns true if all data is successfully stored and false if no or only a part is stored
-			 */
-			inline int push_back(const TType* const data, const unsigned int elem)
-			{
-				for (unsigned int i = 0; i < elem; i++)
-				{
-					if (m_tBuffer->size() >= m_uiSize)
-					{
-						return false;
-					}
-					m_tBuffer->push(data[i]);
-				}
+             *  \param[in] elem Number of elements stored in the Array
+             *  \return Returns true if all data is successfully stored and false if no or only a part is stored
+             */
+             inline int push_back(const TType* const data, const unsigned int elem)
+             {
+                 //if constexpr( std::is_copy_constructible<TType>::value )  C++17 feature to partial enable support of not copyconstructable types
+                 //{
+                     for (unsigned int i = 0; i < elem; i++)
+                     {
+                         if (m_tBuffer->size() >= m_uiSize)
+                         {
+                             return -1;
+                         }
+                         m_tBuffer->push(data[i]);
+                     }
 
-				return true;
-			}
+                     return 0;
+                //}
+                // else
+                // {
+                //     return -1;
+                //}
+             }
 
 			/// Copy of the earliest inserted element
 			/**
@@ -174,12 +197,12 @@ namespace dynstack
 			inline TType back()
 			{
 				if (m_tBuffer == nullptr)
-					return TType();
+					return std::move(TType());
 
 				if (m_tBuffer->size() > 0)
 					return m_tBuffer->front();
 				else
-					return TType();
+					return std::move(TType());
 
 			}
 
@@ -198,12 +221,12 @@ namespace dynstack
 
 				if (m_tBuffer->size() > 0)
 				{
-					TType tmp(m_tBuffer->front());
+					TType tmp( std::move(m_tBuffer->front()));
 					m_tBuffer->pop();
-					return tmp;
+					return std::move(tmp);
 				}
 				else
-					return TType();
+					return std::move( TType() );
 
 			}
 
@@ -228,7 +251,7 @@ namespace dynstack
 
 			/// Removes every element from stack
 			/**
-			*  This function removes all elements from stack and set everything back to zero			
+			*  This function removes all elements from stack and set everything back to zero
 			*/
 			inline void clear()
 			{
@@ -251,7 +274,7 @@ namespace dynstack
  			 *
 			 * \return Returns a pointer to new storage area without and precaution
 			 */
-			
+
 			inline unsigned long size() const
 			{
 				if (m_tBuffer == nullptr)
