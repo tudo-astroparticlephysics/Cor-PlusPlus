@@ -49,12 +49,12 @@ namespace dynstack
 			}
 
 		protected:
-			
+
 
 		public:
 
 			typedef bool(*filter_function_type)(const typename TStack::m_ReturnType* const);
-			
+
 			template<typename ... TArgs>
 			FilterStack(TArgs&&... args)
 					: TStack(std::forward<TArgs>(args)...)
@@ -63,7 +63,7 @@ namespace dynstack
 
 			FilterStack(FilterStack<TStack, TFunc> && rhs)
 				: TStack((TStack)rhs)
-			{				
+			{
 			}
 
 			~FilterStack()
@@ -77,12 +77,12 @@ namespace dynstack
 				if (ret == 0)
 				{
 					return TStack::push_back(data);
-				}					
+				}
 				else
 				{
 					return ret;
 				}
-					
+
 			}
 			inline int push_back(TType&& data)
 			{
@@ -90,17 +90,17 @@ namespace dynstack
 				if (ret == 0)
 				{
 					return TStack::push_back(data);
-				}					
+				}
 				else
 				{
 					return ret;
-				}					
+				}
 			}
 
 			//Copys element to next free space
 			inline int push_back(std::unique_ptr<const TType[]> data, const unsigned int elem)
 			{
-		
+
 				bool check = true;
 				for (unsigned int i = 0; i < elem; i++)
 				{
@@ -121,17 +121,14 @@ namespace dynstack
 				{
 					if (filter(data + i) == 0)
 					{
-						check = check && TStack::push_back(data[i]);
-					}
-						
+                        const int ret = TStack::push_back(data[i]);
+						check = check && ret;
+					}                    
 				}
 				return check;
-			}			
+			}
 
 		};
 
 	}
 }
-
-
-

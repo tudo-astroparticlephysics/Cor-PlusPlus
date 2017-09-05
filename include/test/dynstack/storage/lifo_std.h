@@ -28,18 +28,18 @@ namespace test
 
             ASSERT_EQ(tmp.size(), 0);
 
-            tmp.push_back(3);
+            tmp.push_back(3.0f);
             ASSERT_EQ(tmp.size(), 1);
 
             for(int i=0; i<11; i++)
             {
-                tmp.push_back(3);
+                tmp.push_back(3.0f);
                 ASSERT_EQ(2 + i, tmp.size());
             }
 
-            tmp.push_back(3);
+            tmp.push_back(3.0f);
             ASSERT_EQ(tmp.size(), 12);
-            tmp.push_back(3);
+            tmp.push_back(3.0f);
             ASSERT_EQ(tmp.size(), 12);
         }
 
@@ -47,17 +47,17 @@ namespace test
         {
             ::dynstack::storage::LIFO_std_Stack<float> tmp(12);
 
-            float a = 1;
-            const float b = 2;
+            float a = 1.0f;
+            const float b = 2.0f;
 
             tmp.push_back(a);
             tmp.push_back(b);
-            tmp.push_back(3);
+            tmp.push_back(3.0f);
 
-            ASSERT_EQ(tmp.size(), 3);
-            ASSERT_EQ(tmp.pop_back(), 3);
-            ASSERT_EQ(tmp.pop_back(), 2);
-            ASSERT_EQ(tmp.pop_back(), 1);
+            ASSERT_EQ(tmp.size(), 3.0f);
+            ASSERT_EQ(tmp.pop_back(), 3.0f);
+            ASSERT_EQ(tmp.pop_back(), 2.0f);
+            ASSERT_EQ(tmp.pop_back(), 1.0f);
         }
 
         TEST(LIFO_std, pushBack_move)
@@ -174,6 +174,9 @@ namespace test
 
             // Normal behaviour
             tmp.push_back(3.0f);
+            tmp.push_back(4.0f);
+            ASSERT_EQ(tmp.size(), 2);
+            ASSERT_EQ(tmp.pop_back(), 4.0f);
             ASSERT_EQ(tmp.size(), 1);
             ASSERT_EQ(tmp.pop_back(), 3.0f);
             ASSERT_EQ(tmp.size(), 0);
@@ -204,21 +207,21 @@ namespace test
             ASSERT_EQ(tmp.size(), tmp.capacity());
 
             // Default insert
-            float a = 1;
-            const float b = 2;
+            float a = 1.0f;
+            const float b = 2.0f;
 
             tmp.push_back(a);
             tmp.push_back(b);
-            tmp.push_back(3);
+            tmp.push_back(3.0f);
 
             ASSERT_EQ(tmp.size(), tmp.capacity());
 
             // unique_ptr array insert
             std::unique_ptr<float[]> c(new float[4]);
-            c[0] = 1;
-            c[1] = 2;
-            c[2] = 3;
-            c[3] = 4;
+            c[0] = 1.0f;
+            c[1] = 2.0f;
+            c[2] = 3.0f;
+            c[3] = 4.0f;
             tmp.push_back(std::move(c), 4);
 
             ASSERT_EQ(tmp.size(), tmp.capacity());

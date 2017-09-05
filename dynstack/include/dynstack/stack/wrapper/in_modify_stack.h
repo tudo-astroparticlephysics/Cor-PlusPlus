@@ -23,13 +23,13 @@ namespace dynstack
 	namespace wrapper
 	{
 
-		
+
 		template<class TStack, typename TStack::m_ReturnType (*TFunc)(const typename TStack::m_ReturnType* const)>
-		class InputModifyStack: public TStack
+		class InModifyStack: public TStack
 		{
 
 			static_assert(std::is_base_of<_Stack, TStack>::value, "TStack must be a Stack!");
-			
+
 		private:
 
 			typedef typename TStack::m_ReturnType TType;
@@ -37,22 +37,22 @@ namespace dynstack
 
 
 		protected:
-			
+
 
 		public:
 
 			template<typename ... Args>
-			InputModifyStack(Args&&... args)
+			InModifyStack(Args&&... args)
 					: TStack(args...)
 			{
 			}
 
-			InputModifyStack(InputModifyStack<TStack, TFunc> && rhs)
+			InModifyStack(InModifyStack<TStack, TFunc> && rhs)
 				: TStack(std::forward<TStack>(rhs))
-			{				
+			{
 			}
 
-			~InputModifyStack()
+			~InModifyStack()
 			{
 
 			}
@@ -62,18 +62,18 @@ namespace dynstack
 				return TStack::push_back( TFunc( &data) );
 			}
 			inline int push_back(TType&& data)
-			{				
+			{
 				return TStack::push_back( TFunc( &data) );
 			}
 
 			//Copys element to next free space
 			inline int push_back(std::unique_ptr<const TType[]> data, const unsigned int elem)
-			{				
+			{
 				std::unique_ptr<TType[]> tmp(new TType[elem]);
 
 				for (unsigned int i = 0; i < elem; i++)
-				{					
-					tmp[i] = TFunc(data.get() + i);					
+				{
+					tmp[i] = TFunc(data.get() + i);
 				}
 				return TStack::push_back(std::move(tmp), elem);
 			}
@@ -83,15 +83,13 @@ namespace dynstack
 				std::unique_ptr<TType[]> tmp(new TType[elem]);
 
 				for (unsigned int i = 0; i < elem; i++)
-				{					
+				{
 					tmp[i] = TFunc(data + i);
 				}
 				return TStack::push_back(std::move(tmp), elem);
-			}		
+			}
 
 		};
 
 	}
 }
-
-

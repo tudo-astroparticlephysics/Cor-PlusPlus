@@ -94,7 +94,7 @@ namespace dynstack
 		    inline int push_back(const TType& data)
 			{
                 //if constexpr( std::is_copy_constructible<TType>::value )  C++17 feature to partial enable support of not copyconstructable types
-                //{
+                //{                
                     if (m_tBuffer->size() < m_uiSize)
     				{
     					m_tBuffer->push( data );

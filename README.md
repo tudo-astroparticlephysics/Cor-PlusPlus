@@ -27,6 +27,11 @@ If you want to **upgrade an old [CORSIKA](https://www.ikp.kit.edu/corsika/) veri
 To compile the source code a compiler with C++11 support is neccesary (gcc > 4.8).
 A reduced feature level is available with old gcc up to version 4.6
 
+Clone this repository with git clone and load the included submodules with 
+
+git submodule update --init --recursive
+git pull --recurse-submodules
+
 - - -
 
 ## Versions
