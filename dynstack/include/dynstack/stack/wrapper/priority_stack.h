@@ -41,7 +41,7 @@ namespace dynstack
 
 
             template<class ... TArgs>
-            PriorityStack(TArgs&&... args)
+            PriorityStack(TArgs... args)
             : m_oStack_if(std::forward<TArgs>(args)... ), m_oStack_else(std::forward<TArgs>(args)...)
             { }
 
