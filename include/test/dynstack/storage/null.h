@@ -16,6 +16,24 @@ namespace test
 {
     namespace dynstack
     {
+        TEST(null, Ctr)
+        {
+            ::dynstack::storage::Null_Stack<float> tmp1;
+            tmp1.push_back(1.0f);
+
+            ::dynstack::storage::Null_Stack<float> tmp2( tmp1 );
+
+            ASSERT_EQ(tmp1.size(), 0);
+            ASSERT_EQ(tmp1.back(), float());
+
+            ASSERT_EQ(tmp2.size(), 0);
+            ASSERT_EQ(tmp2.back(), float());
+
+            ::dynstack::storage::Null_Stack < float > tmp3( std::move(tmp1) );
+
+            ASSERT_EQ(tmp3.size(), 0);
+            ASSERT_EQ(tmp3.back(), float());
+        }
 
         TEST(null, capacity)
         {

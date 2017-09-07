@@ -26,7 +26,7 @@ namespace dynstack
 		/**
 		*	Implements a basic last in first out storage similar in functionality to the default corsika implementation.
 		*	This class alone can not handle overflows for to many elements to store, it will simply remove them and returns -1 for the push_back routine.
-		*	In most cases (x64) you can simply expand your stack to several gigabyte of memory and should never run out of memory, for all other cases 
+		*	In most cases (x64) you can simply expand your stack to several gigabyte of memory and should never run out of memory, for all other cases
 		*	the overflow_to_disk_stack decorated should be the appropriated solution.
 		*
 		*	\tparam TType Type of the elements that should be stored into the memory. The data is stored directly as object and does not get casted.
@@ -38,11 +38,11 @@ namespace dynstack
 
 		private:
 
-			std::vector<TType> m_tBuffer;			
+			std::vector<TType> m_tBuffer;
 			const unsigned int m_uiSize;
 
 		protected:
-			
+
 
 
 		public:
@@ -54,9 +54,15 @@ namespace dynstack
 
 			}
 
+            LIFO_std_Stack(const LIFO_std_Stack<TType>& rhs)
+					: Stack<TType>(), m_tBuffer( rhs.m_tBuffer ), m_uiSize(rhs.m_uiSize)
+			{
+
+			}
+
 			LIFO_std_Stack(LIFO_std_Stack<TType> && rhs)
 					: Stack<TType>(), m_tBuffer( std::move(rhs.m_tBuffer) ), m_uiSize(rhs.m_uiSize)
-			{								
+			{
 
 			}
 
@@ -147,7 +153,7 @@ namespace dynstack
 			}
 
 
-					
+
 
 			inline unsigned long size() const
 			{
@@ -163,6 +169,3 @@ namespace dynstack
 	}
 
 }
-
-
-

@@ -21,6 +21,28 @@ namespace test
             return *data + 1.0f;
         }
 
+        TEST(InModify, Ctr)
+        {
+            ::dynstack::wrapper::InModifyStack<::dynstack::storage::FIFO_Stack<float>, modify> tmp1(12);
+            tmp1.push_back(1.0f);
+
+            ::dynstack::wrapper::InModifyStack<::dynstack::storage::FIFO_Stack<float>, modify> tmp2( tmp1 );
+
+            ASSERT_EQ(tmp1.capacity(), 12);
+            ASSERT_EQ(tmp1.size(), 1);
+            ASSERT_EQ(tmp1.back(), 2.0f);
+
+            ASSERT_EQ(tmp2.capacity(), 12);
+            ASSERT_EQ(tmp2.size(), 1);
+            ASSERT_EQ(tmp2.back(), 2.0f);
+
+            ::dynstack::wrapper::InModifyStack<::dynstack::storage::FIFO_Stack<float>, modify> tmp3( std::move(tmp1) );
+
+            ASSERT_EQ(tmp3.capacity(), 12);
+            ASSERT_EQ(tmp3.size(), 1);
+            ASSERT_EQ(tmp3.back(), 2.0f);
+        }
+
         TEST(InModify, capacity)
         {
             ::dynstack::wrapper::InModifyStack<::dynstack::storage::FIFO_Stack<float>, modify> tmp(12);

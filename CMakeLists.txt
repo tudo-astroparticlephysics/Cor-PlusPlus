@@ -53,28 +53,6 @@ else ()
     message(FATAL_ERROR "Your C++ compiler does not support the necessary feature to compile this module. For best results use gcc 4.6 or above.")
 endif ()
 
-# Compiler-specific C++XY activation.
-#if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
-#    execute_process(
-#        COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
-#        message("Compiler version: ${GCC_VERSION}")
-#    if (NOT (GCC_VERSION VERSION_GREATER 4.6 OR GCC_VERSION VERSION_EQUAL 4.6)) #2.6.2 feature
-#        message(FATAL_ERROR "${PROJECT_NAME} requires g++ 4.6 or greater.")
-#    elseif(NOT (GCC_VERSION VERSION_GREATER 4.8 OR GCC_VERSION VERSION_EQUAL 4.8))
-#        message("${PROJECT_NAME} uses a version below g++ 4.8.1 and does not support the full feature level. Read the manual to check which functionality is available!")
-#        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
-#    elseif(NOT (GCC_VERSION VERSION_GREATER 5.0 OR GCC_VERSION VERSION_EQUAL 5.0))
-#        message("${PROJECT_NAME} uses a version above g++ 4.8.1 and does support the full feature level.")
-#        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-#    elseif(NOT (GCC_VERSION VERSION_GREATER 7.0.0 OR GCC_VERSION VERSION_EQUAL 7.0.0))
-#        message("${PROJECT_NAME} uses a g++ version above 5.0.0 and support all features including additional performance and usability tweaks!")
-#        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
-#    endif ()
-#elseif ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
-#    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
-#else ()
-#    message(FATAL_ERROR "Your C++ compiler does not support the necessary feature to compile this module. For best results use gcc 4.6 or above.")
-#endif ()
 
 # Set shared compiler flags
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall -Wextra -pedantic -pedantic-errors")
@@ -125,6 +103,9 @@ include_directories(${CMAKE_BINARY_DIR})
 
 # Check and build tests
 if(BUILD_TESTS)
+    #Set settings to debug
+    set(CMAKE_BUILD_TYPE Debug)
+
     # Find gtest and add it to directory
     enable_testing()
     find_package(GTest REQUIRED)

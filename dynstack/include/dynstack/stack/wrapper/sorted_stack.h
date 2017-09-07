@@ -35,16 +35,12 @@ namespace dynstack
 			typedef typename TStack::m_ReturnType TType;
 			typedef typename TStack::m_StackType TTypeStack;
 
-			std::array<meta::tuple::tupleUnpack<TStack>, TBins> m_oStacks;
+			std::array<meta::tuple::tupleUnpack<TStack>, TBins> m_oStacks;   /// Array of stacks to store elements - tupleUnpack is only for construction of individual elements
 
-			unsigned int m_uiBinSize[TBins];
-			unsigned int m_uiSize;
+			unsigned int m_uiBinSize[TBins]; /// Number of stored elements per bin (similar to bin.size())
+			unsigned int m_uiSize;       /// Number of stored elements
 
-			unsigned int m_uiCap = 0;
-
-			int m_iLastStack;
-
-
+			unsigned int m_uiCap = 0;    /// Capacity of all Stacks combined
 
 		protected:
 
@@ -54,7 +50,7 @@ namespace dynstack
 
 			template<class ... TArgs>
 			SortedStack(TArgs&&... args)
-				: m_oStacks{ { std::forward<TArgs>(args)... } }, m_uiSize(0), m_iLastStack(-1)
+				: m_oStacks{ { std::forward<TArgs>(args)... } }, m_uiSize(0)
 			{
 				static_assert(sizeof...(TArgs) == TBins, "Not enough Arguments for every DiscreteSorted Bin!");
 
@@ -64,14 +60,16 @@ namespace dynstack
 				}
 
 
-				for (unsigned int i = 0; i < TBins; i++)
-					m_uiCap += m_oStacks[i].capacity();
+				for (unsigned int i = 0; i < TBins; i++)// could be replaced with a fold function in c++17 to make it compiletime constant
+                {
+                    m_uiCap += m_oStacks[i].capacity();
+                }
 			}
 
 
 
 			SortedStack(SortedStack<TStack, TBins, TFunc> && rhs)
-				: m_oStacks( std::move(rhs.m_oStacks) ), m_uiSize(rhs.m_uiSize), m_iLastStack(rhs.m_iLastStack)
+				: m_oStacks( std::move(rhs.m_oStacks) ), m_uiSize(rhs.m_uiSize)
 			{
 
 				rhs.m_iLastStack = -1;
@@ -159,7 +157,6 @@ namespace dynstack
 				{
 					if (m_uiBinSize[i] > 0)
 					{
-						m_iLastStack = i;
 						return m_oStacks[i].back();
 					}
 				}
@@ -173,7 +170,6 @@ namespace dynstack
 				{
 					if (m_uiBinSize[i] > 0)
 					{
-						m_iLastStack = -1;
 						m_uiBinSize[i]--;
 						m_uiSize--;
 						return m_oStacks[i].pop_back();
@@ -187,15 +183,16 @@ namespace dynstack
 			// that was readed with back
 			inline bool pop()
 			{
-				if(m_iLastStack != -1)
+                for (unsigned int i = 0; i < TBins; i++)
 				{
-					const int lastStack = m_iLastStack;
-					m_iLastStack = -1;
-
-					m_uiBinSize[lastStack]--;
-					m_uiSize--;
-					return m_oStacks[lastStack].pop();
+					if (m_uiBinSize[i] > 0)
+					{
+						m_uiBinSize[i]--;
+						m_uiSize--;
+						return m_oStacks[i].pop();
+					}
 				}
+
 				return false;
 			}
 

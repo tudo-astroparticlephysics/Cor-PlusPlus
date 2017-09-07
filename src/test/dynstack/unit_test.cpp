@@ -13,7 +13,7 @@
 #include "test/dynstack/advanced/combination.h"
 #include "test/dynstack/advanced/copy.h"
 #include "test/dynstack/advanced/debug.h"
-#include "test/dynstack/advanced/dynamic_sorted.h"
+#include "test/dynstack/advanced/advanced_sorted.h"
 #include "test/dynstack/advanced/if.h"
 
 #include "test/dynstack/storage/fifo.h"
@@ -25,6 +25,8 @@
 #include "test/dynstack/wrapper/filter.h"
 #include "test/dynstack/wrapper/input_callback.h"
 #include "test/dynstack/wrapper/input_modify.h"
+#include "test/dynstack/wrapper/output_callback.h"
+#include "test/dynstack/wrapper/output_modify.h"
 #include "test/dynstack/wrapper/priority.h"
 #include "test/dynstack/wrapper/sorted.h"
 

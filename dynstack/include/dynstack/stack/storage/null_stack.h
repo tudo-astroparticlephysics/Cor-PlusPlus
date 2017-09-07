@@ -26,27 +26,33 @@ namespace dynstack
 			static_assert(!std::is_pointer<TType>::value, "Template parameter can't be a pointer!");
 
 		private:
-			
 
-		protected:			
+
+		protected:
 
 		public:
 
 			Null_Stack()
 					: Stack<TType>()
 			{
-			
+
 			}
+
+            Null_Stack(const Null_Stack<TType>& rhs)
+                    : Stack<TType>()
+            {
+                (void(rhs));
+            }
 
 			Null_Stack(Null_Stack<TType> && rhs)
 					: Stack<TType>()
 			{
-				(void(rhs));						
+				(void(rhs));
 			}
 
 			~Null_Stack()
 			{
-				
+
 			}
 
 			inline int push_back(const TType& data)
@@ -100,7 +106,7 @@ namespace dynstack
 
 			}
 
-			
+
 
 			inline unsigned long size() const
 			{

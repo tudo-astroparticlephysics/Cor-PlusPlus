@@ -26,6 +26,28 @@ namespace test
             return -1;
         }
 
+        TEST(Filter, Ctr)
+        {
+            ::dynstack::wrapper::FilterStack<::dynstack::storage::FIFO_Stack<float>, filter> tmp1(12);
+            tmp1.push_back(1.0f);
+
+            ::dynstack::wrapper::FilterStack<::dynstack::storage::FIFO_Stack<float>, filter> tmp2( tmp1 );
+
+            ASSERT_EQ(tmp1.capacity(), 12); 
+            ASSERT_EQ(tmp1.size(), 1);
+            ASSERT_EQ(tmp1.back(), 1.0f);
+
+            ASSERT_EQ(tmp2.capacity(), 12);
+            ASSERT_EQ(tmp2.size(), 1);
+            ASSERT_EQ(tmp2.back(), 1.0f);
+
+            ::dynstack::wrapper::FilterStack<::dynstack::storage::FIFO_Stack<float>, filter> tmp3( std::move(tmp1) );
+
+            ASSERT_EQ(tmp3.capacity(), 12);
+            ASSERT_EQ(tmp3.size(), 1);
+            ASSERT_EQ(tmp3.back(), 1.0f);
+        }
+
 
         TEST(Filter, capacity)
         {

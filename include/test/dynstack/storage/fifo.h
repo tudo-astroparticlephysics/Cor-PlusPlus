@@ -1,7 +1,7 @@
 /* fifo.h
 * this file is part of Dynstack/RemoteControl for CORSIKA
 *
-* Copyright (C) <2016> <Dominik Baack>
+* Copyright (C) <2017> <Dominik Baack>
 *		All rights reserved.
 *
 * 	This software may be modified and distributed under the terms
@@ -14,6 +14,29 @@ namespace test
 {
     namespace dynstack
     {
+
+
+        TEST(FIFO, Ctr)
+        {
+            ::dynstack::storage::FIFO_Stack<float> tmp1(12);
+            tmp1.push_back(1.0f);
+
+            ::dynstack::storage::FIFO_Stack<float> tmp2( tmp1 );
+
+            ASSERT_EQ(tmp1.capacity(), 12);
+            ASSERT_EQ(tmp1.size(), 1);
+            ASSERT_EQ(tmp1.back(), 1.0f);
+
+            ASSERT_EQ(tmp2.capacity(), 12);
+            ASSERT_EQ(tmp2.size(), 1);
+            ASSERT_EQ(tmp2.back(), 1.0f);
+
+            ::dynstack::storage::FIFO_Stack< float > tmp3( std::move(tmp1) );
+
+            ASSERT_EQ(tmp3.capacity(), 12);
+            ASSERT_EQ(tmp3.size(), 1);
+            ASSERT_EQ(tmp3.back(), 1.0f);
+        }
 
         TEST(FIFO, capacity)
         {

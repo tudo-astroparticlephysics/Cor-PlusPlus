@@ -24,7 +24,7 @@ namespace dynstack
 	namespace advanced
 	{
 
-		/// Auxiliary classes for AdvancedDiscreteSortedStack
+		/// Auxiliary classes for AdvancedSortedStack
 		/**
 		 * This namespace includes helper to execute default stack commands on a single object (at runtime!) in a std::tuple
 		 */
@@ -196,7 +196,7 @@ namespace dynstack
 		*   \tparam TStack List of different Stacks, where every stack presents a single bin from 0 to sizeof...(TStack) - 1
 		*/
 		template<class TType, unsigned int (*TFunc)(const TType* const), class ... TStack>
-		class AdvancedDiscreteSortedStack: public Stack<TType>
+		class AdvancedSortedStack: public Stack<TType>
 		{
 			//static_assert(std::is_base_of<_Stack, TStack>::value, "TStack must be a Stack!");
 			static_assert(!std::is_pointer<TType>::value, "Template parameter can't be a pointer!");
@@ -208,8 +208,6 @@ namespace dynstack
 			unsigned int m_uiBinSize[sizeof...(TStack)];
 
 			unsigned int m_uiCap = 0;
-
-			int m_iLastStack;
 
 		protected:
 
@@ -223,8 +221,8 @@ namespace dynstack
 		*   \tparam TArgs Type of arguments that must be forwarded to the storage stacks
 		*/
 		template<class ... TArgs>
-		AdvancedDiscreteSortedStack(TArgs&&... args)
-		: m_oStacks(std::forward<TArgs>(args)...), m_iLastStack(-1)
+		AdvancedSortedStack(TArgs&&... args)
+		: m_oStacks(std::forward<TArgs>(args)...)
 		{
 			static_assert(sizeof...(TArgs) == sizeof...(TStack), "Not enough Arguments for every DiscreteSorted Bin!");
 
@@ -243,8 +241,8 @@ namespace dynstack
 		/**
 		*
 		*/
-		AdvancedDiscreteSortedStack(AdvancedDiscreteSortedStack<TType, TFunc, TStack...> && rhs)
-		: m_oStacks(std::move(rhs.m_oStacks)), m_iLastStack(rhs.m_iLastStack)
+		AdvancedSortedStack(AdvancedSortedStack<TType, TFunc, TStack...> && rhs)
+		: m_oStacks(std::move(rhs.m_oStacks))
 		{
 
 			rhs.m_iLastStack = -1;
@@ -257,7 +255,7 @@ namespace dynstack
 		/**
 		*
 		*/
-		~AdvancedDiscreteSortedStack()
+		~AdvancedSortedStack()
 		{
 		}
 
@@ -366,7 +364,6 @@ namespace dynstack
 			{
 				if (m_uiBinSize[i] > 0)
 				{
-					m_iLastStack = i;
 					return aux::visit_impl<TType, sizeof...(TStack)>::back_at(m_oStacks, i);
 				}
 			}
@@ -400,15 +397,15 @@ namespace dynstack
 		*/
 		inline bool pop()
 		{
-			if (m_iLastStack != -1)
+            for (unsigned int i = 0; i < sizeof...(TStack); i++)
 			{
-				const int lastStack = m_iLastStack;
-				m_iLastStack = -1;
-
-				m_uiBinSize[lastStack]--;
-
-				return aux::visit_impl<TType, sizeof...(TStack)>::pop_at(m_oStacks, lastStack);
+				if (m_uiBinSize[i] > 0)
+				{
+					m_uiBinSize[i]--;
+					return aux::visit_impl<TType, sizeof...(TStack)>::pop_at(m_oStacks, i);
+				}
 			}
+
 			return false;
 		}
 
@@ -423,9 +420,7 @@ namespace dynstack
 				m_uiBinSize[i] = 0;
 
 				aux::visit_impl<TType, sizeof...(TStack)>::clear_at(m_oStacks, i);
-			}
-			m_iLastStack = -1;
-
+			}		
 		}
 
 		//Get new empty element to write into (direct access, zero copy)

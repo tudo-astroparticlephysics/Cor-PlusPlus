@@ -56,7 +56,7 @@ namespace dynstack
 					: Stack<TType>(), m_uiSize(size)
 			{
 				m_tBuffer = std::unique_ptr< std::queue<TType> >(new std::queue<TType>());
-			}
+            }
 
 			/// Copy constructor
 			/**
@@ -65,8 +65,7 @@ namespace dynstack
 			FIFO_Stack(const FIFO_Stack<TType>& rhs)
 				: Stack<TType>(), m_uiSize(rhs.m_uiSize)
 			{
-				m_tBuffer = std::unique_ptr< std::queue<TType> >(new std::queue<TType>());
-				std::copy(rhs.m_tBuffer->begin(), rhs.m_tBuffer->end(), m_tBuffer->begin());
+				m_tBuffer = std::unique_ptr< std::queue<TType> >(new std::queue<TType>(*rhs.m_tBuffer));
 			}
 
 			/// Move constructor
@@ -74,8 +73,8 @@ namespace dynstack
 			 *  Moves the underlying storage container to the new object. The old stack loses its validity and can not be used anymore.
 			 */
 			FIFO_Stack(FIFO_Stack<TType> && rhs)
-					: Stack<TType>(), m_uiSize(rhs.m_uiSize), m_tBuffer(rhs.m_tBuffer)
-			{
+					: Stack<TType>(), m_tBuffer( std::move(rhs.m_tBuffer) ), m_uiSize(rhs.m_uiSize)
+			{            
 			}
 
 			/// Destructor
@@ -94,7 +93,7 @@ namespace dynstack
 		    inline int push_back(const TType& data)
 			{
                 //if constexpr( std::is_copy_constructible<TType>::value )  C++17 feature to partial enable support of not copyconstructable types
-                //{                
+                //{
                     if (m_tBuffer->size() < m_uiSize)
     				{
     					m_tBuffer->push( data );

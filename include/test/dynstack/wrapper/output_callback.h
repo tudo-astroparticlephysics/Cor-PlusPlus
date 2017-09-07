@@ -1,4 +1,4 @@
-/* input_callback.h
+/* output_callback.h
 * this file is part of Dynstack/RemoteControl for CORSIKA
 *
 * Copyright (C) <2017> <Dominik Baack>
@@ -9,29 +9,28 @@
 */
 
 #include "dynstack/stack/storage/fifo_stack.h"
-#include "dynstack/stack/wrapper/in_callback_stack.h"
+#include "dynstack/stack/wrapper/out_callback_stack.h"
 
 namespace test
 {
     namespace dynstack
     {
-        namespace InCallback
+        namespace OutCallback
         {
 
-
-            static int callbackAdd = 0;
+            float callbackAdd = 0.0f;
 
             void callback(const float* const data)
             {
                 callbackAdd = callbackAdd + *data;
             }
 
-            TEST(InCallback, Ctr)
+            TEST(OutCallback, Ctr)
             {
-                ::dynstack::wrapper::InCallbackStack<::dynstack::storage::FIFO_Stack<float>, callback> tmp1(12);
+                ::dynstack::wrapper::OutCallbackStack< ::dynstack::storage::FIFO_Stack<float>, callback> tmp1(12);
                 tmp1.push_back(1.0f);
 
-                ::dynstack::wrapper::InCallbackStack<::dynstack::storage::FIFO_Stack<float>, callback> tmp2( tmp1 );
+                ::dynstack::wrapper::OutCallbackStack< ::dynstack::storage::FIFO_Stack<float>, callback> tmp2( tmp1 );
 
                 ASSERT_EQ(tmp1.capacity(), 12);
                 ASSERT_EQ(tmp1.size(), 1);
@@ -41,23 +40,23 @@ namespace test
                 ASSERT_EQ(tmp2.size(), 1);
                 ASSERT_EQ(tmp2.back(), 1.0f);
 
-                ::dynstack::wrapper::InCallbackStack<::dynstack::storage::FIFO_Stack<float>, callback> tmp3( std::move(tmp1) );
+                ::dynstack::wrapper::OutCallbackStack< ::dynstack::storage::FIFO_Stack<float>, callback> tmp3( std::move(tmp1) );
 
                 ASSERT_EQ(tmp3.capacity(), 12);
                 ASSERT_EQ(tmp3.size(), 1);
                 ASSERT_EQ(tmp3.back(), 1.0f);
             }
 
-            TEST(InCallback, capacity)
+            TEST(OutCallback, capacity)
             {
-                ::dynstack::wrapper::InCallbackStack<::dynstack::storage::FIFO_Stack<float>, callback> tmp(12);
+                ::dynstack::wrapper::OutCallbackStack< ::dynstack::storage::FIFO_Stack<float>, callback> tmp(12);
 
                 ASSERT_EQ(tmp.capacity(), 12);
             }
 
-            TEST(InCallback, size)
+            TEST(OutCallback, size)
             {
-                ::dynstack::wrapper::InCallbackStack<::dynstack::storage::FIFO_Stack<float>, callback> tmp(12);
+                ::dynstack::wrapper::OutCallbackStack< ::dynstack::storage::FIFO_Stack<float>, callback> tmp(12);
 
                 ASSERT_EQ(tmp.size(), 0);
 
@@ -76,28 +75,24 @@ namespace test
                 ASSERT_EQ(tmp.size(), 12);
             }
 
-            TEST(InCallback, pushBack_reference)
+            TEST(OutCallback, pushBack_reference)
             {
-                ::dynstack::wrapper::InCallbackStack<::dynstack::storage::FIFO_Stack<float>, callback> tmp(12);
+                ::dynstack::wrapper::OutCallbackStack< ::dynstack::storage::FIFO_Stack<float>, callback> tmp(12);
 
                 float a = 1.0f;
                 const float b = 2.0f;
-
-                callbackAdd = 0;
 
                 tmp.push_back(a);
                 tmp.push_back(b);
                 tmp.push_back(3.0f);
 
                 ASSERT_EQ(tmp.size(), 3);
-                ASSERT_EQ(callbackAdd, 6);
-
                 ASSERT_EQ(tmp.pop_back(), 1.0f);
                 ASSERT_EQ(tmp.pop_back(), 2.0f);
                 ASSERT_EQ(tmp.pop_back(), 3.0f);
             }
 
-            TEST(InCallback, pushBack_move)
+            TEST(OutCallback, pushBack_move)
             {
                 /*::dynstack::storage::FIFO_Stack< std::unique_ptr<float> > tmp(12);
 
@@ -116,9 +111,9 @@ namespace test
                 ASSERT_EQ(*tmp.pop_back(), 3.0f);*/
             }
 
-            TEST(InCallback, pushBack_uniquePtr)
+            TEST(OutCallback, pushBack_uniquePtr)
             {
-                ::dynstack::wrapper::InCallbackStack<::dynstack::storage::FIFO_Stack<float>, callback> tmp(12);
+                ::dynstack::wrapper::OutCallbackStack< ::dynstack::storage::FIFO_Stack<float>, callback> tmp(12);
 
                 std::unique_ptr<float[]> a(new float[4]);
                 a[0] = 1.0f;
@@ -126,63 +121,59 @@ namespace test
                 a[2] = 3.0f;
                 a[3] = 4.0f;
 
-                callbackAdd = 0;
-
                 tmp.push_back(std::move(a), 4);
 
                 ASSERT_EQ(tmp.size(), 4);
-                ASSERT_EQ(callbackAdd, 10);
-                callbackAdd = 0;
-
                 ASSERT_EQ(tmp.pop_back(), 1.0f);
                 ASSERT_EQ(tmp.pop_back(), 2.0f);
                 ASSERT_EQ(tmp.pop_back(), 3.0f);
                 ASSERT_EQ(tmp.pop_back(), 4.0f);
             }
 
-            TEST(InCallback, pushBack_ptr)
+            TEST(OutCallback, pushBack_ptr)
             {
-                ::dynstack::wrapper::InCallbackStack<::dynstack::storage::FIFO_Stack<float>, callback> tmp(12);
+                ::dynstack::wrapper::OutCallbackStack< ::dynstack::storage::FIFO_Stack<float>, callback> tmp(12);
 
                 float a[] = {1.0f, 2.0f, 3.0f, 4.0f};
-
-                callbackAdd = 0;
 
                 tmp.push_back(a, 4);
 
                 ASSERT_EQ(tmp.size(), 4);
-                ASSERT_EQ(callbackAdd, 10);
-                callbackAdd = 0;
-
                 ASSERT_EQ(tmp.pop_back(), 1.0f);
                 ASSERT_EQ(tmp.pop_back(), 2.0f);
                 ASSERT_EQ(tmp.pop_back(), 3.0f);
                 ASSERT_EQ(tmp.pop_back(), 4.0f);
             }
 
-            TEST(InCallback, back)
+            TEST(OutCallback, back)
             {
-                ::dynstack::wrapper::InCallbackStack<::dynstack::storage::FIFO_Stack<float>, callback> tmp(12);
+                ::dynstack::wrapper::OutCallbackStack< ::dynstack::storage::FIFO_Stack<float>, callback> tmp(12);
+
+                callbackAdd = 0.0f;
 
                 // Test normal behaviour
                 tmp.push_back(3.0f);
-                ASSERT_EQ( 3.0f, tmp.back());
+                ASSERT_EQ(tmp.back(), 3.0f);
 
                 // Order correct?
                 tmp.push_back(4.0f);
-                ASSERT_EQ( 3.0f, tmp.back());
+                ASSERT_EQ(tmp.back(), 3.0f);
 
                 tmp.pop();
-                ASSERT_EQ( 4.0f, tmp.back());
+                ASSERT_EQ(tmp.back(), 4.0f);
+
+                ASSERT_EQ(callbackAdd, 10.0f);
 
                 // Test back on an empty Stack
-                ::dynstack::wrapper::InCallbackStack<::dynstack::storage::FIFO_Stack<float>, callback> tmp2(12);
+                ::dynstack::wrapper::OutCallbackStack< ::dynstack::storage::FIFO_Stack<float>, callback> tmp2(12);
                 ASSERT_EQ(tmp2.back(), float());   // Returnes default constructed value
             }
 
-            TEST(InCallback, pop)
+            TEST(OutCallback, pop)
             {
-                ::dynstack::wrapper::InCallbackStack<::dynstack::storage::FIFO_Stack<float>, callback> tmp(12);
+                ::dynstack::wrapper::OutCallbackStack< ::dynstack::storage::FIFO_Stack<float>, callback> tmp(12);
+                callbackAdd = 0.0f;
+
                 tmp.push_back(3.0f);
 
                 // Test Normal behaviour
@@ -204,15 +195,18 @@ namespace test
                 ASSERT_EQ(tmp.size(), 11);
 
                 // Test behaviour of a new initialized stack
-                ::dynstack::wrapper::InCallbackStack<::dynstack::storage::FIFO_Stack<float>, callback> tmp2(12);
+                ::dynstack::wrapper::OutCallbackStack< ::dynstack::storage::FIFO_Stack<float>, callback> tmp2(12);
                 tmp2.pop();
+
+                ASSERT_EQ(callbackAdd, 0.0f);
 
                 ASSERT_EQ(tmp2.size(), 0);
             }
 
-            TEST(InCallback, popBack)
+            TEST(OutCallback, popBack)
             {
-                ::dynstack::wrapper::InCallbackStack<::dynstack::storage::FIFO_Stack<float>, callback> tmp(12);
+                ::dynstack::wrapper::OutCallbackStack< ::dynstack::storage::FIFO_Stack<float>, callback> tmp(12);
+                callbackAdd = 0.0f;
 
                 // Empty init behaviour
                 ASSERT_EQ(tmp.size(), 0);
@@ -221,9 +215,14 @@ namespace test
 
                 // Normal behaviour
                 tmp.push_back(3.0f);
-                ASSERT_EQ(tmp.size(), 1);
+                tmp.push_back(4.0f);
+                ASSERT_EQ(tmp.size(), 2);
                 ASSERT_EQ(tmp.pop_back(), 3.0f);
+                ASSERT_EQ(tmp.size(), 1);
+                ASSERT_EQ(tmp.pop_back(), 4.0f);
                 ASSERT_EQ(tmp.size(), 0);
+
+                ASSERT_EQ(callbackAdd, 7.0f);
 
                 // Empty behaviour
                 ASSERT_EQ(tmp.pop_back(), 0.0f);
@@ -238,11 +237,14 @@ namespace test
                 ASSERT_EQ(tmp.pop_back(), 3.0f);
                 ASSERT_EQ(tmp.size(), 11);
 
+                ASSERT_EQ(callbackAdd, 10.0f);
+
             }
 
-            TEST(InCallback, pusbBack_UpperLimit)
+            TEST(OutCallback, pusbBack_UpperLimit)
             {
-                ::dynstack::wrapper::InCallbackStack<::dynstack::storage::FIFO_Stack<float>, callback> tmp(12);
+                ::dynstack::wrapper::OutCallbackStack< ::dynstack::storage::FIFO_Stack<float>, callback> tmp(12);
+                callbackAdd = 0.0f;
 
                 for(unsigned int i=0; i<tmp.capacity(); i++)
                 {
@@ -275,12 +277,15 @@ namespace test
                 tmp.push_back(d, 4);
 
                 ASSERT_EQ(tmp.size(), tmp.capacity());
+
+                ASSERT_EQ(callbackAdd, 0.0f);
             }
 
 
-            TEST(InCallback, clear)
+            TEST(OutCallback, clear)
             {
-                ::dynstack::wrapper::InCallbackStack<::dynstack::storage::FIFO_Stack<float>, callback> tmp(12);
+                ::dynstack::wrapper::OutCallbackStack< ::dynstack::storage::FIFO_Stack<float>, callback> tmp(12);
+                callbackAdd = 0.0f;
 
                 // Empty test
                 ASSERT_EQ(tmp.size(), 0);
@@ -301,11 +306,13 @@ namespace test
                 tmp.clear();
                 ASSERT_EQ(tmp.size(), 0);
 
+                ASSERT_EQ(callbackAdd, 0.0f);
+
             }
 
-            TEST(InCallback, invalidRegion)
+            TEST(OutCallback, invalidRegion)
             {
-                ::dynstack::wrapper::InCallbackStack<::dynstack::storage::FIFO_Stack<float>, callback> tmp(12);
+                ::dynstack::wrapper::OutCallbackStack< ::dynstack::storage::FIFO_Stack<float>, callback> tmp(12);
 
                 tmp.push_back(2);
                 ASSERT_EQ(tmp.size(), 1);
@@ -320,6 +327,8 @@ namespace test
                 ASSERT_EQ(ret, true);
             }
 
+
         }
+
     }
 }
