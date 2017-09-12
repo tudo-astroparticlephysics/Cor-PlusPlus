@@ -7,10 +7,10 @@
 * 	This software may be modified and distributed under the terms
 * 	of the LGPL license. See the LICENSE file for details.
 */
-
-#include "test/remote_control/protocol_test.h"
+#include "gtest/gtest.h"
 
 #include "test/remote_control/message_queue_test.h"
+#include "test/remote_control/protocol_test.h"
 
 namespace test
 {

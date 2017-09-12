@@ -25,7 +25,8 @@ namespace test
 {
 	namespace remote_control
 	{
-        TEST(MessageQueue, SingleInsert)
+
+        TEST(MessageQueueTest, SingleInsert)
         {
             ::remote_control::communication::MessageQueue queue;
 
@@ -52,7 +53,7 @@ namespace test
         }
 
 
-        TEST(MessageQueue, ThreadedInsert)
+        TEST(MessageQueueTest, ThreadedInsert)
         {
             ::remote_control::communication::MessageQueue queue;
 
@@ -112,6 +113,6 @@ namespace test
             t.join();
         }
 
-        
+
 	}
 }
