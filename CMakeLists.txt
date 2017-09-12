@@ -131,9 +131,7 @@ if(BUILD_TESTS)
 
     # Add RCTest
     set(REMOTECONTROL_TEST_SRCS
-        ${PROJECT_SOURCE_DIR}/test/remote_control/unit_test.cpp
-        ${PROJECT_SOURCE_DIR}/test/remote_control/message_queue_test.cpp
-        ${PROJECT_SOURCE_DIR}/test/remote_control/protocol_test.cpp
+        ${PROJECT_SOURCE_DIR}/test/remote_control/unit_test.cpp    
     )
     add_executable(rc_test ${REMOTECONTROL_TEST_SRCS})
 
