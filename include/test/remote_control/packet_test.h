@@ -10,20 +10,24 @@
 
 #pragma once
 
-#include <iostream>
-#include <memory>
-#include <sstream>
-#include <algorithm>
-#include <functional>
+
+#include "../remote_control/communication/packet.h"
+
 
 namespace test
 {
 
 	namespace remote_control
 	{
-		
 
-		bool test_protocol_construction();
-		
+
+		TEST(Packet, Construction)
+        {
+
+
+
+
+        }
+
 	}
 }

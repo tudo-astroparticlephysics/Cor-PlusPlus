@@ -15,9 +15,6 @@
 #include "remote_control/communication/message_queue.h"
 #include "remote_control/communication/packet_id.h"
 
-#include <iostream>
-#include <string>
-
 #include <chrono>
 #include <thread>
 
