@@ -10,9 +10,9 @@
 
 //#include "gtest/gtest.h"
 
-#include "test/dynstack/storage_test.h"
-#include "test/dynstack/wrapper_test.h"
-#include "test/dynstack/advanced_test.h"
+#include "storage_test.h"
+#include "wrapper_test.h"
+#include "advanced_test.h"
 
 /*
 namespace test
@@ -45,9 +45,9 @@ namespace test
 */
 
 
-#include "test/dynstack/storage_test.h"
-#include "test/dynstack/wrapper_test.h"
-#include "test/dynstack/advanced_test.h"
+#include "storage_test.h"
+#include "wrapper_test.h"
+#include "advanced_test.h"
 
 
 namespace test

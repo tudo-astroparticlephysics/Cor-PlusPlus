@@ -8,9 +8,8 @@
 * 	of the LGPL license. See the LICENSE file for details.
 */
 
-#include "test/remote_control/protocol_test.h"
-
-#include "test/remote_control/message_queue_test.h"
+#include "protocol_test.h"
+#include "message_queue_test.h"
 
 namespace test
 {

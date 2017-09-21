@@ -8,7 +8,7 @@
  * 	of the LGPL license. See the LICENSE file for details.
  */
 
-#include "test/remote_control/message_queue_test.h"
+#include "message_queue_test.h"
 
 #include "remote_control/communication/message_queue.h"
 #include "remote_control/communication/packet_id.h"

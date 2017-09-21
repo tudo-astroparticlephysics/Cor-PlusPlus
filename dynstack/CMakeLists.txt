@@ -14,6 +14,7 @@ option(__DYNDEFAULT__ "Set stack to default implementation" ON)
 
 
 # Each subdirectory CMakeList.txt defines booth variable with
+set (PROJECT_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 set (PROJECT_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include)
 set (PROJECT_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
@@ -33,3 +34,35 @@ include_directories("${USER_CODE_INCLUDE_DIR}")
 
 
 add_library(${PROJECT_NAME} STATIC ${DYNSTACK_SRCS})
+
+
+# Check and build tests
+if(BUILD_TESTS)
+    # Find gtest and add it to directory
+    enable_testing()
+    find_package(GTest REQUIRED)
+    include_directories(${GTEST_INCLUDE_DIRS})
+
+    # Include Test directory
+    include_directories(${PROJECT_DIR}/test)
+
+    # Add DynstackTest
+    set(DYNSTACK_TEST_SRCS
+        ${PROJECT_DIR}/test/unit_test.cpp
+        ${PROJECT_DIR}/test/storage_test.cpp
+        ${PROJECT_DIR}/test/wrapper_test.cpp
+    )
+    add_executable(dynstack_test ${DYNSTACK_TEST_SRCS})
+
+    target_link_libraries(dynstack_test Dynstack)
+    target_link_libraries(dynstack_test Basic)
+
+    target_link_libraries(dynstack_test ${GTEST_BOTH_LIBRARIES})
+
+    find_package (Threads)
+    target_link_libraries(dynstack_test ${CMAKE_THREAD_LIBS_INIT})
+
+
+
+endif(BUILD_TESTS)
+

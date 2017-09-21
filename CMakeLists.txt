@@ -130,45 +130,5 @@ if(BUILD_TESTS)
     find_package(GTest REQUIRED)
     include_directories(${GTEST_INCLUDE_DIRS})
 
-    # Add DynstackTest
-    set(DYNSTACK_TEST_SRCS
-        ${PROJECT_SOURCE_DIR}/test/dynstack/unit_test.cpp
-        ${PROJECT_SOURCE_DIR}/test/dynstack/storage_test.cpp
-        ${PROJECT_SOURCE_DIR}/test/dynstack/wrapper_test.cpp
-    )
-    add_executable(dynstack_test ${DYNSTACK_TEST_SRCS})
-
-    target_link_libraries(dynstack_test network_lib)
-
-    target_link_libraries(dynstack_test Dynstack)
-    target_link_libraries(dynstack_test REMOTE_CONTROL)
-    target_link_libraries(dynstack_test Basic)
-
-    target_link_libraries(dynstack_test ${GTEST_BOTH_LIBRARIES})
-
-    find_package (Threads)
-    target_link_libraries(dynstack_test ${CMAKE_THREAD_LIBS_INIT})
-
-
-    # Add RCTest
-    set(REMOTECONTROL_TEST_SRCS
-        ${PROJECT_SOURCE_DIR}/test/remote_control/unit_test.cpp
-        ${PROJECT_SOURCE_DIR}/test/remote_control/message_queue_test.cpp
-        ${PROJECT_SOURCE_DIR}/test/remote_control/protocol_test.cpp
-    )
-    add_executable(rc_test ${REMOTECONTROL_TEST_SRCS})
-
-    target_link_libraries(rc_test network_lib)
-
-    target_link_libraries(rc_test Dynstack)
-    target_link_libraries(rc_test REMOTE_CONTROL)
-    target_link_libraries(rc_test Basic)
-
-    target_link_libraries(rc_test ${GTEST_BOTH_LIBRARIES})
-
-    find_package (Threads)
-    target_link_libraries(rc_test ${CMAKE_THREAD_LIBS_INIT})
-
-
 
 endif(BUILD_TESTS)

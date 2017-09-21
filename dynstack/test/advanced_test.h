@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include "test/dynstack/advanced_test.h"
+#include "advanced_test.h"
 
 #include "dynstack/stack/storage/lifo_stack.h"
 #include "dynstack/stack/storage/fifo_stack.h"
@@ -21,7 +21,7 @@
 #include "dynstack/stack/advanced/if_stack.h"
 
 
-#include "test/dynstack/common_test_function.h"
+#include "common_test_function.h"
 
 namespace test
 {

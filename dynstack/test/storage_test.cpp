@@ -8,7 +8,7 @@
 * 	of the LGPL license. See the LICENSE file for details.
 */
 
-#include "test/dynstack/storage_test.h"
+#include "storage_test.h"
 
 
 
@@ -19,7 +19,7 @@
 #include "dynstack/stack/storage/fifo_stack.h"
 #include "dynstack/stack/storage/null_stack.h"
 
-#include "test/dynstack/common_test_function.h"
+#include "common_test_function.h"
 
 namespace test
 {

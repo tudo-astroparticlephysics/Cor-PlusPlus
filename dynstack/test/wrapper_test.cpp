@@ -23,7 +23,7 @@
 
 
 
-#include "test/dynstack/common_test_function.h"
+#include "common_test_function.h"
 
 #include <memory>
 #include <array>
