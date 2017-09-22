@@ -127,7 +127,9 @@ script:
   - cmake .. -DBUILD_TESTS=ON -D_NOCOCO_=ON
   - echo "Compiler:" $COMP_XX
   - make VERBOSE=1
-  - ./unit_test
+  - ./dtl_test
+  - ./dynstack_test
+  - ./rc_test
 
 notifications:
 email: false

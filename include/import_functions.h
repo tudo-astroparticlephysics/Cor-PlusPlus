@@ -13,6 +13,6 @@
 
 extern "C"
 {
-    void AAMAIN_(); 
+    void CORSIKA_(); 
 
 }
