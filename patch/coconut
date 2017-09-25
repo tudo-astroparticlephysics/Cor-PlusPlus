@@ -1,0 +1,2326 @@
+#!/usr/bin/perl
+
+########################################################################################
+# coconut v3.1 (COrsika CONfiguration UTility)
+#
+# authors: Ralf Ulrich, Tanguy Pierog and Steffen Mueller (Forschungszentrum Karlsruhe)
+#    date: Tu 7. Apr 15:00:00 CEST 2009
+#  version: $Id: $
+#
+########################################################################################
+#
+#
+# coconut is a configuration and installation tool for CORSIKA.
+# It consists of the files
+#    - coconut      (perl script)
+#    - configure.in (autoconf M4 script)
+#    - acinclude.m4 (additional autoconf M4 script)
+#    - Makefile.am  (all the Makefile templates)
+#
+#
+# For developers:
+#  to add a new option, or menu you just have to append to the
+#  MENUDEFINITION and/or OPTIONLIST
+#  Everything is generated out of these two arrays. There is no
+#  further need of any modification in the coconut script.
+#
+#  Additionally also the configure.in and acinclud.m4 needs
+#  modification, since the coconut script passes options via
+#  --enable-<option> to configure. Just have a look at the
+#  option area of the configure.in and acinclude.m4, and make copy
+#  and paste of an existing option. If no special functionality
+#  is required this will work.
+#
+#  To add additional files for compilation you also have to
+#  modify the Makefiles. If you need a new subdirectory, it has
+#  to be added to the CORSIKA_SUBDIRS variable in acinclude.m4
+#  Any compiler flags should be passed via FFLAGS_<name>,
+#  CFLAGS_<name>, etc. to the Makefiles.
+#  Note: use AC_SUBST([name]) to substitute the "@name@" field in
+#  any Makefile.am with the content of the "name" variable in
+#  acinclude.m4/configure.in!
+#  In the Makefiles you may also use "if HAVE_option" constructs.
+#
+#  Remember: Any modification in acinclude.m4, configure.in and the Makefiles.am
+#            needs to be compiled using "autoreconf -if" or equivalent.
+#
+#  Info: To keep the caching mechanism working just stick to the naming-scheme:
+#        for option name: name=<name> , --enable-<name>
+#
+#
+#####################################################################################
+#
+#  Changes
+#
+#  RU, SM, TP, Apr 2009
+#                - v3 of coconut: first version to be distributed with CORISKA
+#
+#  RU, Oct 2010: - v3.1
+#                - Enabled multi selection of options
+#                - Enabled '-' to remove option
+#                - Improved handling of COAST/ROOTOUT/COASTUSERLIB/etc.
+#
+#
+#####################################################################################
+
+
+use strict;
+use warnings;
+use Data::Dumper;
+use Getopt::Long;
+use POSIX;
+use Cwd;
+use File::Path;
+
+#use version;
+use Term::ANSIColor;
+
+######################################################################################
+##
+##  Check of external dependencies and system environment
+##
+######################################################################################
+
+my $currentDir = Cwd::cwd();
+my $SYSTEM = "unknown";
+my $cors_lib="$currentDir/lib/$SYSTEM"; # `uname -s`
+my $cors_path="$currentDir";
+
+my $have_COAST = 0;
+my $have_COAST_LIB = 0;
+my $have_ROOT_LIB = 0;
+my $use_32bit = 1;
+my $is_64bit = 0;
+
+my $gcc_status = "false"; #Check if gcc version is useable for baack modules
+
+checkSystem();
+
+
+######################################################################################
+##
+##  Definition of MENUS and OPTIONS
+##
+######################################################################################
+
+
+# ----------------------------------------------------------------------
+# menu definition
+#
+# <menu> =>        : identifier of menu
+# <question>       : question string of menu
+# <default_option> : default option for this menu
+# <cache>          : cached information for this menu
+# <multi>          : use this for menus with multiple choices
+# ----------------------------------------------------------------------
+
+my %MENUDEFINITION
+    = (
+       hemodel  => {question => "Which high energy hadronic interaction model do you want to use ?",
+		    default_option => "4", cache => "", multi=>"no" },
+
+       lemodel  => {question => "Which low energy hadronic interaction model do you want to use ?",
+		    default_option => "1", cache => "", multi=>"no" },
+
+       time     => {question => "Which routine for date and time ?",
+		    default_option => "1", cache => "", multi=>"no" },
+
+       detector => {question => "Which detector geometry do you have ?",
+		    default_option => "1", cache => "", multi=>"no" },
+
+       options  => {question => "Which additional CORSIKA program options do you need ?",
+		    default_option => "z", cache => "", multi=>"yes" },
+
+       finish   => {question => "Configuration is finished. How do you want to proceed ? ",
+		    default_option => "f", cache => "", multi=>"no" },
+
+       ckov_wlen=> {question => "Do you want Cherenkov light emission angle wavelength dependence ? ",
+		    default_option => "1", cache => "", multi=>"no" },
+
+       ckov_long=> {question => "Cherenkov light vertical (longitudinal) distribution option ? ",
+		    default_option => "1", cache => "", multi=>"no" },
+
+       iact_ext => {question => "IACTEXT external output file option ? ",
+		    default_option => "1", cache => "", multi=>"no" },
+
+       baack    => {question => "Which compiler settings should be used to compile the baack modules?",
+                    default_option => "1", cache => "", multi=>"no" },
+
+       baack_dynstack => {question => "Which stack should be used ? ",
+		    default_option => "1", cache => "", multi=>"no" },
+
+        baack_corpp => {question => "Which executor should be used ?",
+            default_option => "1", cache => "", multi=>"no"},
+
+       bits     => {question => "Compile in 32 or 64bit mode ? ",
+		    default_option => "2", cache => "", multi=>"no" },
+       sizeout  => {question => "Create binaries in 32 or 64bit compatible mode ?",
+		    default_option => "2", cache => "", multi=>"no" },
+
+       parallel_lib => {question => "Compile CORSIKA as subroutine for parallelization with MPI ? ",
+		    default_option => "1", cache => "", multi=>"no" },
+
+       );
+
+
+# ----------------------------------------------------------------------
+# option list
+#
+# <name>     : option identifier
+# <menu>     : identifier of menu to appear in
+# <conflict> : list of in-compatible option identifiers
+# <required> : list of required option identifiers
+# <config>   : string to be passed to ./configure
+# <entry>    : entry character in menu
+# <help>     : help string in menu
+# <func>     : user function for special actions
+# ----------------------------------------------------------------------
+my @OPTIONLIST
+    = (
+       # -----------------------------------
+       # description of time menu options
+       {name=>"TIMEAUTO", menu=>"time", entry=>"1",  func=>undef , dtor=>undef,
+	conflict=>"", required=>"",
+	config=>"CORTIMELIB=TIMEAUTO", help=>"automatic detection by configure\n      (only use other choices if this one fails)"},
+
+       {name=>"TIMENEW", menu=>"time", entry=>"2",  func=>undef , dtor=>undef,
+	conflict=>"", required=>"",
+	config=>"CORTIMELIB=TIMENEW", help=>"new date_and_time routine"},
+
+       {name=>"TIMEOLD", menu=>"time",  func=>undef , dtor=>undef,
+	conflict=>"", required=>"", entry=>"3",
+	config=>"CORTIMELIB=TIMEOLD", help=>"old date routine"},
+
+       {name=>"TIMERC",  menu=>"time", entry=>"4",  func=>undef, dtor=>undef,
+	conflict=>"", required=>"",
+	config=>"CORTIMELIB=TIMERC", help=>"timerc routine" },
+
+       {name=>"TIMEIBM", menu=>"time", entry=>"5",  func=>undef , dtor=>undef,
+	conflict=>"", required=>"",
+	config=>"CORTIMELIB=TIMEIBM", help=>"date and time for IBM risc"},
+
+       {name =>"TIMEPGF77",menu=>"time", entry=>"6",  func=>undef, dtor=>undef,
+	conflict=>"", required=>"",
+	config=>"CORTIMELIB=TIMEPGF77", help=>"old date routine for pgf77" },
+
+
+       # -----------------------------------
+       # description of detector menu options
+       {name=>"HORIZONTAL", menu=>"detector", entry=>"1", func=>undef, dtor=>undef,
+	conflict=>"", required=>"",
+	config=>"CORDETECTOR=HORIZONTAL", help=>"horizontal flat detector array"},
+
+       {name=>"VOLUMEDET", menu=>"detector", entry=>"2", func=>undef , dtor=>undef,
+	conflict=>"", required=>"",
+	config=>"CORDETECTOR=VOLUMEDET", help=>"non-flat (volume) detector geometry"},
+
+       {name=>"VOLUMECORR", menu=>"detector", entry=>"3", func=>undef, dtor=>undef,
+	conflict=>"CERENKOV IACT VIEWCONE", required=>"",
+	config=>"CORDETECTOR=VOLUMECORR", help=>"vertical string detector geometry" },
+
+
+       # -----------------------------------
+       # description of HE model options
+       {name=>"NODPMJET", menu=>"hemodel", entry=>"1", func=>\&funcDPMJET , dtor=>undef,
+        conflict=>"", required=>"",
+        config=>"", help=>"Not yet available"},
+
+       {name=>"EPOS", menu=>"hemodel", entry=>"2",  func=>\&funcEPOS , dtor=>undef,
+	conflict=>"CHARM", required=>"",
+	config=>"CORHEMODEL=EPOS", help=>"EPOS LHC"},
+
+       {name=>"NEXUS", menu=>"hemodel", entry=>"3",  func=>\&funcNEXUS , dtor=>undef,
+	conflict=>"CHARM", required=>"",
+	config=>"CORHEMODEL=NEXUS", help=>"NEXUS 3.97" },
+
+       {name=>"QGSJET01", menu=>"hemodel", entry=>"4",  func=>undef, dtor=>undef,
+	conflict=>"", required=>"",
+	config=>"CORHEMODEL=QGSJET01", help=>"QGSJET 01C (enlarged commons)" },
+
+       {name=>"QGSJETII", menu=>"hemodel", entry=>"5",  func=>\&funcQGSJETII , dtor=>undef,
+	conflict=>"CHARM", required=>"",
+	config=>"CORHEMODEL=QGSJETII", help=>"QGSJETII-04"},
+
+       {name=>"SIBYLL", menu=>"hemodel", entry=>"6",  func=>\&funcSIBYLL , dtor=>undef,
+	conflict=>"", required=>"",
+	config=>"CORHEMODEL=SIBYLL", help=>"SIBYLL 2.3c"},
+
+       {name=>"VENUS", menu=>"hemodel", entry=>"7",  func=>undef , dtor=>undef,
+	conflict=>"CHARM", required=>"",
+	config=>"CORHEMODEL=VENUS", help=>"VENUS 4.12"},
+
+
+       # -----------------------------------
+       # description of LE model options
+       {name=>"GHEISHA", menu=>"lemodel", entry=>"1",  func=>undef , dtor=>undef,
+	conflict=>"", required=>"",
+	config=>"CORLEMODEL=GHEISHA", help=>"GHEISHA 2002d (double precision)"},
+
+       {name=>"FLUKA", menu=>"lemodel", entry=>"2",  func=>\&funcFLUKA , dtor=>undef,
+	conflict=>"DPMJET INTTEST", required=>"",
+	config=>"CORLEMODEL=FLUKA", help=>"FLUKA "},
+
+       {name=>"URQMD", menu=>"lemodel", entry=>"3",  func=>\&funcURQMD , dtor=>undef,
+	conflict=>"", required=>"",
+	config=>"CORLEMODEL=URQMD", help=>"URQMD 1.3cr"},
+
+
+       # -----------------------------------
+       # description of general CORSIKA options
+       {name=>"CERENKOV", menu=>"options", entry=>"1a", func=>\&funcCERENKOV , dtor=>undef,
+	conflict=>"COMPACT VOLUMECORR INTTEST ANAHIST AUGERHIST MUONHIST AUGCERLONG ICECUBE1 ICECUBE2", required=>"",
+	config=>"--enable-CERENKOV", help=>"Cherenkov version"},
+
+       {name=>"IACT", menu=>"options", entry=>"1b", func=>\&funcIACT , dtor=>undef,
+	conflict=>"INTTEST ANAHIST AUGERHIST MUONHIST AUGCERLONG AUGERHIT COMPACT VOLUMECORR", required=>"CERENKOV",
+	config=>"--enable-IACT", help=>"Cherenkov version using Bernlohr IACT routines (for telescopes)"},
+
+       {name=>"CEFFIC", menu=>"options", entry=>"1c",  func=>undef , dtor=>undef,
+	conflict=>"INTTEST CURVED AUGCERLONG", required=>"CERENKOV",
+	config=>"--enable-CEFFIC", help=>"apply atm. absorption, mirror reflectivity & quantum eff."},
+
+       {name=>"AUGCERLONG", menu=>"options", entry=>"1d",  func=>undef , dtor=>undef,
+	conflict=>"CERENKOV IACT CEFFIC INTTEST", required=>"",
+	config=>"--enable-AUGCERLONG", help=>"Auger Cherenkov longitudinal distribution"},
+
+       {name=>"TRAJECT", menu=>"options", entry=>"1e",  func=>undef , dtor=>undef,
+       conflict=>"INTTEST UPWARD", required=>"",
+       config=>"--enable-TRAJECT", help=>"TRAJECTory version to follow motion of source on the sky"},
+
+       {name=>"LPM", menu=>"options", entry=>"2",  func=>undef, dtor=>undef,
+	conflict=>"THIN INTTEST", required=>"",
+	config=>"--enable-LPM", help=>"LPM-effect without thinning" },
+
+       {name=>"THIN", menu=>"options", entry=>"2a",  func=>undef , dtor=>undef,
+	conflict=>"ICECUBE1 INTTEST LPM", required=>"",
+	config=>"--enable-THIN", help=>"THINning version (includes LPM)"},
+
+       {name=>"MULTITHIN", menu=>"options", entry=>"2b",  func=>undef , dtor=>undef,
+	conflict=>"ANAHIST AUGERHIST INTTEST THIN ICECUBE1 ICECUBE2", required=>"",
+	config=>"--enable-MULTITHIN", help=>"MULTIple THINning version (includes LPM)"},
+
+       {name=>"PRESHOWER", menu=>"options", entry=>"3",  func=>undef , dtor=>undef,
+	conflict=>"INTTEST STACKIN HERWIG", required=>"",
+	config=>"--enable-PRESHOWER", help=>"PRESHOWER version for EeV gammas"},
+
+       {name=>"NEUTRINO", menu=>"options", entry=>"4",  func=>undef , dtor=>undef,
+	conflict=>"AUGERHIST INTTEST", required=>"",
+	config=>"--enable-NEUTRINO", help=>"NEUTRINO version"},
+
+       {name=>"HERWIG", menu=>"options", entry=>"4a",  func=>\&funcHERWIG , dtor=>undef,
+	conflict=>"INTTEST PRESHOWER STACKIN CONEX", required=>"",
+	config=>"--enable-HERWIG", help=>"NUPRIM primary neutrino version with HERWIG"},
+
+       {name=>"ICECUBE1", menu=>"options", entry=>"4b",  func=>undef , dtor=>undef,
+        conflict=>"INTTEST PARALLEL PARALLELIB MULTITHIN CERENKOV COAST COASTUSERLIB COMPACT THIN",
+        required=>"",
+        config=>"--enable-ICECUBE1", help=>"ICECUBE1 FIFO version"},
+
+       {name=>"ICECUBE2", menu=>"options", entry=>"4c",  func=>undef , dtor=>undef,
+        conflict=>"INTTEST PARALLEL PARALLELIB MULTITHIN CERENKOV COAST COASTUSERLIB COMPACT",
+        required=>"",
+        config=>"--enable-ICECUBE2", help=>"ICECUBE2 gzip/pipe output"},
+
+       {name=>"STACKIN", menu=>"options", entry=>"5",  func=>undef , dtor=>undef,
+	conflict=>"INTTEST PRESHOWER", required=>"",
+	config=>"--enable-STACKIN", help=>"STACK INput of secondaries, no primary particle"},
+
+       {name=>"CHARM", menu=>"options", entry=>"6",  func=>\&funcCHARM , dtor=>undef,
+	conflict=>"TAULEP EPOS NEXUS QGSJETII VENUS", required=>"",
+	config=>"--enable-CHARM", help=>"CHARMed particle/tau lepton version with PYTHIA"},
+
+       {name=>"TAULEP", menu=>"options", entry=>"6a",  func=>\&funcTAULEP , dtor=>undef,
+       conflict=>"CHARM", required=>"",
+       config=>"--enable-TAULEP", help=>"TAU LEPton version with PYTHIA"},
+
+       {name=>"SLANT", menu=>"options", entry=>"7",  func=>undef , dtor=>undef,
+	conflict=>"INTTEST", required=>"",
+	config=>"--enable-SLANT", help=>"SLANT depth instead of vertical depth for longi-distribution"},
+
+       {name=>"CURVED", menu=>"options", entry=>"7a",  func=>undef , dtor=>undef,
+	conflict=>"CEFFIC INTTEST AUGERHIST", required=>"",
+	config=>"--enable-CURVED", help=>"CURVED atmosphere version"},
+
+       {name=>"UPWARD", menu=>"options", entry=>"7b",  func=>undef , dtor=>undef,
+	conflict=>"INTTEST TRAJECT", required=>"",
+	config=>"--enable-UPWARD", help=>"UPWARD particles version"},
+
+       {name=>"VIEWCONE", menu=>"options", entry=>"7c",  func=>undef , dtor=>undef,
+	conflict=>"VOLUMECORR INTTEST", required=>"",
+	config=>"--enable-VIEWCONE", help=>"VIEWCONE version"},
+
+       {name=>"PLOTSH", menu=>"options", entry=>"8a",  func=>\&funcPLOTSH , dtor=>undef,
+	conflict=>"INTTEST ANAHIST AUGERHIST MUONHIST AUGCERLONG", required=>"",
+	config=>"--enable-PLOTSH", help=>"shower PLOT version (PLOTSH) (only for single events)"},
+
+       {name=>"PLOTSH2", menu=>"options", entry=>"8b",  func=>\&funcPLOTSH2 , dtor=>undef,
+	conflict=>"INTTEST ANAHIST AUGERHIST MUONHIST AUGCERLONG", required=>"",
+	config=>"--enable-PLOTSH2", help=>"shower PLOT(C) version (PLOTSH2) (only for single events)"},
+
+       {name=>"ANAHIST", menu=>"options", entry=>"8c",  func=>\&funcCERN , dtor=>undef,
+	conflict=>"CERENKOV IACT PLOTSH PLOTSH2 INTTEST ROOTOUT COREAS COASTUSERLIB INCLINED", required=>"THIN",
+	config=>"--enable-ANAHIST", help=>"ANAlysis HISTos & THIN (instead of particle file)"},
+
+       {name=>"AUGERHIST", menu=>"options", entry=>"8d",  func=>\&funcCERN, dtor=>undef,
+	conflict=>"IACT NEUTRINO PLOTSH PLOTSH2 INTTEST CURVED UPWARD CONEX ROOTOUT COREAS COASTUSERLIB INCLINED", required=>"THIN AUGERINFO",
+	config=>"--enable-AUGERHIST", help=>"Auger-histo file & THIN" },
+
+       {name=>"MUONHIST", menu=>"options", entry=>"8e",  func=>\&funcCERN, dtor=>undef,
+	conflict=>"IACT PLOTSH PLOTSH2 INTTEST UPWARD CONEX ROOTOUT COREAS COASTUSERLIB INCLINED", required=>"",
+	config=>"--enable-MUONHIST", help=>"MUON-histo file" },
+
+       {name=>"ATMEXT", menu=>"options", entry=>"9",  func=>\&funcATM, dtor=>undef,
+	conflict=>"INTTEST", required=>"",
+	config=>"--enable-ATMEXT", help=>"external atmosphere functions (table interpolation)\n         (using bernlohr C-routines)" },
+
+       {name=>"EFIELD", menu=>"options", entry=>"9a",  func=>undef , dtor=>undef,
+       conflict=>"INTTEST", required=>"",
+       config=>"--enable-EFIELD", help=>"EFIELD version for electrical field in atmosphere"},
+
+       {name=>"RIGIDITY", menu=>"options", entry=>"9b",  func=>undef , dtor=>undef,
+       conflict=>"INTTEST", required=>"",
+       config=>"--enable-RIGIDITY", help=>"RIGIDITY Ooty version rejecting low-energy primaries entering Earth-magnetic field"},
+
+       {name=>"DYNSTACK", menu=>"options", entry=>"10a",  func=>\&funcDYNSTACK, dtor=>\&removeDYNSTACK,
+    	conflict=>"INTTEST PARALLEL PARALLELIB",  required=>"",
+    	config=>"--enable-DYNSTACK", help=>"DYNamic intermediate particle STACK"},
+
+       {name=>"REMOTECONTROL", menu=>"options", entry=>"10b",  func=>\&funcREMOTECONTROL , dtor=>\&removeREMOTECONTROL,
+    	conflict=>"PARALLEL PARALLELIB ROOTOUT COMPACT",  required=>"",
+    	config=>"--enable-REMOTECONTROL", help=>"Remote Control for Corsika"},
+
+       {name=>"CORPP", menu=>"options", entry=>"10c", func=>\&funcCORPP, dtor=>undef,
+       conflict=>"PARALLEL PARALLELLIB COAST", required=>"",
+       config=>"--enable-CORPP", help=>"Compile corsika as library for custom executor"},
+
+       {name=>"CONEX", menu=>"options", entry=>"a",  func=>\&funcCONEX , dtor=>undef,
+	conflict=>"DPMJET VENUS NEXUS INTTEST CERENKOV MUPROD AUGERHIST MUONHIST", required=>"THIN SLANT CURVED UPWARD",
+	config=>"--enable-CONEX", help=>"CONEX for high energy MC and cascade equations"},
+
+       {name=>"PARALLEL", menu=>"options", entry=>"b",  func=>\&funcPARALLEL, dtor=>undef,
+	conflict=>"ANAHIST AUGERHIST MUONHIST CEFFIC CERENKOV COMPACT EHISTORY IACT INTTEST MAC PLOTSH PLOTSH2 ICECUBE1 ICECUBE2", required=>"",
+       config=>"--enable-PARALLEL", help=>"PARALLEL treatment of subshowers (includes LPM)" },
+
+#      option ROOTOUT is only available if COAST_DIR was found
+
+#      option COREAS is only available if COAST_USER_LIB was found
+
+       {name=>"INTTEST", menu=>"options", entry=>"e",  func=>\&funcCERN , dtor=>undef,
+	conflict=>"CERENKOV IACT CEFFIC ATMEXT THIN FLUKA NEUTRINO PLOTSH PLOTSH2 CURVED UPWARD VIEWCONE ANAHIST AUGERHIST MUONHIST AUGCERLONG PRESHOWER TRAJECT COMPACT HERWIG STACKIN MAC ROOTOUT COASTUSERLIB INCLINED MUPROD ICECUBE1 ICECUBE2",
+	required=>"",
+	config=>"--enable-INTTEST", help=>"interaction test version (only for 1st interaction)"},
+
+       {name=>"AUGERINFO", menu=>"options", entry=>"f",  func=>undef , dtor=>undef,
+	conflict=>"INTTEST", required=>"",
+	config=>"--enable-AUGERINFO", help=>"Auger-info file instead of dbase file"},
+
+       {name=>"COMPACT", menu=>"options", entry=>"g",  func=>undef , dtor=>undef,
+	conflict=>"CERENKOV IACT INTTEST ROOTOUT COAST COASTUSERLIB COREAS INCLINED ICECUBE1 ICECUBE2", required=>"",
+	config=>"--enable-COMPACT", help=>"COMPACT particle output file"},
+
+       {name=>"MUPROD", menu=>"options", entry=>"h",  func=>undef , dtor=>undef,
+	conflict=>"INTTEST CONEX", required=>"",
+	config=>"--enable-MUPROD", help=>"MUPROD to write decaying muons"},
+
+       {name=>"EHISTORY", menu=>"options", entry=>"h2",  func=>undef , dtor=>undef,
+	conflict=>"INTTEST CONEX PARALLEL", required=>"",
+	config=>"--enable-EHISTORY", help=>"prEHISTORY of muons: mother and grandmother"},
+
+       {name=>"ANNITEST", menu=>"options", entry=>"k",  func=>undef , dtor=>undef,
+	conflict=>"", required=>"",
+	config=>"--enable-ANNITEST", help=>"annitest cross-section version (obsolete)"},
+
+       {name=>"AUGERHIT", menu=>"options", entry=>"l",  func=>undef, dtor=>undef,
+	conflict=>"CERENKOV IACT PLOTSH PLOTSH2 INTTEST", required=>"",
+	config=>"--enable-AUGERHIT", help=>"hit Auger detector (steered by AUGSCT)" },
+
+       {name=>"DUMMY", menu=>"options", entry=>" ",  func=>undef , dtor=>undef,
+	conflict=>"", required=>"",
+	config=>"", help=>"------------------------------------------"},
+
+       {name=>"RESET", menu=>"options", entry=>"y",  func=>\&funcOptionsRESET, dtor=>undef,
+	conflict=>"", required=>"",
+	config=>"", help=>"*** Reset selection ***" },
+
+       {name=>"FINISH", menu=>"options", entry=>"z",  func=>\&funcOptionsFINISH, dtor=>undef,
+	conflict=>"", required=>"",
+	config=>"", help=>"*** Finish selection ***" },
+
+
+       # -----------------------------------
+       # description of final menu
+       {name=>"COMPILE", menu=>"finish", entry=>"f",  func=>undef , dtor=>undef,
+	conflict=>"", required=>"",
+	config=>"", help=>"Compiling and remove temporary files"},
+
+       {name=>"KEEPSOURCE", menu=>"finish", entry=>"k", func=>undef , dtor=>undef,
+	conflict=>"", required=>"",
+	config=>"--enable-KEEPSOURCE", help=>"Compile and keep extracted CORSIKA source code"},
+
+       {name=>"NOCOMPILE", menu=>"finish", entry=>"n",  func=>undef , dtor=>undef,
+	conflict=>"", required=>"",
+	config=>"--enable-NOCOMPILE --enable-KEEPSOURCE", help=>"Just extract source code. Do not compile!"},
+
+
+       # -----------------------------------
+       # description of Cherenkov wavelength menu
+       {name=>"CERWLENOFF", menu=>"ckov_wlen", entry=>"1", func=>undef , dtor=>undef,
+	conflict=>"", required=>"",
+	config=>"", help=>"Emission angle is wavelength independent" },
+
+       {name=>"CERWLEN", menu=>"ckov_wlen", entry=>"2", func=>undef ,  dtor=>undef,
+	conflict=>"", required=>"",
+	config=>"--enable-CERWLEN", help=>"Emission angle depending on wavelength" },
+
+
+       # -----------------------------------
+       # description of Cherenkov long profile
+       {name=>"INTCLONGSTD", menu=>"ckov_long", entry=>"1", func=>undef , dtor=>undef,
+	conflict=>"", required=>"",
+	config=>"", help=>"Photons counted only in the step where emitted" },
+
+       {name=>"INTCLONG", menu=>"ckov_long", entry=>"2", func=>undef ,  dtor=>undef,
+	conflict=>"", required=>"",
+	config=>"--enable-INTCLONG", help=>"Photons counted in every step down to the observation level\n        (compatible with old versions but inefficient)"},
+
+       {name=>"NOCLONG", menu=>"ckov_long", entry=>"3", func=>undef , dtor=>undef,
+	conflict=>"", required=>"",
+	config=>"--enable-NOCLONG", help=>"No Cherenkov light distribution at all"},
+
+
+       # -----------------------------------
+       # description of parallel library
+       {name=>"NOTLIB", menu=>"parallel_lib", entry=>"1", func=>undef , dtor=>undef,
+	conflict=>"", required=>"",
+	config=>"", help=>"Special stack for shell scripts without MPI" },
+
+       {name=>"PARALLELIB", menu=>"parallel_lib", entry=>"2", func=>\&funcPARALLELIB , dtor=>undef,
+	conflict=>"", required=>"",
+	config=>"--enable-PARALLELIB", help=>"Library to be used with MPI system" },
+
+       # -----------------------------------
+       # binary system options
+       {name=>"M32", menu=>"bits", entry=>"1", func=>undef , dtor=>undef,
+	conflict=>"", required=>"",
+	config=>"--enable-M32", help=>"Force 32bit mode"},
+
+       {name=>"NOM32", menu=>"bits", entry=>"2", func=>\&funcNOM32 , dtor=>undef,
+	conflict=>"", required=>"",
+	config=>"", help=>"Use compiler default ('-m64' on a 64bit machine)" },
+
+
+       # -----------------------------------
+       # binary system output
+       {name=>"OUT32", menu=>"sizeout", entry=>"1", func=>undef, dtor=>undef,
+	conflict=>"", required=>"",
+	config=>"--enable-OUT32", help=>"Out(in)put binary files compatible with 32bit machines\n        (only with GFORTRAN v>4.2 compiler: uses 4 bytes record markers but filesize limited to GB !)" },
+
+       {name=>"OUT64", menu=>"sizeout", entry=>"2", func=>undef, dtor=>undef,
+	conflict=>"", required=>"",
+	config=>"", help=>"Use compiler default for record marker (8 bytes for 64bit compilation)" },
+
+
+       # -----------------------------------
+       # IACT EXT
+       {name=>"NOPART", menu=>"iact_ext", entry=>"1", func=>undef, dtor=>undef,
+	conflict=>"", required=>"",
+	config=>"", help=>"Particles at detector level not stored to IACT file" },
+
+       {name=>"IACTEXT", menu=>"iact_ext", entry=>"2", func=>undef, dtor=>undef,
+	conflict=>"", required=>"",
+	config=>"--enable-IACTEXT", help=>"Particles at detector level are stored to IACT file" },
+
+       # ---------------------------------
+       # Baack
+       {name=>"BAACK_C0X", menu=>"baack", entry=>"1", func=>undef, dtor=>undef,
+	conflict=>"BAACK_C11 BAACK_C14 BAACK_C17", required=>"",
+	config=>"--enable-BAACKC0X", help=>"Use the baack library in compatibility mode C++0x. Some features are disabled or will not work correctly, bugs from depricated stl implementation could be possible but unlikley." },
+
+       {name=>"BAACK_C11", menu=>"baack", entry=>"2", func=>undef, dtor=>undef,
+        conflict=>"BAACK_C14 BAACK_C17", required=>"",
+        config=>"--enable-BAACKC11", help=>"Use the baack library in compatibility mode C++11. Some features are disabled or will not work correctly." },
+
+       {name=>"BAACK_C14", menu=>"baack", entry=>"3", func=>undef, dtor=>undef,
+        conflict=>"BAACK_C17", required=>"",
+        config=>"--enable-BAACKC14", help=>"Use baack in C++14 mode with all features enabled." },
+
+       {name=>"BAACK_C1Z", menu=>"baack", entry=>"4", func=>undef, dtor=>undef,
+        conflict=>"", required=>"",
+        config=>"--enable-BAACKC1Z", help=>"Use baack in C++1z (17) mode. All features are enabled and a small performance increase compared to C++14 is possible." },
+
+       # -----------------------------------
+       # DynStack
+       {name=>"DEFAULT_STACK", menu=>"baack_dynstack", entry=>"1", func=>undef, dtor=>undef,
+        conflict=>"", required=>"",
+        config=>"--enable-DYNDEFAULT", help=>"Emulates the default CORSIKA Stack with a configurable size" },
+
+       {name=>"OUTPUT_STACK", menu=>"baack_dynstack", entry=>"2", func=>undef, dtor=>undef,
+        conflict=>"", required=>"",
+        config=>"--enable-DYNOUTPUT", help=>"Outputs every particle saved in the stack to a file with all available information" },
+
+       {name=>"DYN_ICECUBE", menu=>"baack_dynstack", entry=>"3", func=>undef, dtor=>undef,
+        conflict=>"", required=>"",
+        config=>"--enable-DYNICECUBE", help=>"Reimplementation of the ICECUBE1 priority pattern." },
+
+       {name=>"CUSTOM_STACK", menu=>"baack_dynstack", entry=>"4", func=>undef, dtor=>undef,
+        conflict=>"", required=>"",
+        config=>"--enable-DYNCUSTOM", help=>"User defined custom stack defined in baack/user_code/dynstack_setup.h" },
+
+        # -----------------------------------
+        # Baack Main
+         {name=>"CORPPMAIN", menu=>"baack_corpp", entry=>"1", func=>undef, dtor=>undef,
+          conflict=>"", required=>"",
+          config=>"--enable-BAACKMAIN", help=>"Execute Corsika with a modern C++ system" },
+         {name=>"CORPPLIBONLY", menu=>"baack_corpp", entry=>"2", func=>undef, dtor=>undef,
+          conflict=>"", required=>"",
+          config=>"--enable-BAACKLIBONLY", help=>"Compile corsika as static library" },
+    );
+#print Dumper(\@OPTIONLIST); # for debugging
+
+
+
+my %CONFIG;         # total of all CORSIKA options
+my %CONFIG_AUTO;    # some automatic options without user interference
+my @SELECTEDOPTIONS; # collection of all selected options
+
+# global temporary to store selection of one menu
+my %CONFIGLOCAL;
+my @SELECTEDOPTIONSLOCAL;
+
+
+my $DEV = "";
+my $DBG = "";
+my $MAKEFLAG = "";
+my $EXPERT   = 0;
+my $NOCACHE   = 0;
+my $BATCHMODE = 0;
+Getopt::Long::Configure("pass_through");
+GetOptions('dev'      =>\$DEV,
+	   'nodbg'      =>\$DBG,
+	   'm|make'     => sub { $MAKEFLAG = "all" },
+	   'c|clean'    => sub { $MAKEFLAG = "clean" },
+	   'i|install'  => sub { $MAKEFLAG = "install" },
+	   'd|distclean'=> sub { $MAKEFLAG = "distclean" },
+	   't|dist'     => sub { $MAKEFLAG = "dist" ; $NOCACHE = 1 },
+	   'e|expert'   => sub { $EXPERT   = 1 },
+	   'n|no-cache' => sub { $NOCACHE  = 1 },
+	   'b|batch'    => sub { $BATCHMODE  = 1 },
+	   'h|?'        => \&helpScreen );
+my @configflag = @ARGV;
+
+
+my $SKIPCONFIG = "";
+if ( grep { /--help/ } @configflag ) {
+    $SKIPCONFIG = "skip";
+    $MAKEFLAG = "";
+}
+
+
+# --------------------------------------------------------------------------------------
+# printout welcome screen
+# --------------------------------------------------------------------------------------
+print " \n\n";
+print "|===========================================================================|\n";
+print "|                          Welcome to COCONUT (v3.1)                        |\n";
+print "|                  -- the CORSIKA CONfiguration UTility --                  |\n";
+print "|===========================================================================|\n";
+print "|                                                                           |\n";
+print "|                                                                           |\n";
+print "|           create an executable of a specific CORSIKA version              |\n";
+print "|                                                                           |\n";
+print "|                                                                           |\n";
+print "|        Please read the documentation for a detailed description           |\n";
+print "|                   of the options and how to use it.                       |\n";
+print "|                                                                           |\n";
+print "|             Try './coconut -h' to get some help about COCONUT             |\n";
+if (not $EXPERT) {
+    print "|    Use './coconut --expert' to enable additional configuration steps.     |\n";
+}
+print "|                                                                           |\n";
+print "| (press 'Enter' to select an option followed by \"[DEFAULT]\" or \"[CACHED]\") |\n";
+print "|                                                                           |\n";
+print "|===========================================================================|\n\n\n";
+
+
+
+# --------------------------------------------------------------------------------------
+# check for leftover files from previous installations
+# --------------------------------------------------------------------------------------
+if ( -e "src/compilefile.f" && $MAKEFLAG !~ "/clean/" && $SKIPCONFIG ne "skip") {
+    print "\n\n";
+    print_boxed(
+      'WARNING : File \"compilefile.f\" found in src/ !',
+      "\n",
+      '           This temporary file is renamed "compilefile.f.bak"',
+      '           to prevent conflict with the following installation...'
+    );
+
+    wait_enter();
+
+    system("cp -p -f src/compilefile.f src/compilefile.f.bak");
+    system("rm -f src/compilefile.f");
+}
+
+
+# --------------------------------------------------------------------------------------
+# insert extra options
+# --------------------------------------------------------------------------------------
+
+
+if ( $have_COAST ) {
+
+    my @EXTRAOPTION1 = ({name    => "COREAS",
+                        menu    => "options",
+                        conflict=> "COMPACT MACHINEINDEPENDENT ROOTOUT COASTUSERLIB INCLINED ANAHIST AUGERHIST MUONHIST INTTEST",
+                        required=> "SLANT UPWARD",
+                        config  => "--enable-COREAS",
+                        entry   => "c",
+                        func    => undef,
+                        help    => "CoREAS Radio Simulations"});
+
+    my @EXTRAOPTION2 = ({name    => "INCLINED",
+                        menu    => "options",
+                        conflict=> "COMPACT MACHINEINDEPENDENT ROOTOUT COASTUSERLIB COREAS ANAHIST AUGERHIST MUONHIST INTTEST",
+                        required=> "",
+                        config  => "--enable-INCLINED",
+                        entry   => "d1",
+                        func    => undef,
+                        help    => "Inclined observation plane"});
+
+    my $c = 0;
+    foreach my $lookup_option (@OPTIONLIST) {
+        $c++;
+        if ( $lookup_option->{menu} eq "options" &&
+             $lookup_option->{entry} eq "b" ) {
+            splice(@OPTIONLIST, $c, 0, @EXTRAOPTION2);
+            splice(@OPTIONLIST, $c, 0, @EXTRAOPTION1);
+            last;
+        }
+    }
+
+    # also add 32-bit output option to menu 'sizeout'
+    my @EXTRAOPTION3 = ({name     => "MACHINEINDEPENDENT",
+                         menu     => "sizeout",
+                         entry    => "d0",
+                         func     => \&funcMACHINEINDEPENDENT,
+                         conflict => "COMPACT COREAS ROOTOUT COASTUSERLIB INCLINED",
+                         required => "",
+                         config   => "--enable-MACHINEINDEPENDENT",
+                         help     => "Binary output file will be written by COAST, and is compatible to 32bit fortran output." });
+    my $c2 = 0;
+    foreach my $lookup_option (@OPTIONLIST) {
+        $c2++;
+        if ( $lookup_option->{menu} eq "sizeout" &&
+             $lookup_option->{entry} eq "c" ) {
+            splice(@OPTIONLIST, $c2, 0, @EXTRAOPTION3);
+            last;
+        }
+    }
+}
+
+if ( $have_COAST && $have_ROOT_LIB ) {
+    my @EXTRAOPTION = ({name    => "ROOTOUT",
+                        menu    => "options",
+                        conflict=> "COMPACT MACHINEINDEPENDENT COREAS COASTUSERLIB ANAHIST AUGERHIST MUONHIS INCLINEDT",
+                        required=> "",
+                        config  => "--enable-ROOTOUT",
+                        entry   => "d2",
+                        func    => \&funcROOTOUT,
+                        help    => "ROOT particle OUTput file"}),
+    my $c = 0;
+    foreach my $lookup_option (@OPTIONLIST) {
+        $c++;
+        if ( $lookup_option->{menu} eq "options" &&
+             $lookup_option->{entry} eq "d1" ) {
+            splice(@OPTIONLIST, $c, 0, @EXTRAOPTION);
+            last;
+        }
+    }
+}
+
+if ( $have_COAST && $have_ROOT_LIB && $have_COAST_LIB ) {
+    my @EXTRAOPTION = ({name    => "COASTUSERLIB",
+                        menu    => "options",
+                        conflict=> "COMPACT MACHINEINDEPENDENT COREAS ROOTOUT ANAHIST AUGERHIST MUONHIST INCLINED ICECUBE1 ICECUBE2",
+                        required=> "SLANT",
+                        config  => "--enable-COASTUSERLIB",
+                        entry   => "d3",
+                        help    => "Use an external COAST user library (COrsika data AccesS Tool)",
+                        func    =>  \&funcCOASTUSERLIB });
+    my $c = 0;
+    foreach my $lookup_option (@OPTIONLIST) {
+        $c++;
+        if ( $lookup_option->{menu} eq "options" &&
+             $lookup_option->{entry} eq "d2" ) {
+            splice(@OPTIONLIST, $c, 0, @EXTRAOPTION);
+            last;
+        }
+    }
+}
+
+# --------------------------------------------------------------------------------------
+# cache check
+# --------------------------------------------------------------------------------------
+if ( not $NOCACHE ) {
+    if ( check_cache() ) {
+	print "\n\n";
+	print_boxed(
+	  " INFO:",
+	  "       You are using the cached configuration from \"include/config.h\".",
+	  "       To turn off this you may use the --no-cache option.",
+	);
+    }
+}
+# debug output
+#print Dumper(\%MENUDEFINITION);
+
+
+
+# --------------------------------------------------------------------------------------
+# build main menu list
+# --------------------------------------------------------------------------------------
+my @MENULIST;
+if ( $is_64bit ) { push( @MENULIST, "bits" ); }
+push( @MENULIST, "hemodel" );
+push( @MENULIST, "lemodel" );
+if ( $EXPERT ) {
+    push( @MENULIST, "time" );
+} else {
+    $CONFIG_AUTO{"TIMEAUTO"} = "CORTIMELIB=TIMEAUTO";
+}
+push( @MENULIST, "detector" );
+push( @MENULIST, "options" );
+push( @MENULIST, "finish" );
+
+
+
+if ( $MAKEFLAG eq "" && $SKIPCONFIG ne "skip") {
+
+    my $configReturn = "";
+    do {
+
+	%CONFIG = %CONFIG_AUTO;
+	@SELECTEDOPTIONS = ();
+
+	$configReturn = configureMain();
+
+	if ($configReturn eq "restart") {
+
+	    print "\n\n";
+	    print " ************************************************************************ \n";
+	    print " *                 starting over ...                                    * \n";
+	    print " ************************************************************************ \n\n";
+
+	} elsif ( $configReturn eq "exit" ) {
+	    print "\n\n    ********************************* \n";
+	    print "    *     aborting ...              * \n";
+	    print "    ********************************* \n\n";
+	    exit();
+	}
+
+    } while( $configReturn eq "restart" );
+
+}
+
+
+# build the ultimate configure command with all options
+my $config_cmd = "./configure";
+foreach my $option (@configflag) {
+    $config_cmd = "$config_cmd" . " $option";
+}
+if ( $MAKEFLAG eq  "dist" ) {
+    $config_cmd = "$config_cmd" . " --enable-DIST";
+} else {
+    foreach my $option (values %CONFIG) {
+	$config_cmd = "$config_cmd" . " $option";
+    }
+}
+if ( $config_cmd !~ "/--prefix=/" ) { $config_cmd = "$config_cmd" . " --prefix=$cors_path"; }
+if ( $config_cmd !~ "/--bindir=/" ) { $config_cmd = "$config_cmd" . " --bindir=$cors_path/run"; }
+if ( $config_cmd !~ "/--libdir=/" ) { $config_cmd = "$config_cmd" . " --libdir=$cors_lib"; }
+
+
+if ( $SKIPCONFIG ne "skip" ) {
+
+    # create directories
+    File::Path::mkpath("$cors_lib");
+    File::Path::mkpath("$cors_path");
+    File::Path::mkpath("$cors_path/run");
+
+}
+
+# do configuration and compilation
+if ( $MAKEFLAG eq "" ) {
+    if ( $DEV ne "" )  {$config_cmd = "$config_cmd" . " --enable-dev"}
+    if ( $DBG ne "" )  {$config_cmd = "$config_cmd" . " --disable-debug"}
+    if ( $EXPERT ) { print "config-CMD: \"$config_cmd\"\n\n\n"; }
+    if ( system($config_cmd) == 0 ) {
+	if ( $SKIPCONFIG ne "skip" ) {
+	    if ( grep { /--enable-NOCOMPILE/ } $config_cmd ) {
+		print "\n\nPreprocess CORSIKA.F in \"$cors_path/src\" \n\n";
+		system("make preprocess");
+	    } else {
+		print "\n\nCompile CORSIKA in \"$cors_lib\" and copy executable in \"$cors_path/run\" \n\n";
+		system("make install");
+	    }
+	}
+    } else {
+	print "\n Problems during './configure'. Please fix. \n\n";
+    }
+} elsif ( $config_cmd !~ "/--help/" ) {
+    if ( grep { /--enable-DIST/ } $config_cmd ) {
+	if ( system($config_cmd) == 0 ) {
+	    system("make $MAKEFLAG");
+	}
+    } else {
+	system("make $MAKEFLAG");
+    }
+}
+
+
+
+
+
+########################################################################################
+##
+##   Main automatic configuration routines
+##
+########################################################################################
+
+# --------------------------------------------------------------------------------------
+#               main configuration loop
+# --------------------------------------------------------------------------------------
+
+sub configureMain {
+
+    my $returnValue = "";
+
+    foreach my $menu (@MENULIST) {
+
+	# build list of options for menu
+	my @OPTIONSLIST;
+	foreach my $option (@OPTIONLIST) {
+	    if ( $option->{menu} eq $menu ) {
+		push(@OPTIONSLIST, $option );
+	    }
+	}
+
+	# don't store in global variables directly, use the temporary globals
+	%CONFIGLOCAL = ();         # just the options from this menu, in case of multi=yes
+	@SELECTEDOPTIONSLOCAL = (); # collection of all selected options for this menu
+
+	# print menu
+	my $sel = configureMenu($menu, \@OPTIONSLIST);
+
+	if ( $sel eq "x" ) {
+	    return "exit";
+	} elsif ( $sel eq "r" ) {
+	    return "restart";
+	} elsif ( $sel eq "done") {
+	    %CONFIG = (%CONFIG, %CONFIGLOCAL);
+	    @SELECTEDOPTIONS = (@SELECTEDOPTIONS, @SELECTEDOPTIONSLOCAL);
+	}
+    }
+
+    return "done";
+}
+
+
+# --------------------------------------------------------------------------------------
+#               handle option conflicts
+# --------------------------------------------------------------------------------------
+
+sub checkConflict {
+
+    my $option = shift;
+    my $conflictList = "";
+
+
+    my @optSpec = grep { uc($_->{name}) eq uc($option) } @OPTIONLIST;
+
+    if (@optSpec > 1) {
+        die "Option with name '$option' appears multiple times in this list of valid options. This is a bug in coconut. Please report it to the author";
+    }
+    elsif (@optSpec == 0) {
+        die "Option with name '$option' does not appear in the list of valid options. This is a bug in coconut. Please report it to the author";
+    }
+    my @thisOptConflicts = split /\s+/, $optSpec[0]->{conflict};
+
+
+    foreach my $testOption (@SELECTEDOPTIONS) {
+        my $name = $testOption->{name};
+        my $numberOfConflicts = grep { uc($_) eq uc($name) } @thisOptConflicts;
+	if ( $numberOfConflicts
+             or $testOption->{conflict} =~ /\b\Q$option\E\b/ ) {
+	    $conflictList .= " $name";
+	}
+    }
+    foreach my $testOption (@SELECTEDOPTIONSLOCAL) {
+        my $name = $testOption->{name};
+        my $numberOfConflicts = grep { uc($_) eq uc($name) } @thisOptConflicts;
+	if ( $numberOfConflicts
+             or $testOption->{conflict} =~ /\b\Q$option\E\b/i ) {
+	    $conflictList .= " $name";
+	}
+    }
+    if ( $conflictList eq "" ) {
+	return "ok";
+    }
+    print "    CONFLICT WITH:$conflictList \n";
+    return "conflict";
+}
+
+# --------------------------------------------------------------------------------------
+#               handle required options
+# --------------------------------------------------------------------------------------
+
+sub checkRequired {
+
+    my $requiredListOfOptions = shift;
+    my @missing_required;
+    foreach my $requiredOption (split(/\s+/, $requiredListOfOptions)) {
+	my $foundConflict = 0;
+	my $foundAlready = 0;
+	foreach my $testOption (@SELECTEDOPTIONS) {
+	    if ( $requiredOption eq $testOption->{name} ) {
+		$foundAlready = 1;
+	    }
+	}
+	foreach my $testOption (@SELECTEDOPTIONSLOCAL) {
+	    if ( $requiredOption eq $testOption->{name} ) {
+		$foundAlready = 1;
+	    }
+	}
+	foreach my $testOption (@SELECTEDOPTIONS) {
+	    if ( grep { /$requiredOption/ } $testOption->{conflict} ) {
+		$foundConflict = 1;
+	    }
+	}
+	foreach my $testOption (@SELECTEDOPTIONSLOCAL) {
+	    if ( grep { /$requiredOption/ } $testOption->{conflict} ) {
+		$foundConflict = 1;
+	    }
+	}
+	if ( not $foundConflict and not $foundAlready) {
+	    push(@missing_required, $requiredOption);
+	}
+    }
+    if ( not @missing_required ) {
+	return "ok";
+    }
+
+    #print "    ADDING REQUIRED  : @missing_required\n";
+
+    foreach my $missing (@missing_required) {
+        print "    ADDING REQUIRED  : $missing \n";
+	# lookup option
+	foreach my $lookup_option (@OPTIONLIST) {
+	    if ( $lookup_option->{name} eq $missing ) {
+		if ( addOption( $lookup_option ) ne "done" ) {
+		    print "    ERROR: wrong choice \n";
+		}
+		last;
+	    }
+	}
+    }
+    return "conflict";
+}
+
+# --------------------------------------------------------------------------------------
+#             printout the menu and handles user input
+# --------------------------------------------------------------------------------------
+
+sub configureMenu {
+
+    my $menu_id = shift;
+    my $choices = shift;
+
+    my $menu = $MENUDEFINITION{$menu_id};
+    my $prompt_text = "(only one choice possible)";
+    if ( $menu->{multi} eq "yes" ) {
+	$prompt_text = "(multiple selections accepted, leading '-' removes option)";
+    }
+
+    my $autoChoice = $menu->{default_option};
+    my $autoChoiceName = "[DEFAULT]";
+    if ( $menu->{multi} eq "yes" ) {
+	if ( $menu->{cache} ne "" ) {
+	    print "    ADDING CACHED OPTIONS : $menu->{cache} \n";
+	    foreach my $option ( split(/\s+/, $menu->{cache}) ) {
+		# lookup option
+		foreach my $lookup_option (@OPTIONLIST) {
+		    if ( $lookup_option->{name} eq $option ) {
+			if ( addOption( $lookup_option ) ne "done" ) {
+			    print "    ERROR: wrong choice \n";
+			}
+			last;
+		    }
+		}
+	    }
+	}
+    } else {
+	if ( $menu->{cache} ne "" ) {
+	    foreach my $option ( split( /\s+/, $menu->{cache} ) ) {
+		# find index of option
+		foreach my $index_lookup (@OPTIONLIST) {
+		    if ( $index_lookup->{name} eq $option ) {
+			$autoChoice = $index_lookup->{entry};
+			last;
+			    }
+		}
+	    }
+	    $autoChoiceName = "[CACHED]";
+	}
+    }
+
+
+    my $printMenu = 1;
+    while (1) {
+
+	if ( $printMenu ) {
+
+	    if ( $menu->{multi} ne "yes" ) { $printMenu = 0; }
+	    print "\n\n---------------------------------------------------------------------------\n";
+	    if ( $menu->{multi} eq "yes" ) { printOptions(); }
+
+	    print " $menu->{question}\n";
+	    foreach my $choice (@$choices) {
+		print "    $choice->{entry} - $choice->{help}"
+		    . ($autoChoice eq $choice->{entry} ? " $autoChoiceName\n" : "\n");
+	    }
+	    print "\n    r - restart (reset all options to cached values)\n    x - exit make\n\n";
+	}
+
+        print "    $prompt_text: ";
+	my $line = "$autoChoice";
+	if ( not $BATCHMODE ) {
+	    $line = <STDIN>;
+	    chomp $line;
+	} else {
+	    print "\n";
+	}
+	my @split_line = split( /\s+/, $line );
+	my @problems;
+
+	while (1) {
+
+	    my $input = $line;
+	    if ($input =~ /^\s*$/) {  # default option
+		$input = $autoChoice;
+	    }elsif ( $menu->{multi} eq "yes" ) {
+		$input = shift @split_line;
+		if ( not defined $input ) { last; } # breaks loop
+	    }
+
+	    # handle 'r' and 'x' specificly (by calling code)
+	    if ($input =~ /^\s*(r|x)\s*$/i) {
+		return $1;
+	    }
+
+	    my $remove_choice = ($input =~ /^-/);
+	    if ($remove_choice) {
+		$input =~ s/^-//;
+	    }
+
+	    my $found = 0;
+	    my $status = 0;
+	    foreach my $choice (@$choices) {
+
+		if ( $choice->{entry} eq $input ) {
+
+		    $found = 1;
+
+		    if ($remove_choice) {
+			$status = removeOption( $choice );
+		    } else {
+			$status = addOption( $choice );
+		    }
+
+		    if ( $status eq "finish" ) {
+			return "done";
+		    } elsif ( $status eq "done" ) {
+			if ( $menu->{multi} eq "yes" ) {
+			    #$hint = "";
+			    last;
+			}
+			return "done";
+		    } elsif ( $status eq "optns" ) {
+			last;
+		    } elsif ( $status eq "redo" ) {
+			last;
+		    }
+		}
+	    }
+	    if ( not $found ) { push @problems, $input; }
+	    if ( $menu->{multi} eq "no" ) { last; } # break loop
+	    elsif ( $status eq "optns" ) { last; } # break loop
+	    elsif ( $status eq "finish" ) { last; } # break loop
+	} # end loop multi-options
+
+	# option not recognized or erroneous
+	if ( not $BATCHMODE ) {
+	    if ( @problems ) { print "     -> invalid input: @problems \n"; }
+	    next;
+	} else {
+	    print "     BATCHMODE MODE \n";
+	    return "done";
+	}
+
+    }
+}
+
+
+# --------------------------------------------------------------------------------------
+#             adds option and does all the necessary checks
+# --------------------------------------------------------------------------------------
+sub addOption {
+
+    my $choice = shift;
+
+    # test for conflicts
+    if ( checkConflict($choice->{name}) eq "conflict" ) {
+	print "     -> Choose another option, or fix conflict\n";
+	return "redo";
+    }
+
+    # execute custom code for option
+    my $func = $choice->{func};
+    if ( defined $func && $func ne "" ) {
+	my $code = $func->();
+	if ( not defined $code ) {
+           print "     -> Option cannot be selected\n";
+           return "redo";
+        } elsif ( $code eq "finish" ) {
+	    print "\n\n-------------------------------------------------------------------------\n";
+	    print "  Your final selection to build CORSIKA is:\n\n";
+	    printOptions();
+	    return "finish";
+	} elsif ( $code eq "reset" ) {
+	    print "\n\n-------------------------------------------------------------------------\n";
+	    print "  Are you sure you want to RESET your current option selection:\n";
+	    print "    "; print join(' ', keys %CONFIGLOCAL); print "\n";
+       	    if ( prompt_yn("yes") eq 'yes' ) {
+  	      %CONFIGLOCAL = ();
+	      @SELECTEDOPTIONSLOCAL = ();
+	  } else {
+	      print ' Continue selection ...'
+	    }
+	} elsif ( $code eq "exit" ) {
+	    return "x";
+	} elsif ( $code eq "restart" ) {
+	    return "r";
+	} elsif ( $code eq "optns" ) {
+	    return "optns";
+	} elsif ( $code ne "ok" ) {
+	    print "    -> Option \"$choice->{name}\" cannot be selected\n";
+	    return "redo";
+	}
+    }
+
+    # accept option, and store in list
+    if ( $choice->{config} ne "" ) {
+	$CONFIGLOCAL{"$choice->{name}"} = "$choice->{config}";
+	push(@SELECTEDOPTIONSLOCAL, $choice);
+    } elsif (exists($CONFIGLOCAL{"$choice->{name}"}) ||
+	     exists($CONFIG{"$choice->{name}"})) {
+	$CONFIGLOCAL{"$choice->{name}"} = ""; # clear entry for this key
+    }
+
+    # check for additionally required options
+    checkRequired( $choice->{required} );
+
+    # finish this selection
+    print "    SELECTED         : $choice->{name} \n";
+    if ( $choice->{conflict} ne "" ) { print "    NOT COMPATIBLE TO: $choice->{conflict} \n"; }
+    return "done";
+}
+
+
+# --------------------------------------------------------------------------------------
+#             removes option from selection
+# --------------------------------------------------------------------------------------
+sub removeOption {
+
+    my $choice_rem = shift;
+
+    if (exists($CONFIGLOCAL{"$choice_rem->{name}"})) {
+
+        my $func = $choice_rem->{dtor};
+        if ( defined $func && $func ne "" ) {
+	        my $code = $func->();
+			return "done";
+		}
+
+	delete $CONFIGLOCAL{"$choice_rem->{name}"};
+	@SELECTEDOPTIONSLOCAL = grep { not $_ eq $choice_rem } @SELECTEDOPTIONSLOCAL;
+	print "     REMOVED         : $choice_rem->{name} \n";
+
+    } else {
+
+	print " cannot remove option : $choice_rem->{name} \n";
+
+    }
+
+    # finish this selection
+    return "done";
+}
+
+
+
+########################################################################################
+##
+##  Special configuration user functions
+##
+########################################################################################
+
+# ---------------------------------------------------------------------------------------------
+# these functions are executed, if the corresponding option was selected
+# If the function does not return "ok", the option is not accepted and the
+# user is asked to make another choice.
+#
+# return values for 'configureMenu' :
+#       "ok"  everything ok, nothing special
+#    "reset"  resets all local options
+#   "finish"  printout all options (local options seperatly) and returns "done"
+#  "restart"  as reads
+#     "exit"  as reads
+#
+# ---------------------------------------------------------------------------------------------
+
+sub funcOptionsRESET {
+    return "reset";
+}
+
+sub funcOptionsFINISH {
+    print "  Are you sure you want to continue with these current option selection:\n";
+	    print "    "; print join(' ', keys %CONFIGLOCAL); print "\n";
+    if ( prompt_yn("yes") eq 'yes' ) {
+	return "finish";
+    } else {
+	return "optns";
+    }
+}
+
+sub funcPLOTSH {
+    my $directory = Cwd::abs_path("src/utils");
+    my $file1 = "plottracks3c.f";
+    my $file2 = "work.inc";
+    if ( -e "$directory/$file1" && -e "$directory/$file2" ) {
+    print "\n The utility program \"plottracks\" to convert .track file to ppm\n",
+	"format file (readable by \"xv\") will be installed in run/\n",
+	"This program can be used to visualize the showers produced by\n",
+	"CORSIKA with option PLOTSH\n";
+    wait_enter();
+    return "ok";
+    } else {
+    print "\n The utility program \"plottracks\" to convert .track file to ppm\n",
+	"format file (readable by \"xv\") cannot be installed in run/\n",
+	"PLOTSH option will not be selected (please contact CORSIKA author)\n";
+    wait_enter();
+    return "redo";
+    }
+}
+
+sub funcPLOTSH2 {
+    my $directory = Cwd::abs_path("src/utils");
+    my $file = "map2png.c";
+    if ( -e "$directory/$file" ) {
+    print "\n The utility program \"map2png\" to convert .map file to png\n",
+	"format file will be installed in run/\n",
+	"This program can be used to visualize the showers produced by\n",
+	"CORSIKA with option PLOTSH2\n";
+    wait_enter();
+    return "ok";
+    } else {
+    print "\n The utility program \"map2png\" to convert .map file to png\n",
+	"format file cannot be installed in run/\n",
+	"PLOTSH2 option will not be selected (please contact CORSIKA author)\n";
+    wait_enter();
+    return "redo";
+    }
+}
+
+
+sub funcROOTOUT {
+    print "\n\n";
+    print "       *********************************************************  \n";
+    print "  WARNING : When you chose the option ROOTOUT you have to provide \n";
+    print "            a valid and binary compatible installation of ROOT (http://root.cern.ch) !!!! \n";
+    print "       *********************************************************  \n\n";
+    $CONFIGLOCAL{"ROOT"} = "--with-root";
+    return "ok";
+}
+
+sub funcMACHINEINDEPENDENT {
+    print "\n\n";
+    print "       *********************************************************  \n";
+    print "  WARNING : When you chose the option MACHINE INDEPENDENT you cannot use any \n";
+    print "            other feature or interface of COAST !!!! \n";
+    print "       *********************************************************  \n\n";
+    return "ok";
+}
+
+sub funcCOASTUSERLIB {
+    $CONFIGLOCAL{"ROOT"} = "--with-root";
+    $CONFIGLOCAL{"COAST_LIB"} = "--with-COASTUSERLIB";
+    print "\n\n";
+    print "       *********************************************************  \n";
+    print "  WARNING : When you chose the option COASTUSERLIB you have to \n";
+    print "            have the COAST_USER_LIB path defined and added to your LD_LIBRARY_PATH \n";
+    print "            for the execution of CORSIKA, e.g.   \n";
+    print "            export LD_LIBRARY_PATH=\$LD_LIBRARY_PATH:\$COAST_USER_LIB  \n\n";
+    print "            You also have to provide \n";
+    print "            a valid and binary compatible installation of ROOT (http://root.cern.ch) !!!! \n";
+    print "       *********************************************************  \n\n";
+    return "ok";
+}
+
+
+
+
+
+sub funcCERN {
+    my $cernlib = "";
+    if ( $is_64bit && $use_32bit) {
+        print "\n";
+        print "  WARNING : CERNLIB might not be compatible with 32bit architecture \n";
+        print "           In that case you will get the following error message :\n";
+        print "          - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\n";
+        print "          configure: Missing required packages:  CERNLIB\n";
+        print "          - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \n";
+        print "           If it happens please compile in 64bit mode  \n";
+        print "           (with ./coconut -e)  \n";
+        print "\n";
+    }
+    if ( exists $ENV{'CERN_ROOT'} ) { $cernlib = "$ENV{'CERN_ROOT'}/lib"; }
+    if ( exists $ENV{'CERNLIB'} ) { $cernlib = $ENV{'CERNLIB'}; }
+    return CheckInstallation("\n    Error : Environment variable \$CERN_ROOT is not defined!\n",
+			     "CERNLIBDIR", "cernlib", "libkernlib.a", $cernlib);
+}
+
+
+my $have_DPMJET = 0;
+sub funcCHARM {
+    print " \n";
+    if ( $have_DPMJET ) {
+        print "    Using DPMJET, program PYTHIA is not needed for CHARM\n";
+        print " \n";
+        return "ok";
+    } else {
+        print "Use program PYTHIA for linking\n";
+        my $directory = Cwd::abs_path("pythia");
+        my $archive = "pythia-6.4.11.tar.gz";
+        my $file = "commons60.f";
+        if ( -e "$directory/$archive" && not -e "$directory/$file" ) {
+            system("cd $directory ; tar xzf $archive && rm -f $archive");
+        }
+        return CheckInstallation("\n PYTHIA not available in subdirectory pythia \n Please fix, or do not use charmed particles \n",
+              "PYTHIADIR","pythia",$file, $directory);
+    }
+}
+
+sub funcCONEX {
+    print " \n";
+    print "Use program CONEX for linking\n";
+    my $directory = Cwd::abs_path("conex");
+    my $archive = "conex-4.5000.tar.gz";
+    my $file = "conex_cors.F";
+    if ( -e "$directory/$archive" && not -e "$directory/$file" ) {
+        system("cd $directory ; tar xzf $archive && rm -f $archive");
+    }
+        return CheckInstallation("\n CONEX not available in subdirectory conex/ \n Please fix, or do not use CONEX option \n",
+              "CONEXDIR","conex",$file, $directory);
+}
+
+
+sub funcTAULEP {
+    print " \n";
+    if ( $have_DPMJET ) {
+        print "    Using DPMJET, program PYTHIA is not needed for TAULEP\n";
+        print " \n";
+        return "ok";
+    } else {
+        print "Use program PYTHIA for linking\n";
+        my $directory = Cwd::abs_path("pythia");
+        my $archive = "pythia-6.4.11.tar.gz";
+        my $file = "commons60.f";
+        if ( -e "$directory/$archive" && not -e "$directory/$file" ) {
+            system("cd $directory ; tar xzf $archive && rm -f $archive");
+        }
+        return CheckInstallation("\n PYTHIA not available in subdirectory pythia \n Please fix, or do not use tau leptons \n",
+              "PYTHIADIR","pythia",$file, $directory);
+    }
+}
+
+sub funcDPMJET {
+    $have_DPMJET = 1;
+    print "\n";
+    return "ok";
+}
+
+sub funcSIBYLL {
+    print "\n";
+    print "    ADDING CHARM \n";
+    foreach my $option (@OPTIONLIST) {
+	my $menu_name = $option->{menu};
+	my $cache_name = "__CACHE_" . "CHARM" . "__";
+        if ( $option->{name} eq "CHARM" ) {
+	    if ( exists $MENUDEFINITION{$menu_name} ) {
+		my $menu = $MENUDEFINITION{$menu_name};
+		$menu->{cache} .= " " . $option->{name};
+	    } else {
+		print " ERROR: Menu \"$menu_name\" is not defined !\n";
+	    }
+        }
+    }
+    print "\n";
+    return "ok";
+}
+
+sub funcQGSJETII {
+    if ( not -e "run/qgsdat-II-04") {
+    print "\n";
+    print "    *~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~\n";
+    print "    WARNING : qgsdat-II-04 not available in run/ \n";
+    print "              qgsdat-II-04 is a ASCII file. During your first run,\n";
+    print "              It will be recalculated and this will take a while (about one week...) ! \n";
+    print "    Info : To save time, you should download the qgsdatII-04 file from the CORSIKA ftp server\n";
+    print "           And copy it to the \"run\" subdirectory\n";
+    wait_enter();
+    }
+    return "ok";
+}
+
+sub funcURQMD {
+    print "Use program UrQMD 1.3c for linking\n";
+    my $directory = Cwd::abs_path("urqmd");
+    my $archive = "urqmd1.3_cors.tar.gz";
+    my $file = "urqmd.f";
+    if ( -e "$directory/$archive" && not -e "$directory/$file" ) {
+	system("cd $directory ; tar xzf $archive && rm -f $archive");
+    }
+    if ( not -e "$directory/$file") {
+	print "\n";
+        print_boxed(
+	    " Error : URQMD not available in subdirectory urqmd/",
+	    "         Please fix, or choose a different low energy interaction model",
+            "         (press 'Enter' to continue ...)"
+        );
+        wait_enter();
+	return "redo";
+    }
+
+    return "ok";
+}
+
+sub funcNEXUS {
+    print "Use program NEXUS 3.97 for linking\n";
+    my $directory = Cwd::abs_path("nexus");
+    my $archive = "nexus3.97_cors.tar.gz";
+    my $file = "nexus.inc";
+    if ( -e "$directory/$archive" && not -e "$directory/$file" ) {
+	system("cd $directory ; tar xzf $archive && rm -f $archive");
+    }
+    if ( not -e "$directory/$file") {
+	print "\n";
+        print_boxed(
+	    " Error : NEXUS not available in subdirectory nexus/",
+	    "         Please fix, or choose a different high energy interaction model",
+            "         (press 'Enter' to continue ...)"
+        );
+        wait_enter();
+	return "redo";
+    }
+
+    return "ok";
+}
+
+sub funcEPOS {
+    print "Use program EPOS LHC for linking\n";
+    my $directory = Cwd::abs_path("epos");
+    my $archive = "epos-lhc-v3400_cors.tar.gz";
+    my $file = "epos.inc";
+    if ( -e "$directory/$archive" && not -e "$directory/$file" ) {
+	system("cd $directory ; tar xzf $archive && rm -f $archive");
+    }
+    if ( not -e "$directory/$file") {
+	print "\n";
+        print_boxed(
+	    " Error : EPOS not available in subdirectory epos/",
+	    "         Please fix, or choose a different high energy interaction model",
+            "         (press 'Enter' to continue ...)"
+        );
+        wait_enter();
+	return "redo";
+    }
+
+    return "ok";
+}
+
+sub funcFLUKA {
+    my $flupro = "";
+    if ( exists $ENV{'FLUPRO'} ) {
+	$flupro = $ENV{'FLUPRO'};
+        if ( $is_64bit && ! $use_32bit ) {
+            print "\n";
+            print "  WARNING : FLUKA might not be compatible with 64bit architecture. \n";
+            print "           If you use FLUKA gfor64bit, also all other programs have \n";
+            print "           to be compiled with gfortran. To do so you may give the \n";
+            print "           command 'export F77 = gfortran' before using coconut. \n";
+            print "           In case of incompatibility you will get the following \n";
+            print "           error message : \n";
+            print "           - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\n";
+            print "           configure: Missing required packages:  FLUKA\n";
+            print "           - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\n";
+            print "           If it happens please compile in 32bit mode  \n";
+            print "           or change to another low energy interaction model... \n";
+            print "           (with ./coconut -e)  \n";
+            print "\n";
+        }
+    } else {
+	print "\n";
+	print "    ERROR: Environment variable \$FLUPRO is not defined!\n";
+	print "           To use FLUKA, \$FLUPRO has to be defined!\n";
+	print "           Depending on the shell you use:\n";
+	print "               bash/sh:   export FLUPRO=<dir-to-fluka>\n";
+	print "                   csh:   setenv FLUPRO <dir-to-fluka>\n";
+        print "           Choose a different low energy interaction model,\n";
+	print "           or enter a path to a valid FLUKA installation.\n";
+    }
+    return CheckInstallation("", "FLUKADIR", "fluka", "flukapro/(IOUNIT)", $flupro);
+}
+
+
+# ------------------------------
+# HERWIG warning
+# ------------------------------
+sub funcHERWIG {
+    print "\nUse program HERWIG for linking\n";
+    my $directory = Cwd::abs_path("herwig");
+    my $file = "HERWIG_C.INC";
+    return CheckInstallation("\nHERWIG 6.521 can not be found in directory herwig/ \nTo prepare HERWIG for CORSIKA please read herwig/README\n",
+              "HERWIGDIR","herwig",$file, $directory);
+}
+
+# ------------------------------
+# ask for subroutine PARALLEL
+# ------------------------------
+sub funcPARALLEL {
+    if ($BATCHMODE) { return "ok"; }
+
+    # build list of options for menu 1
+    my @options;
+    foreach my $option (@OPTIONLIST) {
+	if ( $option->{menu} eq "parallel_lib" ) {
+	    push(@options, $option );
+	}
+    }
+    my $sel = configureMenu("parallel_lib", \@options);
+    if ( $sel eq "x" ) {
+	return "exit";
+    } elsif ( $sel eq "r" ) {
+	return "restart";
+    }
+
+    return "ok";
+}
+
+sub funcPARALLELIB {
+    my $parallelib = "src/parallel";
+    return CheckInstallation("", "MPIRUNNER", "mpirunner-lib", "mpi_runner.c", $parallelib);
+
+}
+
+# ------------------------------
+# ask for external IACTEXT file
+# ------------------------------
+sub funcCERENKOV {
+    if ($BATCHMODE) { return "ok"; }
+
+    # build list of options for menu 1
+    my @options;
+    foreach my $option (@OPTIONLIST) {
+	if ( $option->{menu} eq "ckov_long" ) {
+	    push(@options, $option );
+	}
+    }
+    my $sel = configureMenu("ckov_long", \@options);
+    if ( $sel eq "x" ) {
+	return "exit";
+    } elsif ( $sel eq "r" ) {
+	return "restart";
+    }
+
+    # build list of options for menu 2
+    @options = ();
+    foreach my $option (@OPTIONLIST) {
+	if ( $option->{menu} eq "ckov_wlen" ) {
+	    push(@options, $option);
+	}
+    }
+    $sel = configureMenu("ckov_wlen", \@options);
+    if ( $sel eq "x" ) {
+	return "exit";
+    } elsif ( $sel eq "r" ) {
+	return "restart";
+    }
+    return "ok";
+}
+
+# ------------------------------
+# ask for external IACTEXT file
+# ------------------------------
+sub funcIACT {
+    my $directory = Cwd::abs_path("bernlohr");
+    my $archive = "bernlohr-1.50.tar.gz";
+    my $file = "Copyright";
+    if ( -e "$directory/$archive" && not -e "$directory/$file" ) {
+        system("cd $directory ; tar xzf $archive && rm -f $archive");
+    }
+    if ( not -e "$directory/$file") {
+        print "\n";
+        print "Error : bernlohr package not properly available in bernlohr/ \n" ;
+        print "        You should check the files in this subdirectory\n" ;
+        print "         (press 'Enter' to continue ...)\n" ;
+        wait_enter();
+        return "redo";
+    }
+    $CONFIGLOCAL{"IACTDIR"} = "--with-bernlohr";
+
+    if ($BATCHMODE) { return "ok"; }
+
+    # build list of options for menu
+    my @options;
+    foreach my $option (@OPTIONLIST) {
+	if ( $option->{menu} eq "iact_ext" ) {
+	    push(@options, $option);
+	}
+    }
+    my $sel = configureMenu("iact_ext", \@options);
+    if ( $sel eq "x" ) {
+	return "exit";
+    } elsif ( $sel eq "r" ) {
+	return "restart";
+    }
+    return "ok";
+}
+sub funcATM {
+    my $directory = Cwd::abs_path("bernlohr");
+    my $archive = "bernlohr-1.50.tar.gz";
+    my $file = "Copyright";
+    if ( -e "$directory/$archive" && not -e "$directory/$file" ) {
+        system("cd $directory ; tar xzf $archive && rm -f $archive");
+    }
+    return CheckInstallation("\nbernlohr package not properly available in bernlohr/ \nYou should check the files in this subdirectory\n",
+              "BERNLOHRDIR","bernlohr",$file, $directory);
+}
+
+
+# ---------------------------------
+# baack modules compiler version check
+# --------------------------------
+sub funcBAACK {
+    if ( !$gcc_status eq "false" ) {
+        if ( $gcc_status eq "1" ) { return "exit"; }
+        return "ok";
+    }
+
+    my $points = 0;
+
+    my $gcc_version = `gcc -dumpversion`;
+    $gcc_version =~ s/[\r\n]+$//; # remove trailing newline
+    $points = $gcc_version =~ tr/.//;
+    if ($points == 1){
+        $gcc_version = $gcc_version . '.0';
+    }
+    elsif ($points == 2){}
+    else {
+        print colored("Could not parse gcc version", 'red');
+	return "exit";
+    }
+
+    my $gpp_version = `g++ -dumpversion`;
+    $gpp_version =~ s/[\r\n]+$//;
+    $points = $gpp_version =~ tr/.//;
+    if ($points == 1){
+        $gpp_version = $gpp_version . '.0';
+    }
+    elsif ($points == 2){}
+    else {
+        print colored("Could not parse g++ version", 'red');
+	return "exit";
+    }
+
+
+    my $gfo_version = `gfortran -dumpversion`;
+    $gfo_version =~ s/[\r\n]+$//;
+    $points = $gfo_version =~ tr/.//;
+    if ($points == 1){
+        $gfo_version = $gfo_version . '.0';
+    }
+    elsif ($points == 2){}
+    else {
+        print colored("Could not parse gfortran version\n", 'red'); #gfortran < 4.5 or some other problem
+	print colored("Version below 4.5 or not installed\n", 'red');
+	return "exit";
+    }
+
+    #gcc -dumpversion | sed -e 's/\.\([0-9][0-9]\)/\1/g' -e 's/\.\([0-9]\)/0\1/g' -e 's/^[0-9]\{3,4\}$/&00/'
+    my $gcc = version->parse($gcc_version);
+    my $gpp = version->parse($gpp_version);
+    my $gfo = version->parse($gfo_version);
+
+    my $compare_high = version->parse('7.0.0');
+    my $compare_mid = version->parse('5.0.0');
+    my $compare_low = version->parse('4.8.1');
+    my $compare_verylow = version->parse('4.6.0');
+
+
+    if ( $gcc eq $gpp and $gcc eq $gfo ) {
+        print "Versions of gcc, g++ and gfortran match!\n";
+        print "Version: $gcc\n";
+	print "Check feature level...\n";
+
+        $gcc_status = "old";
+
+        if($gcc >= $compare_high) {
+            print "Your compiler version is above the version 7.0.0 and supports all features used in the baack modules.\n";
+            print "Currently no C++ 17 features are used\n";
+            $gcc_status = "4";
+        }
+        elsif($gcc >= $compare_mid) {
+            print "Your compiler version is above the version 5.0.0 and supports all feature used in the baack modules including additional performance and usability tweaks.\n";
+            $gcc_status = "3";
+        }
+	elsif ($gcc >= $compare_low) {
+	    print "Your compiler version is above the version 4.8.1 and supports all features used in the baack modules.\n";
+	    $gcc_status = "2";
+        }
+	elsif ($gcc >= $compare_verylow) {
+	    print colored("Your compiler version is bellow 4.8.1 and does not support the neccesary feature level for the full functionality!\n", 'red');
+	    print colored("The chosen module from the \"baack\" directory is not fully suported. Look at https://github.com/tudo-astroparticlephysics/Cor-PlusPlus/wiki for a full list of ", 'red');
+	    print colored("unsupported features.\n", 'red');
+            $gcc_status = "1";
+	}
+	else {
+		print colored("Your compiler version is bellow 4.6.0 and does not support the neccesary feature level to work with \"baack\" modules!\n", 'red');
+		$gcc_status = "0";
+                return "exit";
+	}
+
+    }
+    else {
+	print "Version of gcc, g++ and gfortran are not equal!";
+        print "Version of gcc is $gcc_version";
+	print "Version of g++ is $gpp_version";
+	print "Version of gfortran is $gfo_version";
+    }
+
+    if ( $BATCHMODE ) { return "ok"; }
+
+    my @options;
+    foreach my $option (@OPTIONLIST) {
+        if ( $option->{menu} eq "baack" ) {
+            if ( $option->{entry} <= $gcc_status) {
+                push(@options, $option);
+            }
+        }
+    }
+    my $sel = configureMenu("baack", \@options);
+    if ( $sel eq "x" ) {
+        return "exit";
+    } elsif ( $sel eq "r" ) {
+        return "restart";
+    }
+
+
+    return "ok";
+}
+
+sub removeDYNSTACK {
+    my $if_remote = '';
+
+    if (exists($CONFIGLOCAL{"REMOTECONTROL"})) {
+        $if_remote = 'ok';
+    }
+
+    foreach my $choice (@OPTIONLIST) {
+        if ( $choice->{name} eq "DYNSTACK" ) {
+            delete $CONFIGLOCAL{"$choice->{name}"};
+	        @SELECTEDOPTIONSLOCAL = grep { not $_ eq $choice } @SELECTEDOPTIONSLOCAL;
+        }
+        if ( $choice->{menu} eq "baack_dynstack" ) {
+            removeOption($choice);
+        }
+
+        if ( !$if_remote ){
+            if ( $choice->{menu} eq "baack" ) {
+                removeOption($choice);
+            }
+        }
+    }
+}
+# ---------------------------------
+# dynstack, select default stack
+# ---------------------------------
+sub funcDYNSTACK {
+    my $compiler_check = funcBAACK();
+    if ($compiler_check eq "exit"){ return "exit"; }
+
+    my $directory = Cwd::abs_path("baack");
+    my $archive = "baack-1.00.tar.gz";
+    my $file = "LICENSE";
+    if ( -e "$directory/$archive" && not -e "$directory/$file" ) {
+        system("cd $directory ; tar xzf $archive && rm -f $archive");
+    }
+    if ( not -e "$directory/$file") {
+        print "\n";
+        print "Error : dynstack package not properly available in directory \"baack\"/ \n" ;
+        print "        You should check the files in this subdirectory\n" ;
+        print "         (press 'Enter' to continue ...)\n" ;
+        wait_enter();
+        return "redo";
+    }
+    $CONFIGLOCAL{"DYNSTACK"} = "--with-dynstack";
+
+    if ($BATCHMODE) { return "ok"; }
+
+    # build list of options for menu
+    my @options;
+    foreach my $option (@OPTIONLIST) {
+	if ( $option->{menu} eq "baack_dynstack" ) {
+	    push(@options, $option);
+	}
+    }
+    my $sel = configureMenu("baack_dynstack", \@options);
+    if ( $sel eq "x" ) {
+	return "exit";
+    } elsif ( $sel eq "r" ) {
+	return "restart";
+    }
+    return "ok";
+}
+
+sub removeREMOTECONTROL {
+    my $if_dyn = '';
+
+    if (exists($CONFIGLOCAL{"DYNSTACK"})) {
+        $if_dyn = 'ok';
+    }
+
+    foreach my $choice (@OPTIONLIST) {
+        if ( $choice->{name} eq "REMOTECONTROL" ) {
+            delete $CONFIGLOCAL{"$choice->{name}"};
+	        @SELECTEDOPTIONSLOCAL = grep { not $_ eq $choice } @SELECTEDOPTIONSLOCAL;
+        }
+        if ( !$if_dyn ){
+            if ( $choice->{menu} eq "baack" ) {
+                removeOption($choice);
+            }
+        }
+    }
+}
+
+sub funcREMOTECONTROL {
+    my $compiler_check = funcBAACK();
+    if ($compiler_check eq "exit"){ return "exit"; }
+
+    my $directory = Cwd::abs_path("baack");
+    my $archive = "baack-1.00.tar.gz";
+    my $file = "LICENSE";
+    if ( -e "$directory/$archive" && not -e "$directory/$file" ) {
+        system("cd $directory ; tar xzf $archive && rm -f $archive");
+    }
+    if ( not -e "$directory/$file") {
+        print "\n";
+        print "Error : remotecontrol package not properly available in directory \"baack\"/ \n" ;
+        print "        You should check the files in this subdirectory\n" ;
+        print "         (press 'Enter' to continue ...)\n" ;
+        wait_enter();
+        return "redo";
+    }
+    $CONFIGLOCAL{"REMOTECONTROL"} = "--with-remotecontrol";
+
+    if ($BATCHMODE) { return "ok"; }
+
+    return "ok";
+}
+
+sub funcCORPP {
+
+    my $compiler_check = funcBAACK();
+    if ($compiler_check eq "exit"){ return "exit"; }
+
+    my $directory = Cwd::abs_path("baack");
+    my $archive = "baack-1.00.tar.gz";
+    my $file = "LICENSE";
+    if ( -e "$directory/$archive" && not -e "$directory/$file" ) {
+        system("cd $directory ; tar xzf $archive && rm -f $archive");
+    }
+    if ( not -e "$directory/$file") {
+        print "\n";
+        print "Error : baack package not properly available in directory \"baack\"/ \n" ;
+        print "        You should check the files in this subdirectory\n" ;
+        print "         (press 'Enter' to continue ...)\n" ;
+        wait_enter();
+        return "redo";
+    }
+    $CONFIGLOCAL{"CORPP"} = "--with-corpp";
+
+    if ($BATCHMODE) { return "ok"; }
+
+    # build list of options for menu
+    my @options;
+    foreach my $option (@OPTIONLIST) {
+    if ( $option->{menu} eq "baack_corpp" ) {
+        push(@options, $option);
+    }
+    }
+    my $sel = configureMenu("baack_corpp", \@options);
+    if ( $sel eq "x" ) {
+    return "exit";
+    } elsif ( $sel eq "r" ) {
+    return "restart";
+    }
+
+    return "ok";
+}
+
+# ---------------------------------
+# handle the -m32 compiler switch
+# ---------------------------------
+sub funcNOM32 {
+
+    $use_32bit = 0;
+    if ( exists $CONFIG{"M32"} ) { delete $CONFIG{"M32"}; }
+    if ( exists $CONFIGLOCAL{"M32"} ) { delete $CONFIGLOCAL{"M32"}; }
+
+    @SELECTEDOPTIONSLOCAL = grep { $_ ne 'M32' }  @SELECTEDOPTIONSLOCAL;
+    @SELECTEDOPTIONS      = grep { $_ ne 'M32' }  @SELECTEDOPTIONS;
+
+    if ($BATCHMODE) { return "ok"; }
+
+    # build list of options for menu 1
+
+    # IF WE DON't WANT THIS MENU, PLEASE LEAVE IT FOR --expert AT LEAST
+
+#    my @options;
+#    foreach my $option (@OPTIONLIST) {
+#	if ( $option->{menu} eq "sizeout" ) {
+#	    push(@options, $option );
+#	}
+#    }
+#    my $sel = configureMenu("sizeout", \@options);
+#    if ( $sel eq "x" ) {
+#	return "exit";
+#    } elsif ( $sel eq "r" ) {
+#	return "restart";
+#    }
+    return "ok";
+}
+
+
+
+
+#######################################################################################
+##
+##  General helper functions
+##
+#######################################################################################
+
+
+# ----------------------------------------------------------------------
+#         Check external dependencies and system environment
+# ----------------------------------------------------------------------
+
+sub checkSystem {
+
+    my @UNAME = POSIX::uname();
+    $SYSTEM = $UNAME[0];
+
+    # --------------------------------------------------------------------------------------
+    # have ext coast at COAST_DIR
+    # --------------------------------------------------------------------------------------
+    $have_COAST = 1; # COAST is now included in CORSIKA. No check needed.
+#    if ( exists $ENV{'COAST_DIR'} ) {
+#        if ( -e "$ENV{'COAST_DIR'}/include/crs/CorsikaConsts.h" ) {
+#        }
+#    }
+
+    # --------------------------------------------------------------------------------------
+    # have ext coast lib at COAST_USER_LIB
+    # --------------------------------------------------------------------------------------
+    if ( exists $ENV{'COAST_USER_LIB'} ) {
+        if ( -e "$ENV{'COAST_USER_LIB'}/libCOAST.so" ) {
+            $have_COAST_LIB = 1;
+        }
+    }
+
+    # --------------------------------------------------------------------------------------
+    # have ext ROOT (check for root-config and libCore.so)
+    # --------------------------------------------------------------------------------------
+    my @root_lib_dir_out = `root-config --libdir`;
+    if ( $? == 0 &&  scalar @root_lib_dir_out == 1) {
+	my $root_lib_dir = $root_lib_dir_out[0];
+	$root_lib_dir =~ s/\r|\n//g;
+        if ( -e "$root_lib_dir/libCore.so" ) {
+            $have_ROOT_LIB = 1;
+        }
+    }
+
+    # --------------------------------------------------------------------------------------
+    # is 64bit architecture
+    # --------------------------------------------------------------------------------------
+    my $ARCH = $UNAME[4];
+    if ( grep { /64/ } $ARCH ) {
+        $is_64bit = 1;
+    }
+
+    return (1);
+}
+
+
+# ----------------------------------------------------------------------
+#              parser of 'include/config.h' file
+# ----------------------------------------------------------------------
+
+#
+# examples:
+#   $assoc->{foo}
+#   keys %$assoc
+#   ...
+
+sub check_cache {
+
+    my $file = 'include/config.h';
+    my $cache_ = parse_header($file);
+    if ( not defined $cache_ ) { return(); }
+    my %cache = %{$cache_};
+    #print Dumper(%cache);
+
+    foreach my $option (@OPTIONLIST) {
+	my $menu_name = $option->{menu};
+	my $cache_name = "__CACHE_" . $option->{name} . "__";
+	if ( exists $cache{$cache_name} and  defined $cache{$cache_name} ) {
+	    if ( exists $MENUDEFINITION{$menu_name} ) {
+		my $menu = $MENUDEFINITION{$menu_name};
+		$menu->{cache} .= " " . $option->{name};
+	    } else {
+		print " ERROR: Menu \"$menu_name\" is not defined !\n";
+	    }
+	}
+    }
+
+    # special treatment for -m32 bit flag
+    if ( exists $cache{"__CACHE_M32__"} && not defined $cache{"__CACHE_M32__"} ) {
+	$MENUDEFINITION{"bits"}->{cache}="NOM32";
+	delete($CONFIG_AUTO{"M32"});
+    }
+    # special treatment for -frecord-lenght=4 bit flag
+    if ( exists $cache{"__CACHE_OUT32__"} && not defined $cache{"__CACHE_OUT32__"} ) {
+        if ( exists $cache{"__ROOTOUT__"} && not defined $cache{"__ROOTOUT__"} ) {
+            $MENUDEFINITION{"sizeout"}->{cache}="OUT64";
+            delete($CONFIG_AUTO{"ROOTOUT"});
+        } else {
+            $MENUDEFINITION{"sizeout"}->{cache}="MACHINEINDEPENDENT";
+        }
+	delete($CONFIG_AUTO{"OUT32"});
+    }
+
+    return(1);
+}
+
+#my $assoc = parse_header(1);  # with debug output
+#my $assoc = parse_header();    # without debug output
+sub parse_header {
+
+    my $file = shift;
+    my $debug = shift || 0;
+
+    if ( not defined $file or not -f $file ) { return(); }
+    my $assoc = {};
+
+    open(my $fh, '<', $file) or die $!;
+
+    while (defined($_ = <$fh>)) {
+
+	my $name;
+	my $value;
+
+	if (/^\s*\#define\s+(\S+)\s+(\S.*)$/) { # pick out the "#define somthing value" lines
+	    $name  = $1;
+	    $value = $2;
+	    $value =~ s/\s+$//;
+	    if ( $debug ) { print "read define '$name' == '$value'\n"; }
+
+	} elsif (/^\s*\#define\s+(\S+)/) { # pick out the "#define somthing" lines
+	    $name  = $1;
+	    $value = "1";
+	    if ( $debug ) { print "read define '$name' \n"; }
+
+	} elsif (/^\s*\/\*\s*\#undef\s+(\w+)\s*\*\//) { # pick out the "/* #undef something" lines
+	    $name = $1;
+	    if ( $debug ) { print "read define '$name' == 'undef'\n"; }
+
+	} elsif (/^\s*\/\/\s*\#undef\s+(\w+)/) { # pick out the "// #undef something" lines
+	    $name = $1;
+	    if ( $debug ) { print "read define '$name' == 'undef'\n"; }
+
+	} elsif (/^\s*\#undef\s+(\w+)/) { # pick out the "#undef something" lines
+	    $name = $1;
+
+	} else { next; }
+
+	if ($debug) {
+	    print "Found define '$name' == '"
+		. (defined($value) ? $value : "[undef]")
+		. "'\n";
+	}
+	$assoc->{$name} = $value;
+    }
+    close $fh;
+    return $assoc;
+}
+
+
+# ----------------------------------------------------------------------
+#               ask for directory of installation
+# CheckInstallation(message, optionKey, optionName, requiredFile, currentDir)
+#
+#      message: to be printed in case of wrong installation
+#    optionKey: key of option in option list
+#   optionName: --with-<optionName>=$currentDir
+# requiredFile: to validate installation
+#   currentDir: default choice for installation
+#
+# ----------------------------------------------------------------------
+
+sub CheckInstallation {
+    my $message      = shift;
+    my $optKey       = shift;
+    my $optName      = shift;
+    my $requiredFile = shift;
+    my $currDir      = shift;
+
+    if ( not -f "$currDir/$requiredFile" ) {
+	print $message;
+    }
+    while ( not -f "$currDir/$requiredFile" ) {
+	print "    enter \'$optName\' full PATH (or 'x' to exit): ";
+	$currDir = <STDIN>;
+	chomp $currDir;
+	if ($currDir eq "x") { return "redo"; }
+    }
+    $CONFIGLOCAL{$optKey} = "--with-$optName=$currDir";
+    print "    SELECTED path to installation: \"$currDir\" \n";
+    return "ok";
+}
+
+
+# ----------------------------------------------------------------------
+#               print options helper function
+# ----------------------------------------------------------------------
+
+sub printOptions {
+    print "  options:   ";
+    print join(' ', @configflag);
+    if ( @configflag )                       { print " | ";      }
+    print join(' ', keys %CONFIG), " ";
+    if ( keys %CONFIGLOCAL ) {
+	print "\n  selection: ";
+        print join(' ', keys %CONFIGLOCAL);
+    }
+    print "\n\n";
+}
+
+
+
+# ----------------------------------------------------------------------
+#               help screen
+# ----------------------------------------------------------------------
+sub helpScreen {
+    print "\n\n           -- COCONUT (v3.1) Oct 2010 --\n\n";
+    print "     by   Ralf Ulrich (ralf.ulrich\@kit.edu) \n";
+    print "        Tanguy Pierog (tanguy.pierog\@kit.edu) \n";
+    print "       Steffen Müller (steffen.mueller2\@kit.edu) \n";
+    print "\n run ./coconut (without arguments) to configure and install CORSIKA \n\n";
+    print "                   all options are for expert use only: \n";
+#    print "               -h  to see this help \n";
+    print "      -e,--expert  activate expert mode with additional configuration steps \n";
+    print "    -n,--no-cache  do not use cached configuration \n";
+    print "       -b,--batch  no user interaction, just take DEAFULT and CACHED configuration \n";
+    print "     -i,--install  to skip configuration and run \"make install\" \n";
+    print "        -m,--make  to skip configuration and run \"make all\" \n";
+    print "       -c,--clean  to run \"make clean\" (skips configuration) \n";
+    print "   -d,--distclean  to run \"make distclean\" (skips configuration) \n";
+    print "   -t,--dist       to run \"make dist\" (skips configuration) \n";
+    print "         --dev  do not use system flag for compilation and use -O0 \n";
+    print "              --*  any additional option  with trailing \"--\" will be \n";
+    print "                   passed on to \"./configure\" directly (try e.g. --help) \n\n";
+    exit();
+}
+
+
+
+# ----------------------------------------------------------------------
+#               print text in a box of stars
+# ----------------------------------------------------------------------
+sub print_boxed {
+    my @text = @_;
+    @text = map { chomp; split /\n/ } @text;
+
+    my $max_len = 0;
+    my $lines = @text;
+    foreach my $line (@text) {
+        if (length($line) > $max_len) {
+          $max_len = length($line)
+        }
+    }
+    my $starline = '*' x ($max_len+4);
+
+    print "$starline\n";
+    foreach my $line (@text) {
+        print "* $line"
+            . (' ' x ( $max_len - length($line)) )
+            . " *\n";
+    }
+    print "$starline\n";
+    return length($starline);
+}
+
+
+# ----------------------------------------------------------------------
+#               wait for user to press enter if not in batch mode
+# ----------------------------------------------------------------------
+sub wait_enter {
+    if (not $BATCHMODE) {
+      print "\n(press Enter to continue)\n";
+      readline(STDIN);
+    }
+    return;
+}
+
+# ----------------------------------------------------------------------
+#               prompt user for yes/no if not in batch mode
+# ----------------------------------------------------------------------
+sub prompt_yn {
+    my $default = shift || 'no';
+    if ($default =~ /^\s*y(?:es)?/i) {
+      $default = 'yes';
+    }
+    else {
+      $default = 'no';
+    }
+
+    if ($BATCHMODE) {
+      print "    Yes/no prompt skipped: Batch mode! Defaulting to '$default'!\n";
+    }
+    else {
+      print "    yes or no ? (default: $default) > ";
+      my $answer = <STDIN>;
+      return 'yes' if $answer =~ /^\s*y(?:es)?/i;
+      return 'no' if $answer =~ /^\w/i;;   #any caracter or word
+#      return 'no' if $answer =~ /^\s*no?/i;;  #something with "no"
+    }
+    return $default;
+}

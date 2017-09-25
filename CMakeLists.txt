@@ -27,7 +27,7 @@ set(PROJECT_SOURCE_DIR ${PROJECT_SOURCE_DIR}/src)
 
 set(USER_CODE_INCLUDE_DIR "${PROJECT_INCLUDE_DIR}")
 
-set(CORSIKA_DIR "/home/dominik/workspace/corsika-75700")
+set(CORSIKA_DIR "/home/dominik/workspace/corsika-76300")
 
 #Set settings to release
 #set(CMAKE_BUILD_TYPE Release)
@@ -86,13 +86,23 @@ if(BUILD_BAACK)
     )
     add_executable(Corsika_test ${BAACK_SRCS})
 
+    link_directories("/usr/lib")
+
+    target_link_libraries(Corsika_test Cor)
+    target_link_libraries(Corsika_test urqmd)
+    target_link_libraries(Corsika_test gfortran)
+
+
     target_link_libraries(Corsika_test network_lib)
 
     target_link_libraries(Corsika_test Dynstack)
     target_link_libraries(Corsika_test REMOTE_CONTROL)
     target_link_libraries(Corsika_test Basic)
 
-    target_link_libraries(Corsika_test CorsikaPP)    
+
+
+
+    #target_link_libraries(Corsika_test Cor)
 endif(BUILD_BAACK)
 
 

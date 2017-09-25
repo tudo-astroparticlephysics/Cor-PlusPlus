@@ -14,7 +14,7 @@
 
 int main(int argc, char** argv)
 {
-    cor_();
+    corsika_();
 
 
 

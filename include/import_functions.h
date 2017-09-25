@@ -11,4 +11,4 @@
 //#pragma once
 
 
-extern "C" void cor_();
+extern "C" void corsika_();
