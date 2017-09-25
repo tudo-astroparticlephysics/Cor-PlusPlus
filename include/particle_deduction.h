@@ -13,7 +13,7 @@
 
 #ifdef _NOCOCO_
 #else
-#include "../../include/config.h"
+#include "config.h"
 #endif
 
 #include "../basic/include/corsika/particle.h"

@@ -8,11 +8,7 @@
 * 	of the LGPL license. See the LICENSE file for details.
 */
 
-#pragma once
+//#pragma once
 
 
-extern "C"
-{
-    void CORSIKA_(); 
-
-}
+extern "C" void cor_();

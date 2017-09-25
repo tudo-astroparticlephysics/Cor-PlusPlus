@@ -1,0 +1,251 @@
+/* produce analysis histograms */
+#cmakedefine __ANAHIST__
+
+/* external atmosphere */
+#cmakedefine __ATMEXT__
+
+/* cerenkov longitudinal profile */
+#cmakedefine __AUGCERLONG__
+
+/* augerhist */
+#cmakedefine __AUGERHIST__
+
+/* augerhit */
+#cmakedefine __AUGERHIT__
+
+/* augerinfo */
+#cmakedefine __AUGERINFO__
+
+/* BAACK modules with C++0x option */
+#cmakedefine __BAACKC0X__
+
+/* BAACK modules with C++11 option */
+#cmakedefine __BAACKC11__
+
+/* BAACK modules with C++14 option */
+#cmakedefine __BAACKC14__
+
+/* BAACK modules with C++1z option */
+#cmakedefine __BAACKC1Z__
+
+/* RECL parameter */
+#cmakedefine __BYTERECL__
+
+/* simulate telescope detector */
+#cmakedefine __CEFFIC__
+
+/* for Cherenkov grid detector */
+#cmakedefine __CERENKOV__
+
+/* Cherenkov wavelength dependent */
+#cmakedefine __CERWLEN__
+
+/* pythia charm production */
+#cmakedefine __CHARM__
+
+/* Inclined observation level */
+#cmakedefine __COASTUSERLIB__
+
+/* ENABLE COAST INTERFACE */
+#cmakedefine __COAST__
+
+/* compact output */
+#cmakedefine __COMPACT__
+
+/* CONEX cascade equation (CONEX) */
+#cmakedefine __CONEX__
+
+/* curved atmosphere */
+#cmakedefine __CURVED__
+
+/* to compile without optimisation and system flags */
+#cmakedefine __DEV__
+
+/* to make dist */
+#cmakedefine __DIST__
+
+/* include DPMJET 2.55 program */
+#cmakedefine __DPMJET__
+
+/* user defined intermediate particle stack */
+#cmakedefine __DYNCUSTOM__
+
+/* emulation of normal stack */
+#cmakedefine __DYNDEFAULT__
+
+/* reimplementation of the ICECUBE1 module */
+#cmakedefine __DYNICECUBE__
+
+/* stores every saved particle to file */
+#cmakedefine __DYNOUTPUT__
+
+/* DYNamic particle STACK */
+#cmakedefine __DYNSTACK__
+
+/* electrical field */
+#cmakedefine __EFIELD__
+
+/* particle history */
+#cmakedefine __EHISTORY__
+
+/* include EPOS program */
+#cmakedefine __EPOS__
+
+/* include FLUKA 2011 program */
+#cmakedefine __FLUKA__
+
+/* In case of GFORTRAN compiler (GCC > 4) */
+#cmakedefine __GFORTRAN__
+
+/* include GHEISHA program */
+#cmakedefine __GHEISHAD__
+
+/* for external IACT Cherenkov file */
+#cmakedefine __IACTEXT__
+
+/* for Cherenkov telescope detector */
+#cmakedefine __IACT__
+
+/* ibmrisc routine */
+#cmakedefine __IBMRISC__
+
+/* ICECUBE FiFo */
+#cmakedefine __ICECUBE1__
+
+/* ICECUBE gzip/pipe output */
+#cmakedefine __ICECUBE2__
+
+/* In case of IFORT compiler */
+#cmakedefine __IFORT__
+
+/* new Cherenkov counting */
+#cmakedefine __INTCLONG__
+
+/* interaction test */
+#cmakedefine __INTTEST__
+
+/* FLUKA 2011 for Linux */
+#cmakedefine __LINUX__
+
+/* LPM effect */
+#cmakedefine __LPM__
+
+/* explicitly use the -m32 flag */
+#cmakedefine __M32__
+
+/* In case of Apple computer */
+#cmakedefine __MAC__
+
+/* for multiple thinning */
+#cmakedefine __MULTITHIN__
+
+/* muonhist */
+#cmakedefine __MUONHIST__
+
+/* MUPROD */
+#cmakedefine __MUPROD__
+
+/* neutrino primaries */
+#cmakedefine __NEUTRINO__
+
+/* include neXus 3.97 program */
+#cmakedefine __NEXUS__
+
+/* no cherenkov longitudinla profile */
+#cmakedefine __NOCLONG__
+
+/* do not compile binaries, just extract CORSIKA compilefile */
+#cmakedefine __NOCOMPILE__
+
+/* herwig neutrino production (NUPRIM) */
+#cmakedefine __NUPRIM__
+
+/* official version marker */
+#cmakedefine __OFFIC__
+
+/* old date and time routine for LINUX beta */
+#cmakedefine __OLDDATE2__
+
+/* old date and time routine */
+#cmakedefine __OLDDATE__
+
+/* explicitly use the -frecord-marker=4 flag */
+#cmakedefine __OUT32__
+
+/* parallel computation with MPI */
+#cmakedefine __PARALLELIB__
+
+/* parallel computation */
+#cmakedefine __PARALLEL__
+
+/* plot shower C */
+#cmakedefine __PLOTSH2__
+
+/* plot shower */
+#cmakedefine __PLOTSH__
+
+/* photon preshower */
+#cmakedefine __PRESHOWER__
+
+/* include QGSJET II program */
+#cmakedefine __QGSII__
+
+/* include QGSJET 01C program */
+#cmakedefine __QGSJETOLD__
+
+/* include QGSJET01/QGSJET II program */
+#cmakedefine __QGSJET__
+
+/* Remote acces to corsika */
+#cmakedefine __REMOTECONTROL__
+
+/* rigidity */
+#cmakedefine __RIGIDITY__
+
+/* to keep the CORSIKA compilefile */
+#cmakedefine __SAVEDCORS__
+
+/* include Sybill 2.3 program */
+#cmakedefine __SIBYLL__
+
+/* slant profile */
+#cmakedefine __SLANT__
+
+/* stack input */
+#cmakedefine __STACKIN__
+
+/* pythia tau lepton production */
+#cmakedefine __TAULEP__
+
+/* annitest */
+#cmakedefine __TEST__
+
+/* for thinning */
+#cmakedefine __THIN__
+
+/* timerc routine */
+#cmakedefine __TIMERC__
+
+/* trajectory */
+#cmakedefine __TRAJECT__
+
+/* In case of UNIX computer */
+#cmakedefine __UNIX__
+
+/* upward particles */
+#cmakedefine __UPWARD__
+
+/* include UrQMD 1.3 program */
+#cmakedefine __URQMD__
+
+/* include VENUS 4.12 program */
+#cmakedefine __VENUS__
+
+/* viewcone */
+#cmakedefine __VIEWCONE__
+
+/* detector geometry (vertical string) */
+#cmakedefine __VOLUMECORR__
+
+/* detector geometry (volume) */
+#cmakedefine __VOLUMEDET__
