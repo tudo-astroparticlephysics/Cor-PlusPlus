@@ -136,9 +136,9 @@ install:
   - export CXX=$COMP_XX
   - export CC=$COMP_C
   - export FC=$COMP_F
-  - $(CXX) --version
-  - $(CC) --version
-  - $(FC) --version
+  - $($CXX) --version
+  - $($CC) --version
+  - $($FC) --version
   - sudo cmake .
   - sudo make
   - sudo mv libgtest* /usr/lib/
