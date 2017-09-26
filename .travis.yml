@@ -136,12 +136,9 @@ install:
   - export CXX=$COMP_XX
   - export CC=$COMP_C
   - export FC=$COMP_F
-  - echo "CXX: " $CXX
-  - echo "CC: " $CC
-  - echo "FC: " $FC  
-  - $($CXX --version)
-  - $($CC --version)
-  - $($FC --version)
+    #  - $($CXX --version)
+    #  - $($CC --version)
+    #  - $($FC --version)
   - sudo cmake .
   - sudo make
   - sudo mv libgtest* /usr/lib/
@@ -152,7 +149,9 @@ script:
   - mkdir build
   - cd build
   - cmake .. -DBUILD_TESTS=ON -D_NOCOCO_=ON
-  - echo "Compiler:" $COMP_XX
+  - echo "C++ Compiler:" $CXX
+  - echo "C   Compiler:" $CC
+  - echo "For Compiler:" $FC
   - make VERBOSE=1
   - ./dtl_test
   - ./dynstack_test
