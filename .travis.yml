@@ -136,7 +136,7 @@ install:
   - sudo cmake -DBUILD_SHARED_LIBS=ON .
   - sudo make
   - sudo cp -a ./googlemock/include/gtest /usr/include
-  - sudo cp -a ./googlemock/gtest/libgtest_main.so ./googlemock/gtest/libgtest.so /usr/lib/
+  - sudo cp -a ./googletest/gtest/libgtest_main.so ./googlemock/gtest/libgtest.so /usr/lib/
   - which valgrind
   - cd "${TRAVIS_BUILD_DIR}/Cor-PlusPlus"
 
