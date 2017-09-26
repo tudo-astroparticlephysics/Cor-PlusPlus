@@ -139,7 +139,7 @@ install:
   - echo "C++ Compiler:" $CXX
   - echo "C   Compiler:" $CC
   - echo "F   Compiler:" $FC
-  - $( $CXX --version )
+    #  - $( $CXX --version )
     #  - $($CC --version)
     #  - $($FC --version)
   - sudo cmake .
