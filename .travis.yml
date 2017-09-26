@@ -136,6 +136,9 @@ install:
   - export CXX=$COMP_XX
   - export CC=$COMP_C
   - export FC=$COMP_F
+  - echo "CXX: " $CXX
+  - echo "CC: " $CC
+  - echo "FC: " $FC  
   - $($CXX --version)
   - $($CC --version)
   - $($FC --version)
