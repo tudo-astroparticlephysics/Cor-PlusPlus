@@ -154,6 +154,7 @@ before_install:
 before_script:
   - ls
   - mkdir build
+  - cd build
   - cmake .. -DBUILD_TESTS=on -D_NOCOCO_=on
   - make VERBOSE=1
 
