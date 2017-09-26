@@ -127,7 +127,7 @@ matrix:
       - compiler: gcc-4.9
   fast_finish: true
 
-before_install:
+install:
   - sudo apt-get update -qq
   - sudo apt-get install -y libgtest-dev valgrind
   - sudo wget https://github.com/google/googletest/archive/release-1.8.0.tar.gz
@@ -140,7 +140,7 @@ before_install:
   - which valgrind
   - cd "${TRAVIS_BUILD_DIR}"
 
-install:
+before_install:
   - export CXX=$COMP_XX
   - export CC=$COMP_C
   - export FC=$COMP_F
