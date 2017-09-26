@@ -136,6 +136,9 @@ install:
   - export CXX=$COMP_XX
   - export CC=$COMP_C
   - export FC=$COMP_F
+  - echo "C++ Compiler:" $CXX
+  - echo "C   Compiler:" $CC
+  - echo "F   Compiler:" $FC
     #  - $($CXX --version)
     #  - $($CC --version)
     #  - $($FC --version)
