@@ -6,13 +6,6 @@ language: cpp
 
 
 matrix:
-  addons:
-    apt:
-      sources:
-        - george-edison55-precise-backports
-      packages:
-        - cmake-data
-        - cmake
   include:
     - compiler: gcc-4.6
       addons:
@@ -84,10 +77,13 @@ matrix:
           sources:
             - ubuntu-toolchain-r-test
             - llvm-toolchain-precise-3.6
+            - george-edison55-precise-backports
           packages:
             - clang-3.6
             - gfortran-6
             - automake
+            - cmake-data
+            - cmake
       env:
           - COMP_XX=clang++-3.6
           - COMP_C=clang-3.6
@@ -101,10 +97,13 @@ matrix:
           sources:
             - ubuntu-toolchain-r-test
             - llvm-toolchain-precise-3.7
+            - george-edison55-precise-backports
           packages:
             - clang-3.7
             - gfortran-6
             - automake
+            - cmake-data
+            - cmake
       env:
            - COMP_XX=clang++-3.7
            - COMP_C=clang-3.7
