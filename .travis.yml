@@ -138,7 +138,7 @@ install:
   - sudo cp -a ./googletest/include/gtest /usr/include
   - sudo cp -a ./googlemock/gtest/libgtest_main.so ./googlemock/gtest/libgtest.so /usr/lib/
   - which valgrind
-  - cd "${TRAVIS_BUILD_DIR}/Cor-PlusPlus"
+  - cd ${TRAVIS_BUILD_DIR}
 
 before_install:
   - export CXX=$COMP_XX
