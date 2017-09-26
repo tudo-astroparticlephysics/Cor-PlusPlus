@@ -139,9 +139,9 @@ install:
   - echo "C++ Compiler:" $CXX
   - echo "C   Compiler:" $CC
   - echo "F   Compiler:" $FC
-    - $CXX --version 
-    - $CC --version
-    - $FC --version
+  - $CXX --version 
+  - $CC --version
+  - $FC --version
   - sudo cmake .
   - sudo make
   - sudo mv libgtest* /usr/lib/
