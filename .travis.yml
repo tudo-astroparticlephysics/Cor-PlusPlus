@@ -127,7 +127,7 @@ matrix:
       - compiler: gcc-4.9
   fast_finish: true
 
-before-install:
+before_install:
   - sudo apt-get update -qq
   - sudo apt-get install -y libgtest-dev valgrind
   - sudo wget https://github.com/google/googletest/archive/release-1.8.0.tar.gz
@@ -151,15 +151,13 @@ install:
   - $CC --version
   - $FC --version
 
-script:
+before-script:
   - ls
   - mkdir build
-  - cd build
-  - cmake .. -DBUILD_TESTS=ON -D_NOCOCO_=ON
-  - echo "C++ Compiler:" $CXX
-  - echo "C   Compiler:" $CC
-  - echo "For Compiler:" $FC
+  - cmake .. -DBUILD_TESTS=on -D_NOCOCO_=on
   - make VERBOSE=1
+
+script:
   - ./dtl_test
   - ./dynstack_test
   - ./rc_test
