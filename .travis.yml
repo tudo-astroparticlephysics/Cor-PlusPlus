@@ -151,7 +151,7 @@ install:
   - $CC --version
   - $FC --version
 
-before-script:
+before_script:
   - ls
   - mkdir build
   - cmake .. -DBUILD_TESTS=on -D_NOCOCO_=on
