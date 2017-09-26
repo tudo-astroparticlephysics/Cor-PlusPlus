@@ -134,7 +134,7 @@ install:
   - sudo apt-get install libgtest-dev
   - cd /usr/src/gtest
   - export CXX=$COMP_XX
-  - export CC=$COMP_X
+  - export CC=$COMP_C
   - export FC=$COMP_F
   - sudo cmake .
   - sudo make
