@@ -81,10 +81,10 @@ matrix:
           packages:
             - clang-3.6
             - gfortran-6
+            - g++-6
             - automake
             - cmake-data
             - cmake
-            - libstdc++
       env:
           - COMP_XX=clang++-3.6
           - COMP_C=clang-3.6
@@ -102,10 +102,10 @@ matrix:
           packages:
             - clang-3.7
             - gfortran-6
+            - g++-6
             - automake
             - cmake-data
             - cmake
-            - libstdc++
       env:
            - COMP_XX=clang++-3.7
            - COMP_C=clang-3.7
@@ -122,8 +122,8 @@ matrix:
           packages:
             - clang-3.8
             - gfortran-6
+            - g++-6
             - automake
-            - libstdc++
       env:
           - COMP_XX=clang++-3.8
           - COMP_C=clang-3.8
