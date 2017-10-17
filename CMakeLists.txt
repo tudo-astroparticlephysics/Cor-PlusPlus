@@ -1,6 +1,6 @@
 
 # Specify the minimum version for CMake
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 3.0)
 
 # Project's name
 project(COR-PP C CXX Fortran)
@@ -108,7 +108,7 @@ endif(BUILD_BAACK)
 
 # Add generic library
 if(BUILD_DYNSTACK OR BUILD_REMOTECONTROL OR BUILD_BASIC)
-    include_directories("${PROJECT_DIR}/lib/DTL/include")
+    include_directories("${PROJECT_DIR}/lib/DTL/include") ## target_include_directories is better, this one is global!
     add_subdirectory(lib/DTL)
 endif(BUILD_DYNSTACK OR BUILD_REMOTECONTROL OR BUILD_BASIC)
 
@@ -118,10 +118,6 @@ if(BUILD_DYNSTACK)
     add_subdirectory(dynstack)
 endif(BUILD_DYNSTACK)
 
-if(BUILD_REMOTECONTROL)
-    include_directories("${PROJECT_DIR}/remote_control/include")
-    add_subdirectory(remote_control)
-endif(BUILD_REMOTECONTROL)
 
 if(BUILD_BASIC)
     include_directories("${PROJECT_DIR}/basic/include")
