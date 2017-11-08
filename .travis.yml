@@ -93,7 +93,8 @@ matrix:
 
 
 
-before-install:
+before_install:
+  - eval "${MATRIX_EVAL}"
   - echo "C++ Compiler:" $CXX
   - echo "C   Compiler:" $CC
   - echo "F   Compiler:" $FC
