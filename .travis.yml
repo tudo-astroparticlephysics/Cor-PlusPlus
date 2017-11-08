@@ -107,26 +107,37 @@ matrix:
   fast_finish: true
 
 before-install:
-  - sudo apt-get update -qq
+  - export CXX=$COMP_XX
+  - export CC=$COMP_C
+  - export FC=$COMP_F
+  - echo "C++ Compiler:" $CXX
+  - echo "C   Compiler:" $CC
+  - echo "F   Compiler:" $FC
+  - $CXX --version
+  - $CC --version
+  - $FC --version
 
 install:
-  - sudo apt-get install libgtest-dev
-  - cd /usr/src/gtest
-  - export CXX=$COMP_XX
-  - export CC=$COMP_X
-  - sudo cmake .
+  - sudo apt-get update -qq
+  - sudo apt-get install -y libgtest-dev
+  - sudo wget https://github.com/google/googletest/archive/release-1.8.0.tar.gz
+  - sudo tar xf release-1.8.0.tar.gz
+  - cd googletest-release-1.8.0
+  - sudo cmake -DBUILD_SHARED_LIBS=ON .
   - sudo make
-  - sudo mv libgtest* /usr/lib/
+  - sudo cp -a ./googletest/include/gtest /usr/include
+  - sudo cp -a ./googlemock/gtest/libgtest_main.so ./googlemock/gtest/libgtest.so /usr/lib/
+  - which valgrind
   - cd ${TRAVIS_BUILD_DIR}
 
-script:
+before_script:
   - ls
-  - g++ --version
   - mkdir build
   - cd build
-  - cmake .. -DBUILD_TESTS=ON -D_NOCOCO_=ON
-  - echo "Compiler:" $COMP_XX
+  - cmake .. -DBUILD_TESTS=on -DNOCOCO=on
   - make VERBOSE=1
+
+script:
   - ./dtl_test
   - ./dynstack_test
   - ./rc_test
