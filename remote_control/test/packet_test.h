@@ -11,7 +11,7 @@
 #pragma once
 
 
-#include "../remote_control/communication/packet.h"
+#include "remote_control/communication/packet.h"
 
 
 namespace test

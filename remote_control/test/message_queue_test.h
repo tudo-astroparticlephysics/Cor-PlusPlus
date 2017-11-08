@@ -10,8 +10,6 @@
 
 #pragma once
 
-#include "test/remote_control/message_queue_test.h"
-
 #include "remote_control/communication/message_queue.h"
 #include "remote_control/communication/packet_id.h"
 

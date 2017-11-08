@@ -129,6 +129,7 @@ script:
   - make VERBOSE=1
   - ./dtl_test
   - ./dynstack_test
+  - ./rc_test
 
 notifications:
 email: false

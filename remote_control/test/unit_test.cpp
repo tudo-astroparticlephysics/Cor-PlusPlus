@@ -9,8 +9,8 @@
 */
 #include "gtest/gtest.h"
 
-#include "test/remote_control/message_queue_test.h"
-#include "test/remote_control/protocol_test.h"
+#include "message_queue_test.h"
+#include "packet_test.h"
 
 namespace test
 {
