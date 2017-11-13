@@ -2,7 +2,10 @@
 cmake_minimum_required(VERSION 3.0)
 
 # Project's name
-project(COR-PP C CXX Fortran)
+project(COR-PP)
+enable_language (C)
+enable_language (CXX)
+#enable_language (Fortran)
 
 set (CORPP_VERSION_MAJOR 2)
 set (CORPP_VERSION_MINOR 0)

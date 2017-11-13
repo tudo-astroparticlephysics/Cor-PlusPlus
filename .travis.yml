@@ -118,6 +118,7 @@ before_script:
   - ls
   - mkdir build
   - cd build
+  - echo $FC
   - cmake .. -DBUILD_TESTS=on -DNOCOCO=on
   - make VERBOSE=1
 
