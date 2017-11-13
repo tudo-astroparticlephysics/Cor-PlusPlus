@@ -58,7 +58,7 @@ matrix:
             - llvm-toolchain-precise-3.6
           packages:
             - clang-3.6
-            - g++4.9
+            - g++-4.9
               #- gfortran-4.9
             - automake
       env:
@@ -71,7 +71,7 @@ matrix:
             - llvm-toolchain-precise-3.7
           packages:
             - clang-3.7
-            - g++4.9
+            - g++-4.9
               #- gfortran-4.9
             - automake
       env:
