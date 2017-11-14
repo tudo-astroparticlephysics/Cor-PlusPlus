@@ -106,6 +106,7 @@ before_install:
 
 install:
   - sudo apt-get update -qq
+# GTEST
   - sudo apt-get install -y libgtest-dev
   - sudo wget https://github.com/google/googletest/archive/release-1.8.0.tar.gz
   - sudo tar xf release-1.8.0.tar.gz
@@ -114,6 +115,9 @@ install:
   - sudo make
   - sudo cp -a ./googletest/include/gtest /usr/include
   - sudo cp -a ./googlemock/gtest/libgtest_main.so ./googlemock/gtest/libgtest.so /usr/lib/
+# CPPCHECK
+  - sudo apt-get install -qq cppcheck
+# Back to main
   - cd ${TRAVIS_BUILD_DIR}
 
 before_script:
@@ -127,6 +131,11 @@ script:
   - ./dtl_test
   - ./dynstack_test
   - ./rc_test
+# CPPCHECK
+  - cppcheck ../dynstack/ -I./../dynstack/include -I./../lib/DTL/include --enable=all --suppress=missingIncludeSystem --check-config --inconclusive --force --project=./compile_commands.json
+  - cppcheck ../remote_control/ -I./../remote_control/include -I./../lib/DTL/include --enable=all --suppress=missingIncludeSystem --check-config --inconclusive --force --project=./compile_commands.json
+  - cppcheck ../basic/ -I./../basic/include -I./../lib/DTL/include --enable=all --suppress=missingIncludeSystem --check-config --inconclusive --force --project=./compile_commands.json
+
 
 notifications:
 email: false
