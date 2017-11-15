@@ -55,8 +55,8 @@ void callback_out(const DeductedParticleType* const p)
 }
 
 
-typedef  dynstack::wrapper::OutputCallbackStack<
-  	       dynstack::wrapper::InputCallbackStack<
+typedef  dynstack::wrapper::OutCallbackStack<
+  	       dynstack::wrapper::InCallbackStack<
         		 dynstack::storage::LIFO_Stack<DeductedParticleType>,
 			 callback_in>,
 	       callback_out> stacktype;
@@ -69,7 +69,7 @@ auto dynstack_setup(std::vector<long> sizes, std::vector< std::list<std::string>
 		exit(-1);
 	}
 	const int size = sizes[0];
-		
+
 	if(arguments.size() != 1)
 	{
 		std::cerr << "You need to define the base name of the output file with DYNSTACK_P in the input card" << std::endl;
@@ -90,7 +90,7 @@ auto dynstack_setup(std::vector<long> sizes, std::vector< std::list<std::string>
 	}
 
 	std::cout << "(Dyn) Showerview file ready!" << std::endl;
-	
+
 	auto stack = std::unique_ptr< stacktype >(new stacktype(size));
 
 	/*

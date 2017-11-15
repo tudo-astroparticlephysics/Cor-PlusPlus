@@ -23,7 +23,7 @@ namespace dynstack
 		/**
 		*	Implements a basic last in first out storage similar in functionality to the default corsika implementation.
 		*	This class alone can not handle overflows for to many elements to store, it will simply remove them and returns -1 for the push_back routine.
-		*	In most cases (x64) you can simply expand your stack to several gigabyte of memory and should never run out of memory, for all other cases 
+		*	In most cases (x64) you can simply expand your stack to several gigabyte of memory and should never run out of memory, for all other cases
 		*	the overflow_to_disk_stack decorated should be the appropriated solution.
 		*
 		*	\tparam TType Type of the elements that should be stored into the memory. The data is stored directly as object and does not get casted.
@@ -36,7 +36,7 @@ namespace dynstack
 		private:
 
 			std::unique_ptr<TType[]> m_tBuffer;
-			
+
 			TType* m_tNextFree;				// Pointer to next Empty position
 
 			const unsigned int m_uiSize;
@@ -55,12 +55,18 @@ namespace dynstack
 					: Stack<TType>(), m_tBuffer(new TType[size]), m_uiSize(size)
 			{
 				m_tNextFree = m_tBuffer.get();
+			}
 
+            LIFO_Stack(const LIFO_Stack<TType>& rhs)
+					: Stack<TType>(), m_tBuffer( new TType[rhs.m_uiSize] ), m_uiSize(rhs.m_uiSize)
+			{
+                std::copy( rhs.m_tBuffer.get(), rhs.m_tBuffer.get() + m_uiSize, this->m_tBuffer.get() );
+                m_tNextFree = this->m_tBuffer.get() + rhs.getCurrentOffset();
 			}
 
 			LIFO_Stack(LIFO_Stack<TType> && rhs)
 					: Stack<TType>(), m_tBuffer( std::move(rhs.m_tBuffer) ), m_uiSize(rhs.m_uiSize)
-			{								
+			{
 				this->m_tNextFree = rhs.m_tNextFree;
 				rhs.m_tNextFree = nullptr;
 
@@ -165,7 +171,7 @@ namespace dynstack
 
 
 
-					
+
 
 			inline unsigned long size() const
 			{
@@ -181,6 +187,3 @@ namespace dynstack
 	}
 
 }
-
-
-

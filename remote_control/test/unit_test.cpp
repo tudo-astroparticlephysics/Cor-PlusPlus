@@ -1,4 +1,4 @@
-/* protocol_test.h
+/* unit_test.cpp
 * this file is part of Dynstack/RemoteControl for CORSIKA
 *
 * Copyright (C) <2016> <Dominik Baack>
@@ -7,23 +7,21 @@
 * 	This software may be modified and distributed under the terms
 * 	of the LGPL license. See the LICENSE file for details.
 */
+#include "gtest/gtest.h"
 
-#pragma once
+#include "message_queue_test.h"
+#include "periodic_task_test.h"
+#include "packet_test.h"
 
-#include <iostream>
-#include <memory>
-#include <sstream>
-#include <algorithm>
-#include <functional>
 
 namespace test
 {
-
 	namespace remote_control
 	{
-		
-
-		bool test_protocol_construction();
-		
-	}
+        int main(int argc, char **argv)
+        {
+            ::testing::InitGoogleTest(&argc, argv);
+            return RUN_ALL_TESTS();
+        }
+    }
 }

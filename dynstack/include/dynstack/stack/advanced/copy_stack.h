@@ -57,9 +57,20 @@ namespace dynstack
 
 		public:
 
-			template<typename ... TArgs1, typename ... TArgs2>
-			CopyStack(std::tuple<TArgs1...> arg1, std::tuple<TArgs2...> arg2)
-					: meta::tuple::tupleUnpack< TStackOrig >( std::forward<std::tuple<TArgs1...> >(arg1) ), m_oCopy(arg2)
+
+            CopyStack()
+            {
+            }
+
+            template<typename TArgs1>
+            CopyStack(TArgs1 arg1)
+                    : meta::tuple::tupleUnpack< TStackOrig >( std::forward<TArgs1>(arg1) )
+            {
+            }
+
+			template<typename TArgs1, typename TArgs2>
+			CopyStack(TArgs1 arg1, TArgs2 arg2)
+					: meta::tuple::tupleUnpack< TStackOrig >( std::forward<TArgs1>(arg1) ), m_oCopy( std::forward<TArgs2>(arg2) )
 			{
 			}
 

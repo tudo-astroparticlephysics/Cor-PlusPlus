@@ -22,34 +22,34 @@ namespace dynstack
 {
 	namespace wrapper
 	{
-		
+
 		template<class TStack, void (*TFunc)(const typename TStack::m_ReturnType* const)>
-		class OutputCallbackStack: public TStack
+		class OutCallbackStack: public TStack
 		{
 
 			static_assert(std::is_base_of<_Stack, TStack>::value, "TStack must be a Stack!");
 
 		private:
-			
+
 			typedef typename TStack::m_ReturnType TType;
 			typedef typename TStack::m_StackType TTypeStack;
 
 		protected:
-			
+
 		public:
 
 			template<typename ... Args>
-			OutputCallbackStack(Args&&... args)
+			OutCallbackStack(Args&&... args)
 					: TStack( std::forward<Args>(args)... )
 			{
 			}
 
-			OutputCallbackStack(OutputCallbackStack<TStack, TFunc> && rhs)
+			OutCallbackStack(OutCallbackStack<TStack, TFunc> && rhs)
 					: TStack((TStack&&) rhs)
 			{
 			}
 
-			~OutputCallbackStack()
+			~OutCallbackStack()
 			{
 
 			}
@@ -59,7 +59,7 @@ namespace dynstack
 			TType back()
 			{
 				auto tmp = TStack::back();
-				
+
 				TFunc(&tmp);
 
 				return tmp;
@@ -79,6 +79,3 @@ namespace dynstack
 
 	}
 }
-
-
-

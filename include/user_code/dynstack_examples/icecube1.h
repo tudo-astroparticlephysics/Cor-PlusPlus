@@ -32,7 +32,7 @@
 double energy_interesting; 	// ENERGY ABOVE WHICH PARTICLES ARE INTERESTING
 int n_interesting;      	// NUMBER OF INTERESTING PARTICLES
 int n_interesting_nu;   	// NUMBER OF INTERESTING NEUTRINOS
-bool still_interesting; 	// FLAG INDICATING IF AN EVENT IS STILL INTERESTING    
+bool still_interesting; 	// FLAG INDICATING IF AN EVENT IS STILL INTERESTING
 
 
 int first = 0;
@@ -48,9 +48,9 @@ void callback_out(const DeductedParticleType* const p)
 		p->data()[0] == 6   ||  p->data()[0] == 7   ||
 		p->data()[0] == 16  ||  p->data()[0] == 17  ||
 		p->data()[0] == 18 )  &&
-		p->data()[1]*SBasic().particleRestMass(p->data()[0]) >= energy_interesting ) 
-		
-	{	
+		p->data()[1]*SBasic().particleRestMass(p->data()[0]) >= energy_interesting )
+
+	{
 		n_interesting = n_interesting - 1;
 	}
 
@@ -82,18 +82,18 @@ void callback_in(const DeductedParticleType* const p)
 		 particle_type ==  6  ||  particle_type ==  7  ||
 		 particle_type == 16  ||  particle_type == 17  ||
 		 particle_type == 18 )  &&
-		 p->data()[1]*SBasic().particleRestMass(particle_type) >= energy_interesting ) 
+		 p->data()[1]*SBasic().particleRestMass(particle_type) >= energy_interesting )
 	{
 		//  NEUTRINO PROGENITOR
 		n_interesting = n_interesting + 1;
 	}
-	else if( particle_type >= 66  && particle_type <= 69 &&  p->data()[1] >= energy_interesting ) 
+	else if( particle_type >= 66  && particle_type <= 69 &&  p->data()[1] >= energy_interesting )
 	{	//  NEUTRINO
 		n_interesting    = n_interesting + 1;
 		n_interesting_nu = n_interesting_nu + 1;
 	}
 
-	
+
 }
 
 
@@ -102,7 +102,7 @@ bool sort_function(const DeductedParticleType* const p)
 {	// TSTOUT Part
 
 	if( n_interesting_nu > 0)
-	{	
+	{
 		return true;
 	}
 	switch((int)p->data()[0])
@@ -121,7 +121,7 @@ bool sort_function(const DeductedParticleType* const p)
 			if( p->data()[1]*pama >= energy_interesting)
 			{
 				return true;
-			}	
+			}
 			break;
 		}
 	}
@@ -130,9 +130,9 @@ bool sort_function(const DeductedParticleType* const p)
 
 
 typedef dynstack::wrapper::FilterStack<
-		dynstack::wrapper::InputCallbackStack<
-			dynstack::wrapper::OutputCallbackStack<
-				dynstack::advanced::IfStack< 
+		dynstack::wrapper::InCallbackStack<
+			dynstack::wrapper::OutCallbackStack<
+				dynstack::advanced::IfStack<
 					dynstack::storage::FIFO_Stack<DeductedParticleType>,
 					dynstack::storage::LIFO_Stack<DeductedParticleType>,
 				        sort_function>,
@@ -148,7 +148,7 @@ auto dynstack_setup(std::vector<long> sizes, std::vector< std::list<std::string>
         {
                 std::cerr << "You need to define the size of a single stack with DYNSTACK N in the input card" << std::endl;
 		std::cerr << "You provided " << sizes.size() << " Arguments" << std::endl;
-		
+
                 exit(-1);
         }
 	const int stackSize = sizes[0];
@@ -181,13 +181,9 @@ inline void reset()
 	still_interesting = true;
 	n_interesting      = 0;
 	n_interesting_nu   = 0;
-	
+
 	first = 0;
 }
 
 
 inline void close() {}
-
-
-
-

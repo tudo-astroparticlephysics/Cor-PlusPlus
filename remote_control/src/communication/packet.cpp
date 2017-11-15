@@ -42,7 +42,7 @@ namespace remote_control
 
 
 
-			m_data.reserve(p_size);
+			m_data.reserve(p_size + 8);
 		}
 
 		Packet::Packet(const Packet& p_rhs)
