@@ -97,7 +97,7 @@ namespace test
 				if (i != 5)
 				{
                     ASSERT_GT(diff.count(), 0.005);
-                    ASSERT_LT(diff.count(), 0.015);
+                    ASSERT_LT(diff.count(), 0.020);
 				}
 				else
 				{
