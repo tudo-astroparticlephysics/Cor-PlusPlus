@@ -89,8 +89,6 @@ namespace remote_control
 		template<class T>
 		void Packet::append(const T p_data)
 		{
-			m_data.reserve(m_data.size() + sizeof(T));
-
 			for (unsigned int i = 0; i < sizeof(T); i++)
 				m_data.push_back(reinterpret_cast<const uint8_t* const>(&p_data)[i]);
 		}		
@@ -98,8 +96,6 @@ namespace remote_control
 		template<class T>
 		void Packet::append(std::unique_ptr<T> p_data)
 		{
-			m_data.reserve(m_data.size() + sizeof(T));
-
 			for (int i = 0; i < sizeof(T); i++)
 				m_data.push_back(reinterpret_cast<uint8_t*>(p_data.get())[i]);
 

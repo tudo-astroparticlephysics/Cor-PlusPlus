@@ -10,7 +10,9 @@
 #include "gtest/gtest.h"
 
 #include "message_queue_test.h"
+#include "periodic_task_test.h"
 #include "packet_test.h"
+
 
 namespace test
 {
