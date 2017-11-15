@@ -131,10 +131,10 @@ script:
   - ./dtl_test
   - ./dynstack_test
   - ./rc_test
-# CPPCHECK
-  - cppcheck ../dynstack/ -I./../dynstack/include -I./../lib/DTL/include --enable=all --suppress=missingIncludeSystem --check-config --inconclusive --force --project=./compile_commands.json
-  - cppcheck ../remote_control/ -I./../remote_control/include -I./../lib/DTL/include --enable=all --suppress=missingIncludeSystem --check-config --inconclusive --force --project=./compile_commands.json
-  - cppcheck ../basic/ -I./../basic/include -I./../lib/DTL/include --enable=all --suppress=missingIncludeSystem --check-config --inconclusive --force --project=./compile_commands.json
+# CPPCHECK --error-exitcode=1
+  - cppcheck ../dynstack/ -I./../dynstack/include -I./../lib/DTL/include --enable=all --suppress=missingIncludeSystem --check-config --inconclusive --force #--project=./compile_commands.json
+  - cppcheck ../remote_control/ -I./../remote_control/include -I./../lib/DTL/include --enable=all --suppress=missingIncludeSystem --check-config --inconclusive --force #--project=./compile_commands.json
+  - cppcheck ../basic/ -I./../basic/include -I./../lib/DTL/include --enable=all --suppress=missingIncludeSystem --check-config --inconclusive --force #--project=./compile_commands.json
 
 
 notifications:
