@@ -1,0 +1,24 @@
+#pragma once
+// This options get automatically filled from the CMake Script with current values
+
+#cmakedefine RC_VERSION_MAJOR @RC_VERSION_MAJOR@
+#cmakedefine RC_VERSION_MINOR @RC_VERSION_MINOR@
+#cmakedefine RC_VERSION_PATCH @RC_VERSION_PATCH@
+
+
+#cmakedefine BUILD_TESTS
+
+#cmakedefine BUILD_REMOTECONTROL
+
+
+#cmakedefine _NOCOCO_
+#cmakedefine NOCOCO
+
+
+#ifdef BUILD_TESTS
+    #define _NOCOCO_
+#endif
+
+#ifdef NOCOCO
+    #define _NOCOCO_
+#endif
