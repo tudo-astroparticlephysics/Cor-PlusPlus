@@ -4,11 +4,8 @@ dist: trusty
 
 language: cpp
 
-addons: 
-  apt: 
-    packages:
-      - cmake
-      - automake
+
+addons: {apt: {packages: &default_packages [cmake, automake, valgrind, doxygen]}}
 
 matrix:
   include:
@@ -17,9 +14,7 @@ matrix:
         apt:
           sources:
             - ubuntu-toolchain-r-test
-          packages:
-            - g++-4.6
-            - gfortran-4.6           
+          packages: [*default_packages, g++-4.6, gfortran-4.6]                       
       env:
           - MATRIX_EVAL="CXX=g++-4.6 CC=gcc-4.6 FC=gfortran-4.6"
     - compiler: gcc-4.9
@@ -27,9 +22,7 @@ matrix:
         apt:
           sources:
             - ubuntu-toolchain-r-test
-          packages:
-            - g++-4.9
-            - gfortran-4.9            
+          packages: [*default_packages, g++-4.9, gfortran-4.9]                      
       env:
           - MATRIX_EVAL="CXX=g++-4.9 CC=gcc-4.9 FC=gfortran-4.9"
     - compiler: gcc-5
@@ -37,9 +30,7 @@ matrix:
         apt:
           sources:
             - ubuntu-toolchain-r-test
-          packages:
-            - g++-5
-            - gfortran-5            
+          packages: [*default_packages, g++-5, gfortran-5]
       env:
           - MATRIX_EVAL="CXX=g++-5 CC=gcc-5 FC=gfortran-5"
     - compiler: gcc-6
@@ -47,9 +38,7 @@ matrix:
         apt:
           sources:
             - ubuntu-toolchain-r-test
-          packages:
-            - g++-6
-            - gfortran-6            
+          packages: [*default_packages, g++-6, gfortran-6]                    
       env:
           - MATRIX_EVAL="CXX=g++-6 CC=gcc-6 FC=gfortran-6"
     - compiler: clang-3.6
@@ -58,10 +47,7 @@ matrix:
           sources:
             - ubuntu-toolchain-r-test
             - llvm-toolchain-precise-3.6
-          packages:
-            - clang-3.6
-            - g++-4.9
-              #- gfortran-4.9           
+          packages: [*default_packages, clang-3.6, g++-4.9] # gfortran-4.9    
       env:
           - MATRIX_EVAL="CXX=clang++-3.6 CC=clang-3.6 FC=gfortran-4.9" 
     - compiler: clang-3.7
@@ -70,10 +56,7 @@ matrix:
           sources:
             - ubuntu-toolchain-r-test
             - llvm-toolchain-precise-3.7
-          packages:
-            - clang-3.7
-            - g++-4.9
-              #- gfortran-4.9            
+          packages: [*default_packages, clang-3.7, g++-4.9]                     
       env:
            - MATRIX_EVAL="CXX=clang++-3.7 CC=clang-3.7 FC=gfortran-4.9"
     - compiler: clang-3.8
@@ -82,9 +65,7 @@ matrix:
           sources:
             - ubuntu-toolchain-r-test
             - llvm-toolchain-precise-3.8
-          packages:
-            - clang-3.8
-            - g++-6            
+          packages: [*default_packages, clang-3.8, g++-6]     
       env:
           - MATRIX_EVAL="CXX=clang++-3.8 CC=clang-3.8 FC=gfortran-4.8"
   allow_failures:
