@@ -1,4 +1,4 @@
-/* unit_test.cpp
+/* seed.h
 * this file is part of Cor-PlusPlus for CORSIKA
 *
 * Copyright (C) <2017> <Dominik Baack>
@@ -8,19 +8,18 @@
 * 	of the LGPL license. See the LICENSE file for details.
 */
 
-#include "gtest/gtest.h"
 
-#include "mersenne/seed.h"
 
 namespace test
 {
     namespace dynrng
     {
-        int main(int argc, char **argv)
-        {
-            ::testing::InitGoogleTest(&argc, argv);
-            return RUN_ALL_TESTS();
-        }
 
+        TEST(MERSENNE, Seed)
+        {
+
+        	// put seed in and test first N values
+            //ASSERT_EQ(, 1.0f);
+        }
     }
 }
