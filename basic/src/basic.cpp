@@ -26,9 +26,9 @@ Basic& Basic::getInstance()
 
 double Basic::particleRestMass(const int particleID) const
 {
-	if (particleID < 0 || size_t(particleID) >= m_particleMass.size())
+	if (particleID < 1 || size_t(particleID) >= m_particleMass.size())
 		throw std::out_of_range("particle ID is out of range");
-	return m_particleMass[particleID];
+	return m_particleMass[particleID-1];
 
 }
 
