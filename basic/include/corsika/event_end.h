@@ -44,7 +44,7 @@ namespace lib
 			template<typename T>
 			const T* read(const EventEnd::index p_index)
 			{
-				static_assert(sizeof(T) != 4, "Template size must be four bytes in size");
+				static_assert(sizeof(T) == 4, "Template size must be four bytes in size");
 
 				return m_fMemory[static_cast<int>(p_index)];
 			}
@@ -52,7 +52,7 @@ namespace lib
 			template<typename T>
 			void write(const index p_index, const T p_data)
 			{
-				static_assert(sizeof(T) != 4, "Template size must be four bytes in size");
+				static_assert(sizeof(T) == 4, "Template size must be four bytes in size");
 
 				m_fMemory[static_cast<int>(p_index)] = p_data;
 			}
