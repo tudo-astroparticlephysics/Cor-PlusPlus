@@ -80,6 +80,11 @@ if(BUILD_DYNSTACK OR BUILD_REMOTECONTROL OR BUILD_BASIC)
 endif(BUILD_DYNSTACK OR BUILD_REMOTECONTROL OR BUILD_BASIC)
 
 # Add each corsika module developed from this author
+if(BUILD_BASIC)
+    include_directories("${PROJECT_DIR}/basic/include")
+    add_subdirectory(basic)
+endif(BUILD_BASIC)
+
 if(BUILD_DYNSTACK)
     include_directories("${PROJECT_DIR}/dynstack/include")
     add_subdirectory(dynstack)
@@ -89,12 +94,6 @@ if(BUILD_REMOTECONTROL)
     include_directories("${PROJECT_DIR}/remote_control/include")
     add_subdirectory(remote_control)
 endif(BUILD_REMOTECONTROL)
-
-if(BUILD_BASIC)
-    include_directories("${PROJECT_DIR}/basic/include")
-    add_subdirectory(basic)
-endif(BUILD_BASIC)
-
 
 # configure a header file to pass CMake settings and checks
 # to the source code
