@@ -1,0 +1,23 @@
+#pragma once
+// This options get automatically filled from the CMake Script with current values
+
+
+#cmakedefine CHERENKOV_VERSION_MAJOR @CHERENKOV_VERSION_MAJOR@
+#cmakedefine CHERENKOV_VERSION_MINOR @CHERENKOV_VERSION_MINOR@
+#cmakedefine CHERENKOV_VERSION_PATCH @CHERENKOV_VERSION_PATCH@
+
+
+// Build Options
+#cmakedefine BUILD_CHERENKOV
+#cmakedefine BUILD_TESTS
+
+#cmakedefine _NOCOCO_
+#cmakedefine NOCOCO
+
+#ifdef BUILD_TESTS
+    #define _NOCOCO_
+#endif
+
+#ifdef NOCOCO
+    #define _NOCOCO_
+#endif
