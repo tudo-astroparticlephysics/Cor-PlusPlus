@@ -1,0 +1,98 @@
+
+
+Checks: readability-identifier-naming.'-*, readability-identifier-naming'
+CheckOptions:
+  - { key: readability-identifier-naming.Namespace, value: CamelCase                                        }
+
+  - { key: readability-identifier-naming.InlineNamespace, value: CamelCase                                  }
+
+  - { key: readability-identifier-naming.EnumConstant, value: lower_case                                    }
+
+  - { key: readability-identifier-naming.ConstexprVariable, value: camelCase                                }
+  - { key: readability-identifier-naming.ConstexprVariablePrefix, value: cexpr_                             }
+
+  - { key: readability-identifier-naming.ConstantMember, value: camelCase                                   }
+  - { key: readability-identifier-naming.ConstantMemberPrefix, value: m_                                    }
+
+  - { key: readability-identifier-naming.PrivateMember, value: camelCase                                    }
+  - { key: readability-identifier-naming.PrivateMemberPrefix, value: m_                                     }
+
+  - { key: readability-identifier-naming.ProtectedMember, value: camelCase                                  }
+
+  - { key: readability-identifier-naming.PublicMember, value: camelCase                                     }
+  - { key: readability-identifier-naming.PublicMemberPrefix, value: m_                                      }
+
+  - { key: readability-identifier-naming.Member, value: camelCase                    .                      }
+
+  - { key: readability-identifier-naming.ClassConstant, value: camelCase                                    }
+
+  - { key: readability-identifier-naming.ClassMember, value: camelCase                                      }
+  - { key: readability-identifier-naming.ClassMemberPrefix, value: m_                                       }
+
+  - { key: readability-identifier-naming.GlobalConstant, value: UPPER_CASE                                  }
+  
+  - { key: readability-identifier-naming.GlobalVariable, value: UPPER_CASE                                  }
+
+  - { key: readability-identifier-naming.LocalConstant, value: camelCase                                    }
+
+  - { key: readability-identifier-naming.LocalVariable, value: camelCase                                    }
+
+  - { key: readability-identifier-naming.StaticConstant, value: camelCase                                   }
+
+  - { key: readability-identifier-naming.StaticVariable, value: camelCase                                   }
+
+  - { key: readability-identifier-naming.Constant, value: camelCase                                         }
+
+  - { key: readability-identifier-naming.Variable, value: camelCase                                         }
+
+  - { key: readability-identifier-naming.ConstantParameter, value: camelBack                                }
+  - { key: readability-identifier-naming.ConstantParameterPrefix, value: p_                                 }
+
+  - { key: readability-identifier-naming.ParameterPack, value: camelCase                                    }
+
+  - { key: readability-identifier-naming.Parameter, value: camelBack                                        }
+  - { key: readability-identifier-naming.ParameterPrefix, value: p_                                         }
+
+  - { key: readability-identifier-naming.AbstractClass, value: camelCase                                    }
+
+  - { key: readability-identifier-naming.Struct, value: camelCase                                           }
+
+  - { key: readability-identifier-naming.Class, value: camelCase                                            }
+
+  - { key: readability-identifier-naming.Union, value: camelCase                                            }
+
+  - { key: readability-identifier-naming.Enum, value: camelCase                                             }
+
+  - { key: readability-identifier-naming.GlobalFunction, value: camelCase                                   }
+
+  - { key: readability-identifier-naming.ConstexprFunction, value: camelCase                                }
+
+  - { key: readability-identifier-naming.Function, value: camelCase                                         }
+
+  - { key: readability-identifier-naming.ConstexprMethod, value: camelCase                                  }
+
+  - { key: readability-identifier-naming.VirtualMethod, value: camelCase                                    }
+
+  - { key: readability-identifier-naming.ClassMethod, value: camelCase                                      }
+
+  - { key: readability-identifier-naming.PrivateMethod, value: camelCase                                    }
+
+  - { key: readability-identifier-naming.ProtectedMethod, value: camelCase                                  }
+
+  - { key: readability-identifier-naming.PublicMethod, value: camelCase                                     }
+
+  - { key: readability-identifier-naming.Method, value: camelCase                                           }
+
+  - { key: readability-identifier-naming.Typedef, value: camelCase                                          }
+
+  - { key: readability-identifier-naming.TypeTemplateParameter, value: camelCase                            }
+
+  - { key: readability-identifier-naming.ValueTemplateParameter, value: camelCase                           }
+
+  - { key: readability-identifier-naming.TemplateTemplateParameter, value: camelCase                        }
+
+  - { key: readability-identifier-naming.TemplateParameter, value: camelCase                                }
+
+  - { key: readability-identifier-naming.TypeAlias, value: camelCase                                        }
+
+  - { key: readability-identifier-naming.MacroDefinition, value: camelCase                                  }
