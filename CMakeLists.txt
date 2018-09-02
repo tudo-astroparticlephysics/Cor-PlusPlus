@@ -14,14 +14,19 @@ set (CORPP_VERSION_PATCH 0)
 option(BUILD_DYNSTACK "Build the DynStack module" ON)
 option(BUILD_REMOTECONTROL "Build the Remote-Control module" ON)
 option(BUILD_BASIC "Build the Basic module" ON)
+option(BUILD_CHERENKOV "Build the Cherenkov module" ON)
 option(BUILD_TESTS "Build test programs" OFF)
 
 option(NOCOCO "Deactivate CORSIKA dependents" OFF)
 
 
-# set(CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/build)
+set(CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/build)
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR})
+
+SET(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 set(PROJECT_DIR ${PROJECT_SOURCE_DIR})
 set(PROJECT_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include)
@@ -34,10 +39,13 @@ set(USER_CODE_INCLUDE_DIR "${PROJECT_INCLUDE_DIR}")
 
 # make sure that the default is a RELEASE
 if (NOT CMAKE_BUILD_TYPE)
-  set (CMAKE_BUILD_TYPE RELEASE CACHE STRING
+    set (CMAKE_BUILD_TYPE RELEASE CACHE STRING
       "Choose the type of build, options are: None Debug Release."
       FORCE)
+ELSE (NOT CMAKE_BUILD_TYPE)
+    set(BUILD_TESTS True)
 endif (NOT CMAKE_BUILD_TYPE)
+
 
 # Compiler-specific C++XY activation.
 if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
@@ -72,7 +80,6 @@ include_directories("${PROJECT_INCLUDE_DIR}")
 message("Code to modify baack plugins is located in: ${PROJECT_INCLUDE_DIR}")
 message("")
 
-
 # Add generic library
 if(BUILD_DYNSTACK OR BUILD_REMOTECONTROL OR BUILD_BASIC)
     include_directories("${PROJECT_DIR}/lib/DTL/include") ## target_include_directories is better, this one is global!
@@ -94,6 +101,11 @@ if(BUILD_REMOTECONTROL)
     include_directories("${PROJECT_DIR}/remote_control/include")
     add_subdirectory(remote_control)
 endif(BUILD_REMOTECONTROL)
+
+if(BUILD_CHERENKOV)
+    include_directories("${PROJECT_DIR}/cherenkov/include")
+    add_subdirectory(cherenkov)
+endif(BUILD_CHERENKOV)
 
 # configure a header file to pass CMake settings and checks
 # to the source code
