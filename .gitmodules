@@ -1,3 +1,6 @@
 [submodule "lib/DTL"]
 	path = lib/DTL
 	url = https://github.com/matyro/DTL.git
+[submodule "lib/cppzmq"]
+	path = lib/cppzmq
+	url = https://github.com/zeromq/cppzmq
