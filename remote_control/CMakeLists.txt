@@ -18,13 +18,8 @@ set (PROJECT_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 set(REMOTECONTROL_SRCS
 ${PROJECT_SOURCE_DIR}/export.cpp
-${PROJECT_SOURCE_DIR}/communication/message_queue.cpp
-${PROJECT_SOURCE_DIR}/communication/packet.cpp
 ${PROJECT_SOURCE_DIR}/control/main_control.cpp
-${PROJECT_SOURCE_DIR}/control/periodic_task.cpp
-${PROJECT_SOURCE_DIR}/control/recv_cache.cpp
 )
-
 
 
 # include config.h
@@ -51,14 +46,17 @@ if(BUILD_TESTS)
     )
     add_executable(rc_test ${REMOTECONTROL_TEST_SRCS})
 
-    target_link_libraries(rc_test network_lib)
-
     target_link_libraries(rc_test REMOTE_CONTROL)
 
     target_link_libraries(rc_test ${GTEST_BOTH_LIBRARIES})
 
     find_package (Threads)
     target_link_libraries(rc_test ${CMAKE_THREAD_LIBS_INIT})
+
+    list(APPEND CMAKE_MODULE_PATH "${PROJECT_DIR}/CMake")
+    find_package(ZeroMQ)
+    include_directories(${ZeroMQ_INCLUDE_DIR})
+    target_link_libraries(rc_test ${ZeroMQ_LIBRARY} )
 
 
 

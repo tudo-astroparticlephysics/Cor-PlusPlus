@@ -1,7 +1,7 @@
 /* main_control.cpp
  * this file is part of Dynstack/RemoteControl for CORSIKA
  *
- * Copyright (C) <2016> <Dominik Baack>
+ * Copyright (C) <2018> <Dominik Baack>
  *		All rights reserved.
  *
  * 	This software may be modified and distributed under the terms
@@ -10,121 +10,123 @@
 
 #include "remote_control/control/main_control.h"
 
-#include "io/network/dns_lookup.h"
+#include "zmq.hpp"
+
+#include <iostream>
+#include <string>
+#include <chrono>
 
 namespace remote_control
 {
 
+	
+
 	void MainControl::loop()
 	{
-		std::cout << "(RC) Start main loop..." << std::endl;
-		//auto start_time = std::chrono::high_resolution_clock::now();
+		zmq::context_t ctx(zmq::context_t(1));
 
-		try
+		zmq::socket_t client(ctx, ZMQ_REQ);
+
+		client.setsockopt(ZMQ_IDENTITY, 1234);		
+		client.connect(m_address); // example: "tcp://localhost:5570")
+
+		client.send("startup", 8);
+		
+		zmq::message_t message(20);
+		client.recv(&message, 20);
+				
+		while(m_running)
 		{
-			while (m_tsRunning == true)
+			if( m_msgBuffer.empty() )
 			{
-				const auto msg_recv = m_client.recv(std::chrono::milliseconds(5));
-
-				if (!msg_recv.empty())
-				{
-					//evaluate message
-					remote_control::communication::Packet recv_packet(msg_recv);
-
-					// Check for packet consistency, returns 0 if everything is fine else an error code
-					// C++17 allows if with initializer
-					int check = recv_packet.check();
-					if( check )
-					{
-						std::cerr << "Received a compromised package!" << std::endl;
-					}
-					else
-					{
-						// Send to callback functions
-						auto callback = m_callback.find( recv_packet.header() );
-						if(callback != m_callback.end())
-						{
-							callback->second( recv_packet.data() );
-						}
-					}
-
-				}
-
-				if (!m_tsQueue.empty())
-				{
-					auto msg_send = m_tsQueue.pop_front_blocking();
-
-					if (!m_client.send(msg_send.toByte(), static_cast<const unsigned int>(msg_send.size()) ))
-					{
-						std::cerr << __FILE__ << " Message could not be send" << std::endl;
-					}
-				}
-
-				/// Call periodic functions
-				auto current_time = std::chrono::high_resolution_clock::now();
-
-				for(auto itr : m_periodic)
-				{
-					itr.call( current_time );
-				}
-
+				std::this_thread::sleep_for( std::chrono::microseconds(1) );
 			}
-		} catch (std::exception e)
-		{
-			std::cerr << __FILE__ << " Exception in main loop: " << e.what() << std::endl;
+			else
+			{				
+				client.send( m_msgBuffer.front());
+				m_msgBuffer.pop_front();
+
+				
+				zmq::message_t data(64);
+				client.recv(&data);  
+
+				m_recvBuffer.push_back( std::move(data) );              
+			}
 		}
 
-		/// Terminate all connections
-		std::cout << "(RC) Close main loop ..." << std::endl;
-		m_client.close();
-
-		std::cout << "(RC) Main loop closed" << std::endl;
+		client.close();
+		ctx.close();
 	}
 
 	MainControl::MainControl()
-			: m_periodic(register_periodic_callback()), m_callback(register_server_callback())
+		: m_running(false)			
 	{
-		m_tsRunning = false;
+		// 	context_t( Number of threads )       
+
+        
 	}
 
 	MainControl::~MainControl()
 	{
+		
 
 	}
 
-	bool MainControl::start(const std::string dns, const unsigned short port)
-	{
-		if (m_tsRunning == true)
-		{
-			return false;
-		}
+	bool MainControl::start(const std::string address)
+	{		
+		m_address = address;
 
-		const std::string ip = io::network::hostname_to_ip(dns);
-		if (!m_client.init(ip, port))
-		{
-			std::cerr << "Could not connect to " << dns << ":" << port << "(" << ip << ")" << std::endl;
-			return false;
-		}
+		m_running = true;
 
-		m_tsRunning = true;
-		m_thread = std::thread(&MainControl::loop, this);
+		m_loop = std::thread(&MainControl::loop, this);		
 
 		return true;
 
 	}
 
-	void MainControl::stopp()
-	{
-		if (m_tsRunning == true && m_thread.joinable())
-		{
-			m_tsRunning = false;
-			m_thread.join();
-		}
+	void MainControl::stop()
+	{		
+		m_running = false;
+		m_loop.join();				
+
+		m_msgBuffer.clear();
+		m_recvBuffer.clear();
 	}
 
-	void MainControl::send(remote_control::communication::Packet p)
+	int MainControl::send(const void* p, unsigned int len)
 	{
-		this->m_tsQueue.push_back(p);
+
+		m_msgBuffer.emplace_back(p, len);
+
+		return m_msgBuffer.size();
+	}
+
+	int MainControl::send(std::vector<char> p)
+	{		
+		m_msgBuffer.emplace_back(p.data(), p.size());
+
+		return m_msgBuffer.size();
+	}
+
+	std::vector<char> MainControl::recv()
+	{
+		std::cout << "Length: " << m_recvBuffer.size();
+		if( m_recvBuffer.empty() )
+		{
+			return std::vector<char>();
+		}
+		else
+		{
+			char* data = reinterpret_cast<char*>( m_recvBuffer.front().data() );
+
+			std::vector<char> buf(data, data + m_recvBuffer.front().size() );
+
+			m_recvBuffer.pop_front();
+
+			std::cout << "Length: " << m_recvBuffer.size();
+
+			return std::move(buf);
+		}
 	}
 
 } /* namespace RemoteControl */

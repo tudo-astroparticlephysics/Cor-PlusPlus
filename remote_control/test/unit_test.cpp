@@ -9,10 +9,9 @@
 */
 #include "gtest/gtest.h"
 
-#include "message_queue_test.h"
-#include "periodic_task_test.h"
-#include "packet_test.h"
-
+#include "zmq_cpp_test.h"
+#include "maincontrol_test.h"
+#include "export_test.h"
 
 namespace test
 {

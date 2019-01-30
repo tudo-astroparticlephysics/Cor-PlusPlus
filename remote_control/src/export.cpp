@@ -10,18 +10,19 @@
 
 #include "remote_control/export.h"
 
-#include <memory>
-#include <array>
-#include <iostream>
-
-#include <sstream>
-#include <string>
-#include <algorithm>
+#include "remote_control/communication/packet.h"
+#include "remote_control/control/main_control.h"
 
 #include "user_code/remotecontrol_setup.h"
 
-#include "remote_control/communication/packet.h"
-#include "remote_control/control/main_control.h"
+
+#include <sstream>
+#include <string>
+#include <map>
+#include <vector>
+#include <utility>
+#include <list>
+
 
 static std::map<std::string, std::list<std::string> > remotecontrol_steering_card;
 
@@ -34,7 +35,6 @@ void remotecontrol_init_(const char* line, const int* size)
 
 	std::list<std::string> list;
 	std::string item;
-	
 	while (std::getline(sstr, item, ' '))
 	{
 		if(item == " " || item == "")
@@ -47,11 +47,10 @@ void remotecontrol_init_(const char* line, const int* size)
 		}
 	}
 
-	
 	item = list.front();
 	list.pop_front();
-
-	remotecontrol_steering_card[item] = list;
+	
+	std::cout << item << " with " << list.size() << std::endl;
 	
 }
 
@@ -60,52 +59,21 @@ void remotecontrol_init_(const char* line, const int* size)
  */
 void remotecontrol_start_()
 {
-	remotecontrol_setup();
-
-
-	std::string ip;
-	short port = 0;
-
-	for (auto itr : remotecontrol_steering_card)
+	if( remotecontrol_steering_card.size() == 0)
 	{
-		std::cout << "(RC) Setting: " << itr.first << " with ";
-		for (auto tmp : itr.second)
-		{
-			std::cout << tmp << '\t';
-		}
-		std::cout << std::endl;
-
-		if (itr.first == "REMOTECONTROL_IP")
-		{
-			if (itr.second.size() != 2)
-			{
-				std::cerr << "(RC) Invalid number of parameter for REMOTECONTROL_IP (dns) (port)" << std::endl;
-				throw(std::exception());
-			}
-
-			std::stringstream sstr;
-
-			ip = itr.second.front();
-			itr.second.pop_front();
-
-			sstr << itr.second.front();
-			sstr >> port;
-			itr.second.pop_front();
-		}
-		else if (itr.first == "REMOTECONTROL_P")
-		{
-			
-		}
-		else
-		{
-			std::cerr << "(RC) Filter in corsika.f are not correct or unsupported setting" << std::endl;
-			std::cerr << "(RC) " << itr.first << std::endl;
-			
-		}
+		std::cerr << "Error: No stack size set!" << std::endl;
+		std::cerr << "You need to set at least one size with \"DYNSTACK N\" in the steering card" << std::endl;
+		exit(-1337);
 	}
 
-	std::cout << "IP|" << ip << "|" << port << "|" << std::endl;
-	remote_control::SMainControl().start(ip, port);
+	if( remotecontrol_steering_card.find("RC_IP") == remotecontrol_steering_card.end() )
+	{
+		std::cerr << "RemoteIP not found in steering card" << std::endl;
+	}
+
+	remote_control::SMainControl().start( remotecontrol_steering_card["RC_IP"].front() );
+
+
 }
 
 /** \details
@@ -113,7 +81,7 @@ void remotecontrol_start_()
  */
 void remotecontrol_end_()
 {
-	remote_control::SMainControl().stopp();
+	remote_control::SMainControl().stop();
 }
 
 //@{
@@ -125,9 +93,8 @@ void remotecontrol_push_runh_(const float* data)
 {
 #ifdef SEND_RUN_HEADER
 	std::cout << "Send run header" << std::endl;
-	remote_control::communication::Packet p(static_cast<uint32_t>(RUN_HEADER_ID), 273);
-	p.append(data, 273);
-	remote_control::SMainControl().send(p);
+	
+	remote_control::SMainControl().send( remote_control::communication::Packet(123, data, 273).getData() );
 #endif
 	(void) (data);
 }
@@ -136,9 +103,8 @@ void remotecontrol_push_rune_(const float* data)
 {
 #ifdef SEND_RUN_END
 	std::cout << "Send run end" << std::endl;
-	remote_control::communication::Packet p(static_cast<uint32_t>(RUN_END_ID), 273);
-	p.append(data, 273);
-	remote_control::SMainControl().send(p);
+	
+	remote_control::SMainControl().send( remote_control::communication::Packet(124, data, 273).getData() );
 #endif
 	(void) (data);
 }
@@ -147,9 +113,8 @@ void remotecontrol_push_evth_(const float* data)
 {
 #ifdef SEND_EVENT_HEADER
 	std::cout << "Send event header " << EVENT_HEADER_ID << std::endl;
-	remote_control::communication::Packet p(static_cast<uint32_t>(EVENT_HEADER_ID), static_cast<unsigned int>(273) );
-	p.append(data, 273);
-	remote_control::SMainControl().send(p);
+	
+	remote_control::SMainControl().send( remote_control::communication::Packet(125, data, 273).getData() );
 #else
 	(void) (data);
 #endif
@@ -159,9 +124,8 @@ void remotecontrol_push_evte_(const float* data)
 {
 #ifdef SEND_EVENT_END
 	std::cout << "Send event end" << std::endl;
-	remote_control::communication::Packet p(static_cast<uint32_t>(EVENT_END_ID), 273);
-	p.append(data, 273);
-	remote_control::SMainControl().send(p);
+	
+	remote_control::SMainControl().send( remote_control::communication::Packet(126, data, 273).getData() );
 #endif
 	(void) (data);
 }
@@ -193,61 +157,6 @@ void remotecontrol_recv_initalparticle_(const float* data)
 void remotecontrol_send_(const int ID, const void* data, int len)
 {
 	std::cout << "Normal send: " << ID << std::endl;
-	remote_control::communication::Packet p(static_cast<uint32_t>(ID), static_cast<unsigned int>(len));
-
-	p.append(data, len);
-
-	remote_control::SMainControl().send(p);
+	
 
 }
-
-/** \details
- *  Function to receive steering card parameter. It returns the next parameter with every call. If the the line is empty (length = 0)
- *  the end of file is reached.
- */
-void remotecontrol_steering_nextline_(char* line, int* lineLength, int* length)
-{
-	static int lineCounter = 0;
-
-	static std::vector<std::string> input;
-	if(input.size() == 0)
-	{
-		while (!std::cin.fail())
-		{
-			std::string tmp;
-			std::getline(std::cin, tmp);
-			input.push_back( tmp.erase(tmp.find_last_not_of(" \n\r\t")+1) );
-		}
-    		
-	}
-	
-
-	std::fill(line, &line[*lineLength], ' ');
-	if(static_cast<int>( input.size() ) > lineCounter)
-	{
-		std::string lineInput = input[lineCounter];
-		
-
-		*length = static_cast<int>(lineInput.length());
-	
-		std::replace(lineInput.begin(), lineInput.end(), '\t', ' ');
-
-		if (static_cast<int>(lineInput.length()) <= *lineLength)
-		{
-			lineInput.copy(line, lineInput.length(), 0);
-		}
-		else
-		{
-			std::cerr << "Remotecontrol: Steeringcard line length is longer then allowed! (" << *lineLength << " bytes max)" << std::endl;
-		}
-	
-		lineCounter++;
-		return;
-	}
-	else
-	{
-		*length = 0;
-		return;
-	}
-}
-

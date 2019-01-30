@@ -10,10 +10,6 @@
 
 #pragma once
 
-#include <list>
-#include <string>
-#include <map>
-
  /// Function that handles steeringcard parameter
  /**
  *

@@ -10,75 +10,45 @@
 
 #pragma once
 
-#include <mutex>
-#include <thread>
+#include "zmq.hpp"
+
+#include <queue>
+
 #include <atomic>
+#include <thread>
+#include <mutex>
 #include <condition_variable>
 
-#include <chrono>
 
-#include "io/network/client.h"
 
-#include "remote_control/communication/message_queue.h"
-#include "remote_control/communication/packet.h"
-
-#include "remote_control/control/periodic_task.h"
-
-#include "user_code/remotecontrol_setup.h"
 
 namespace remote_control
 {
 
 	class MainControl
 	{
-	private:
+	private:		
+		/// Storage of messages send to the server
+		std::deque<zmq::message_t> m_msgBuffer;
+		std::deque<zmq::message_t> m_recvBuffer;
 
-		///
-		/** \defgroup Thread Access only in main (thread) loop thread or with stopped thread
-		 * @{
-		 *
-		 */
-		io::network::Client m_client;
-
-		decltype(register_periodic_callback()) m_periodic;
-		decltype(register_server_callback()) m_callback;
-
-		/// @}
+		std::mutex m_mutex;
+		std::condition_variable m_condition;
 
 
-		///
-		/** \defgroup Main Access only with from external sources
-		 * @{
-		 *
-		 */
-		std::thread m_thread;
+		std::atomic<bool> m_running;
 
+		std::thread m_loop;
 
-		/// @}
-
-
-		///
-		/** \defgroup Synchronisation Communication with the parallel running network thread
-		 *  @{
-		 *   Every variable which is thread save is marked with a ts **in this class**
-		 */
-		std::atomic<bool> m_tsRunning;
-		remote_control::communication::MessageQueue m_tsQueue;
-
-
-
-		//std::mutex m_periodicMutex;
-		//std::vector<>
-		/// @}
-
+		std::string m_address;
 
 
 		MainControl();
-
+	
 		void loop();
 
 	public:
-
+	
 		virtual ~MainControl();
 
 		inline static MainControl& getInstance()
@@ -87,10 +57,13 @@ namespace remote_control
 			return instance;
 		}
 
-		bool start(const std::string dns, const unsigned short port);
-		void stopp();
+		bool start(const std::string address);
+		void stop();
 
-		void send(remote_control::communication::Packet p);
+		int send(const void* p, unsigned int len);
+		int send(std::vector<char> p);
+		
+		std::vector<char> recv();
 	};
 
 	inline static MainControl& SMainControl()
