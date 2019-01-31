@@ -47,11 +47,11 @@ void remotecontrol_init_(const char* line, const int* size)
 		}
 	}
 
+
 	item = list.front();
 	list.pop_front();
-	
-	std::cout << item << " with " << list.size() << std::endl;
-	
+
+	remotecontrol_steering_card[item] = list;
 }
 
 /** \details
@@ -60,9 +60,8 @@ void remotecontrol_init_(const char* line, const int* size)
 void remotecontrol_start_()
 {
 	if( remotecontrol_steering_card.size() == 0)
-	{
-		std::cerr << "Error: No stack size set!" << std::endl;
-		std::cerr << "You need to set at least one size with \"DYNSTACK N\" in the steering card" << std::endl;
+	{		
+		std::cerr << "RC Steering card empty!" << std::endl;
 		exit(-1337);
 	}
 
@@ -72,8 +71,6 @@ void remotecontrol_start_()
 	}
 
 	remote_control::SMainControl().start( remotecontrol_steering_card["RC_IP"].front() );
-
-
 }
 
 /** \details

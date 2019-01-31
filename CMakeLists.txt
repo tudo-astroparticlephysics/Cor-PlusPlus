@@ -74,10 +74,10 @@ message("")
 
 
 # Add generic library
-if(BUILD_DYNSTACK OR BUILD_REMOTECONTROL OR BUILD_BASIC)
+if(BUILD_DYNSTACK OR BUILD_BASIC)
     include_directories("${PROJECT_DIR}/lib/DTL/include") ## target_include_directories is better, this one is global!
     add_subdirectory(lib/DTL)
-endif(BUILD_DYNSTACK OR BUILD_REMOTECONTROL OR BUILD_BASIC)
+endif(BUILD_DYNSTACK OR BUILD_BASIC)
 
 # Add each corsika module developed from this author
 if(BUILD_BASIC)

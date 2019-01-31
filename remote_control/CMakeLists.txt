@@ -36,7 +36,8 @@ add_library(${PROJECT_NAME} STATIC ${REMOTECONTROL_SRCS})
 # Check and build tests
 if(BUILD_TESTS)
     # Find gtest and add it to directory
-    enable_testing()
+    ENABLE_TESTING()
+
     find_package(GTest REQUIRED)
     include_directories(${GTEST_INCLUDE_DIRS})
 
@@ -44,8 +45,14 @@ if(BUILD_TESTS)
     set(REMOTECONTROL_TEST_SRCS
         ${PROJECT_DIR}/test/unit_test.cpp
     )
-    add_executable(rc_test ${REMOTECONTROL_TEST_SRCS})
+    ADD_EXECUTABLE(rc_test ${REMOTECONTROL_TEST_SRCS})
+    ADD_TEST( rc ${CMAKE_BINARY_DIR}/rc_test)
 
+    #ADD_TEST( rc_aa rc_test
+    #        COMMAND ${CMAKE_COMMAND} -DACTUAL_TEST=$<TARGET_FILE:rc_test> -P 
+    #        ${CMAKE_CURRENT_SOURCE_DIR}/unittest_wrapper.cmake )
+
+    
     target_link_libraries(rc_test REMOTE_CONTROL)
 
     target_link_libraries(rc_test ${GTEST_BOTH_LIBRARIES})

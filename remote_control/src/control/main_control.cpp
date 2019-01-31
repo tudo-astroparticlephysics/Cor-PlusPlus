@@ -34,6 +34,8 @@ namespace remote_control
 		
 		zmq::message_t message(20);
 		client.recv(&message, 20);
+
+		//std::cout << "|<|<|<||>|>|>|" << std::endl;
 				
 		while(m_running)
 		{
@@ -47,14 +49,14 @@ namespace remote_control
 				m_msgBuffer.pop_front();
 
 				
-				zmq::message_t data(64);
+				zmq::message_t data(2048);
 				client.recv(&data);  
 
 				m_recvBuffer.push_back( std::move(data) );              
-			}
+			}		
 		}
 
-		client.close();
+		client.close();		
 		ctx.close();
 	}
 
@@ -74,6 +76,7 @@ namespace remote_control
 
 	bool MainControl::start(const std::string address)
 	{		
+		//std::cout << ">>>>>>>>>><<<<<<<<<<" << std::endl;
 		m_address = address;
 
 		m_running = true;
@@ -87,7 +90,12 @@ namespace remote_control
 	void MainControl::stop()
 	{		
 		m_running = false;
+
+
+		std::cout << "..." << std::endl;
+
 		m_loop.join();				
+		std::cout << "..." << std::endl;
 
 		m_msgBuffer.clear();
 		m_recvBuffer.clear();
@@ -110,7 +118,7 @@ namespace remote_control
 
 	std::vector<char> MainControl::recv()
 	{
-		std::cout << "Length: " << m_recvBuffer.size();
+		//std::cout << "Length: " << m_recvBuffer.size();
 		if( m_recvBuffer.empty() )
 		{
 			return std::vector<char>();
@@ -123,7 +131,7 @@ namespace remote_control
 
 			m_recvBuffer.pop_front();
 
-			std::cout << "Length: " << m_recvBuffer.size();
+			//std::cout << "Length: " << m_recvBuffer.size();
 
 			return std::move(buf);
 		}

@@ -13,33 +13,21 @@
 #include "zmq.hpp"
 
 #include "remote_control/control/main_control.h"
+#include "helper.h"
+
 
 #include <tuple>
+#include <thread>
+#include <chrono>
+
+
 
 namespace test
 {
 	namespace remote_control
 	{
 
-        auto router_recv(zmq::socket_t& s)
-        {
-            zmq::message_t idty(8);
-            s.recv( &idty);
-
-            zmq::message_t message(128);
-            s.recv( &message);
-            s.recv( &message);
-
-            return std::make_tuple( std::move(idty), std::move(message));
-        }
-
-        template< class TAddress>
-	    void router_send(zmq::socket_t& s, TAddress addr, void* msg, unsigned int size)
-        {
-            s.send(addr, sizeof(*addr), ZMQ_SNDMORE);
-			s.send("", 0, ZMQ_SNDMORE);
-			s.send(msg, size);
-        }
+       
 
         TEST(MAINCONTROL, Init)
         {
@@ -123,8 +111,7 @@ namespace test
             ASSERT_TRUE(  ::remote_control::SMainControl().start("tcp://localhost:55554") );
             
             auto  data = router_recv(server);
-
-            
+                        
             int* addr = reinterpret_cast<int*>( std::get<0>(data).data() );
             ASSERT_STREQ( reinterpret_cast<char*>(std::get<1>(data).data()), "startup");
            
@@ -137,16 +124,26 @@ namespace test
                 ASSERT_LE( ::remote_control::SMainControl().send("Test", 5), 2) << "Message Queue should not fill up here";
 
                 auto data = router_recv(server);
-                ASSERT_STREQ( reinterpret_cast<char*>(std::get<1>(data).data()), "Test" );
                 
-
-                std::cout << "Status: " << 202 + i;
+                ASSERT_STREQ( reinterpret_cast<char*>(std::get<1>(data).data()), "Test" );
+                                
+                //std::cout << "Status: " << 202 + i << std::endl;
 
                 status = 202 + i;
                 router_send(server, addr, &status, 4);
-                
+
+                std::this_thread::sleep_for( std::chrono::milliseconds(200) );
+
                 auto ret = ::remote_control::SMainControl().recv();
-                ASSERT_EQ( 202 + i, *reinterpret_cast<int*>( ret.data() ) );
+                
+                if(ret.size() == 0)
+                {
+                    ADD_FAILURE();
+                }
+                else
+                {
+                    ASSERT_EQ( 202 + i, *reinterpret_cast<int*>( ret.data() ) );
+                }
 
             }
             
