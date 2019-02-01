@@ -130,6 +130,7 @@ install:
   - sudo cp -a ./googlemock/include/gmock /usr/include
   - sudo cp -a ./googlemock/gtest/libgtest_main.so ./googlemock/gtest/libgtest.so /usr/lib/
   - sudo cp -a ./googlemock/libgmock_main.so ./googlemock/libgmock.so /usr/lib/
+  - cd ..
 #ZMQ
   - sudo curl -L -o ./zeromq.tar.gz https://github.com/zeromq/libzmq/releases/download/v4.3.1/zeromq-4.3.1.tar.gz
   - sudo tar -C . -zxvf ./zeromq.tar.gz
@@ -140,6 +141,8 @@ install:
   - make
   - sudo make install
   - sudo ldconfig
+  - sudo cp -a ./include/* /usr/include
+  - sudo cp -a ./src/.libs/libzmq.so /usr/lib/
   - cd ..
 
 # CPPCHECK
