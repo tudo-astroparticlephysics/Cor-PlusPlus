@@ -59,7 +59,7 @@ namespace dynstack
 			{
 				auto tmp = TStack::back();
 				
-				TFunc(*tmp);
+				TFunc(tmp);
 
 				return tmp;
 			}
@@ -68,7 +68,7 @@ namespace dynstack
 			{
 				auto tmp = TStack::pop_back();
 
-				TFunc(*tmp);
+				TFunc(tmp);
 
 				return tmp;
 			}
